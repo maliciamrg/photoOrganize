@@ -13,7 +13,7 @@ public class workWithFiles {
         //TODO
     }
 
-    public static String changeExtansionTo(String fichierName, String newExt) {
+    public static String changeExtensionTo(String fichierName, String newExt) {
         //TODO
         return null;
     }

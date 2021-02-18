@@ -1,43 +1,42 @@
 package com.malicia.mrg;
 
-import com.malicia.mrg.param.nomageRepertoire;
-import com.malicia.mrg.param.repertoirePhoto;
+import com.malicia.mrg.param.NommageRepertoire;
+import com.malicia.mrg.param.RepertoirePhoto;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
 
 public class Context {
-    private nomageRepertoire paramNomageRepertoire;
-    private List<repertoirePhoto> arrayrepertoirePhoto;
+    private NommageRepertoire paramNommageRepertoire;
+    private List<RepertoirePhoto> arrayRepertoirePhoto;
     private String repertoireRoamingAdobeLightroom;
     private String repertoireDestZip;
-    private List<String> arraynomsubdirectoryrejet;
+    private List<String> arrayNomSubdirectoryRejet;
     private String repertoire50Phototheque;
     private String repertoire00NEW;
 
     public Context() {
-        ChargeArraynomsubdirectoryrejet();
-        ChargeRepertoireFonctionnel();
-        ChargeNomageRepertoire();
+        chargeArrayNomSubdirectoryRejet();
+        chargeRepertoireFonctionnel();
+        chargeNommageRepertoire();
     }
 
-    private void ChargeNomageRepertoire() {
+    private void chargeNommageRepertoire() {
         //todo
-        paramNomageRepertoire= null;
+        paramNommageRepertoire = null;
     }
 
     public static Context chargeParam() {
-        Context ctx = new Context();
-        return ctx;
+        return new Context();
     }
 
-    public nomageRepertoire getParamNomageRepertoire() {
-        return paramNomageRepertoire;
+    public NommageRepertoire getParamNommageRepertoire() {
+        return paramNommageRepertoire;
     }
 
-    public List<repertoirePhoto> getArrayrepertoirePhoto() {
-        return arrayrepertoirePhoto;
+    public List<RepertoirePhoto> getArrayRepertoirePhoto() {
+        return arrayRepertoirePhoto;
     }
 
     public String getRepertoireDestZip() {
@@ -52,29 +51,29 @@ public class Context {
     }
 
 
-    private void ChargeRepertoireFonctionnel() {
+    private void chargeRepertoireFonctionnel() {
         //TODO
-        this.arrayrepertoirePhoto = null;
-        this.repertoireDestZip = null; //"D:\95_Boite_a_outils\LigthroomConfigSauve\ligthroomSauve-00%num%.zip"
+        this.arrayRepertoirePhoto = null;
+        this.repertoireDestZip = null; //"D:\95_Boite_a_outils\LightroomConfigSauve\LightroomSauve-00%num%.zip"
         this.repertoireRoamingAdobeLightroom = null; //"C:\Users\professorX\AppData\Roaming\Adobe\Lightroom"
         this.repertoire50Phototheque = null; //"D:\50_Phototheque\"
         this.repertoire00NEW = null; //"P:\00_NEW" "P:\50_Phototheque" "P:\20_Portfolio"
     }
 
-    public List<String> getArraynomsubdirectoryrejet() {
-        return arraynomsubdirectoryrejet;
+    public List<String> getArrayNomSubdirectoryRejet() {
+        return arrayNomSubdirectoryRejet;
     }
 
-    private void ChargeArraynomsubdirectoryrejet() {
+    private void chargeArrayNomSubdirectoryRejet() {
         //TODO
-        this.arraynomsubdirectoryrejet = null;
+        this.arrayNomSubdirectoryRejet = null;
     }
 
-    public String getrepertoire50Phototheque() {
+    public String getRepertoire50Phototheque() {
         return repertoire50Phototheque;
     }
 
-    public String getrepertoire00NEW() {
+    public String getRepertoire00NEW() {
         return repertoire00NEW;
     }
 

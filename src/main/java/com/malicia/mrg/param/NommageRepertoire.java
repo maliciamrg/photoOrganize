@@ -1,5 +1,5 @@
 package com.malicia.mrg.param;
 
-public class nomageRepertoire {
+public class NommageRepertoire {
     //todo
 }

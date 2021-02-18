@@ -6,19 +6,19 @@ import javafx.collections.FXCollections;
 
 import java.util.List;
 
-public class repertoirePhoto extends Serialize {
+public class RepertoirePhoto extends Serialize {
 
     private String repertoire;
     private int uniteDeJour;
     private int nbMaxParUniteDeJour;
     private List<Integer> maxStar;
-    private List<paramZone> pZone;
+    private List<ParamZone> pZone;
 
-    public repertoirePhoto() {
+    public RepertoirePhoto() {
         super();
     }
 
-    public repertoirePhoto(String repertoireIn, int uniteDeJourIn, int nbMaxParUniteDeJourIn) {
+    public RepertoirePhoto(String repertoireIn, int uniteDeJourIn, int nbMaxParUniteDeJourIn) {
         repertoire = repertoireIn;
         uniteDeJour = uniteDeJourIn;
         nbMaxParUniteDeJour = nbMaxParUniteDeJourIn;
@@ -50,11 +50,11 @@ public class repertoirePhoto extends Serialize {
         this.maxStar = maxStar;
     }
 
-    public List<paramZone> getpZone() {
+    public List<ParamZone> getpZone() {
         return pZone;
     }
 
-    public void setpZone(List<paramZone> pZone) {
+    public void setpZone(List<ParamZone> pZone) {
         this.pZone = pZone;
     }
 
@@ -78,7 +78,7 @@ public class repertoirePhoto extends Serialize {
     }
 
     public void addParamZone(Boolean isEditable, String valeurParDefaut, Boolean isValditationFacultative) {
-        pZone.add(new paramZone(isEditable, valeurParDefaut, isValditationFacultative));
+        pZone.add(new ParamZone(isEditable, valeurParDefaut, isValditationFacultative));
     }
 
     public void addParamZone(String isEditableVirgule, String valeurParDefautVirgule, String isValditationFacultativeVirgule) {
@@ -86,7 +86,7 @@ public class repertoirePhoto extends Serialize {
         String[] arrvaleurParDefautVirgule = valeurParDefautVirgule.split(",");
         String[] arrisValditationFacultativeVirgule = isValditationFacultativeVirgule.split(",");
         for (int i = 0; i < arrEditableVirgule.length; i++) {
-            pZone.add(new paramZone(
+            pZone.add(new ParamZone(
                     arrEditableVirgule[i].compareTo("Close") == 0 ? false : true,
                     arrvaleurParDefautVirgule[i],
                     arrisValditationFacultativeVirgule[i].compareTo("Facul") == 0 ? false : true));
@@ -94,19 +94,19 @@ public class repertoirePhoto extends Serialize {
 
     }
 
-    public static class paramZone {
+    public static class ParamZone {
 
-        public String valeurDefaut;
+        public String valeurDefault;
         public Boolean validationFacultative;
         public Boolean editable;
 
-        public paramZone() {
+        public ParamZone() {
             super();
         }
 
-        public paramZone(Boolean isEditable, String valeurParDefaut, Boolean isValidatationFacultative) {
+        public ParamZone(Boolean isEditable, String valeurParDefaut, Boolean isValidatationFacultative) {
             editable = isEditable;
-            valeurDefaut = valeurParDefaut;
+            valeurDefault = valeurParDefaut;
             validationFacultative = isValidatationFacultative;
         }
     }
