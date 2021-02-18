@@ -1,0 +1,24 @@
+{
+  "fileName" : "D:\\JavaProjet\\photoOrganize\\target\\classes\\objJson\\repertoirePhoto-Sauvegarde.json",
+  "repertoire" : "!!Collections\\##Sauvegarde 999 j",
+  "uniteDeJour" : 1,
+  "nbMaxParUniteDeJour" : 999,
+  "maxStar" : [ 0, 0, 0, 0, 0 ],
+  "pZone" : [ {
+    "valeurDefaut" : "*",
+    "validationFacultative" : false,
+    "editable" : true
+  }, {
+    "valeurDefaut" : "*",
+    "validationFacultative" : false,
+    "editable" : true
+  }, {
+    "valeurDefaut" : "*",
+    "validationFacultative" : false,
+    "editable" : true
+  }, {
+    "valeurDefaut" : "*",
+    "validationFacultative" : false,
+    "editable" : true
+  } ]
+}

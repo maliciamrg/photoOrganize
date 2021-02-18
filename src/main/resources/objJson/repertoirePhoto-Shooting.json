@@ -1,0 +1,24 @@
+{
+  "fileName" : "D:\\JavaProjet\\photoOrganize\\target\\classes\\objJson\\repertoirePhoto-Shooting.json",
+  "repertoire" : "01-Cataloque_Photo\\##Shooting 03-05 j",
+  "uniteDeJour" : 1,
+  "nbMaxParUniteDeJour" : 6,
+  "maxStar" : [ 25, 12, 5, 2, 1 ],
+  "pZone" : [ {
+    "valeurDefaut" : "*",
+    "validationFacultative" : true,
+    "editable" : false
+  }, {
+    "valeurDefaut" : "*",
+    "validationFacultative" : true,
+    "editable" : true
+  }, {
+    "valeurDefaut" : "*",
+    "validationFacultative" : true,
+    "editable" : true
+  }, {
+    "valeurDefaut" : "*",
+    "validationFacultative" : true,
+    "editable" : true
+  } ]
+}

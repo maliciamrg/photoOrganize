@@ -1,0 +1,24 @@
+{
+  "fileName" : "D:\\JavaProjet\\photoOrganize\\target\\classes\\objJson\\repertoirePhoto-Rejet.json",
+  "repertoire" : "99-Rejet",
+  "uniteDeJour" : 1,
+  "nbMaxParUniteDeJour" : 999,
+  "maxStar" : [ 0, 0, 0, 0, 0 ],
+  "pZone" : [ {
+    "valeurDefaut" : "*",
+    "validationFacultative" : true,
+    "editable" : false
+  }, {
+    "valeurDefaut" : "@rejet@",
+    "validationFacultative" : false,
+    "editable" : true
+  }, {
+    "valeurDefaut" : "Space",
+    "validationFacultative" : false,
+    "editable" : false
+  }, {
+    "valeurDefaut" : "Space",
+    "validationFacultative" : false,
+    "editable" : false
+  } ]
+}
