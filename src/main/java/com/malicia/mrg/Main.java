@@ -2,11 +2,13 @@ package com.malicia.mrg;
 
 import com.malicia.mrg.app.workWithFiles;
 import com.malicia.mrg.app.workWithRepertory;
+import com.malicia.mrg.data.Database;
+import com.malicia.mrg.param.repertoirePhoto;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import net.lingala.zip4j.ZipFile
+import net.lingala.zip4j.ZipFile;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -18,13 +20,14 @@ public class Main {
 
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
     private static Context ctx;
+    private static Database dbLr;
 
     public static void main(String[] args) {
         try {
 
             /// chargement aplication
             ctx = Context.chargeParam();
-            chargeDatabaseLR();
+            dbLr = Database.chargeDatabaseLR();
             //*
 
             //En Fonction De La Strategie De Rangement
@@ -48,9 +51,40 @@ public class Main {
 
         } catch (ZipException e) {
             e.printStackTrace();
-            excptlog(e,LOGGER);
+            excptlog(e, LOGGER);
         }
 
+    }
+
+    private static void SauvegardeStudioPhoto2Reseau() {
+        //todo
+    }
+
+    private static void regrouperLesNouvellesPhoto() {
+        //todo
+    }
+
+    private static void renommerLesRepertoires() {
+        List<repertoirePhoto> arrayrepertoirePhoto = ctx.getArrayrepertoirePhoto();
+
+        ListIterator<repertoirePhoto> repertoirePhotoIterator = arrayrepertoirePhoto.listIterator();
+        while (repertoirePhotoIterator.hasNext()) {
+            repertoirePhoto repPhoto = repertoirePhotoIterator.next();
+            List<String> listRep = workWithRepertory.listRepertoireEligible(repPhoto);
+
+            ListIterator<String> repertoireIterator = listRep.listIterator();
+            while (repertoireIterator.hasNext()) {
+                String repertoire = repertoireIterator.next();
+                String newRepertoire = workWithRepertory.newNameRepertoire(repertoire, repPhoto, ctx.getParamNomageRepertoire());
+                renommerRepertoire(repertoire, newRepertoire);
+            }
+        }
+    }
+
+    private static void renommerRepertoire(String repertoire, String newRepertoire) {
+        if (repertoire.compareTo(newRepertoire) != 0) {
+            //Todo
+        }
     }
 
     private static void SauvegardeLigthroomConfigSauve() throws ZipException {

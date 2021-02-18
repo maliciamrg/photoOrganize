@@ -1,10 +1,13 @@
 package com.malicia.mrg.app;
 
 import com.malicia.mrg.Main;
+import com.malicia.mrg.param.nomageRepertoire;
+import com.malicia.mrg.param.repertoirePhoto;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.util.List;
 
 public class workWithRepertory {
 
@@ -27,5 +30,15 @@ public class workWithRepertory {
             }
         }
         return isFinished;
+    }
+
+    public static List<String> listRepertoireEligible(repertoirePhoto repPhoto) {
+        //TODO
+        return null;
+    }
+
+    public static String newNameRepertoire(String repertoire, repertoirePhoto repPhoto, nomageRepertoire paramNomageRepertoire) {
+        //TODO
+        return null;
     }
 }
