@@ -2,11 +2,15 @@ package com.malicia.mrg;
 
 import com.malicia.mrg.app.workWithFiles;
 import com.malicia.mrg.app.workWithRepertory;
+import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import net.lingala.zip4j.ZipFile
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -16,30 +20,42 @@ public class Main {
     private static Context ctx;
 
     public static void main(String[] args) {
-        /// chargement aplication
-        ctx = Context.chargeParam();
-        chargeDatabaseLR();
-        //*
+        try {
 
-        //En Fonction De La Strategie De Rangement
-        rangerLesRejets();
-        renommerLesRepertoires();
-        regrouperLesNouvellesPhoto();
-        //*
+            /// chargement aplication
+            ctx = Context.chargeParam();
+            chargeDatabaseLR();
+            //*
 
-        //Nettoyage repertoires Local
-        //depreciated nettoyagedesrejetsde50Phototheque();
-        Purgedesrepertoirevide50Phototheque();
+            //En Fonction De La Strategie De Rangement
+            rangerLesRejets();
+            renommerLesRepertoires();
+            regrouperLesNouvellesPhoto();
+            //*
 
-        //Nettoyage repertoires reseau
-        purgedesrepertoirevide00NEW();
+            //Nettoyage repertoires Local
+            //depreciated nettoyagedesrejetsde50Phototheque();
+            Purgedesrepertoirevide50Phototheque();
 
-        //Sauvegarde Ligthroom sur Local
-        SauvegardeLigthroomConfigSauve();
+            //Nettoyage repertoires reseau
+            purgedesrepertoirevide00NEW();
 
-        //sauvgardeVers Reseau Pour Cloud
-        SauvegardeStudioPhoto2Reseau();
+            //Sauvegarde Ligthroom sur Local
+            SauvegardeLigthroomConfigSauve();
 
+            //sauvgardeVers Reseau Pour Cloud
+            SauvegardeStudioPhoto2Reseau();
+
+        } catch (ZipException e) {
+            e.printStackTrace();
+            excptlog(e,LOGGER);
+        }
+
+    }
+
+    private static void SauvegardeLigthroomConfigSauve() throws ZipException {
+        // zip file with a folder
+        new ZipFile(ctx.getRepertoireDestZip()).addFolder(new File(ctx.getRepertoireRoamingAdobeLightroom()));
     }
 
     private static void Purgedesrepertoirevide50Phototheque() {
@@ -77,4 +93,12 @@ public class Main {
         }
     }
 
+    public static void excptlog(Exception theException, Logger loggerori) {
+        StringWriter stringWritter = new StringWriter();
+        PrintWriter printWritter = new PrintWriter(stringWritter, true);
+        theException.printStackTrace(printWritter);
+        printWritter.flush();
+        stringWritter.flush();
+        loggerori.fatal("theException = " + "\n" + stringWritter.toString());
+    }
 }
