@@ -10,25 +10,31 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import net.lingala.zip4j.ZipFile;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.List;
 import java.util.ListIterator;
 
 public class Main {
 
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
+    //Work In Progress ??????
+    private static final Boolean isInWork = Boolean.TRUE;
+
     private static Context ctx;
     private static Database dbLr;
 
     public static void main(String[] args) {
         try {
+            chargeLog4j();
 
             /// chargement application
             ctx = Context.chargeParam();
             dbLr = Database.chargeDatabaseLR();
             //*
+
+            if (isInWork) {
+                throw new IllegalStateException("Under Construct");
+            }
 
             //En Fonction De La Strategies De Rangement
             rangerLesRejets();
@@ -48,11 +54,38 @@ public class Main {
             //sauvegarde Vers Réseaux Pour Cloud
             sauvegardeStudioPhoto2Réseaux();
 
-        } catch (ZipException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             exceptionLog(e, LOGGER);
         }
 
+    }
+
+    private static void chargeLog4j() {
+        InputStream stream = Context.class.getClassLoader().getResourceAsStream("log4j2.properties");
+//        LogManager.getLogManager().readConfiguration(stream);
+        LOGGER.fatal("                                                                                    ");
+        LOGGER.fatal("          <==============================================================>          ");
+        LOGGER.fatal("    <===                                                                    ===>    ");
+        LOGGER.fatal(" <=====        S T A R T   A P P L I C A T I O N   P H O T O T R I 2         =====> ");
+        LOGGER.fatal("    <===                                                                    ===>    ");
+        LOGGER.fatal("          <==============================================================>          ");
+        LOGGER.fatal("                                                                                    ");
+//        OFF	0
+//        FATAL	100
+//        ERROR	200
+//        WARN	300
+//        INFO	400
+//        DEBUG	500
+//        TRACE	600
+//        ALL	Integer.MAX_VALUE
+        LOGGER.trace("---==[ trace  ]==---");
+        LOGGER.debug("---==[ debug ]==---");
+        LOGGER.info("---==[  info   ]==---");
+        LOGGER.warn("---==[  warn   ]==---");
+        LOGGER.error("---==[ error  ]==---");
+        LOGGER.fatal("---==[  fatal  ]==---");
+        LOGGER.info("Start");
     }
 
     private static void sauvegardeStudioPhoto2Réseaux() {

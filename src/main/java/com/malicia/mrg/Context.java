@@ -1,25 +1,47 @@
 package com.malicia.mrg;
 
 import com.malicia.mrg.param.NommageRepertoire;
+import com.malicia.mrg.param.RepertoireFonctionnel;
 import com.malicia.mrg.param.RepertoirePhoto;
+import javafx.collections.FXCollections;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
 
 public class Context {
     private NommageRepertoire paramNommageRepertoire;
-    private List<RepertoirePhoto> arrayRepertoirePhoto;
+    private List<RepertoirePhoto> arrayRepertoirePhoto = FXCollections.observableArrayList();
     private String repertoireRoamingAdobeLightroom;
     private String repertoireDestZip;
-    private List<String> arrayNomSubdirectoryRejet;
+    private List<String> arrayNomSubdirectoryRejet = FXCollections.observableArrayList();
     private String repertoire50Phototheque;
     private String repertoire00NEW;
+    private RepertoireFonctionnel RepFonctionnel;
 
-    public Context() {
+    public Context() throws IOException {
         chargeArrayNomSubdirectoryRejet();
+        chargeRepertoirePhoto();
         chargeRepertoireFonctionnel();
         chargeNommageRepertoire();
+    }
+
+    private void chargeRepertoirePhoto() throws IOException {
+        String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+        File f = new File(rootPath + "objJson\\");
+        FilenameFilter filter = new FilenameFilter() {
+            @Override
+            public boolean accept(File f, String name) {
+                return (name.startsWith("repertoirePhoto") && name.endsWith(".json"));
+            }
+        };
+        File[] files = f.listFiles(filter);
+        for (int i = 0; i < files.length; i++) {
+            arrayRepertoirePhoto.add((RepertoirePhoto)  RepertoirePhoto.readJSON(RepertoirePhoto.class ,files[i].toString()));
+        }
     }
 
     private void chargeNommageRepertoire() {
@@ -27,7 +49,7 @@ public class Context {
         paramNommageRepertoire = null;
     }
 
-    public static Context chargeParam() {
+    public static Context chargeParam() throws IOException {
         return new Context();
     }
 
@@ -51,13 +73,25 @@ public class Context {
     }
 
 
-    private void chargeRepertoireFonctionnel() {
-        //TODO
-        this.arrayRepertoirePhoto = null;
-        this.repertoireDestZip = null; //"D:\95_Boite_a_outils\LightroomConfigSauve\LightroomSauve-00%num%.zip"
-        this.repertoireRoamingAdobeLightroom = null; //"C:\Users\professorX\AppData\Roaming\Adobe\Lightroom"
-        this.repertoire50Phototheque = null; //"D:\50_Phototheque\"
-        this.repertoire00NEW = null; //"P:\00_NEW" "P:\50_Phototheque" "P:\20_Portfolio"
+    private void chargeRepertoireFonctionnel() throws IOException {
+        String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+        File f = new File(rootPath + "objJson\\");
+        FilenameFilter filter = new FilenameFilter() {
+            @Override
+            public boolean accept(File f, String name) {
+                return (name.startsWith("RepertoireFonctionnel") && name.endsWith(".json"));
+            }
+        };
+        File[] files = f.listFiles(filter);
+        for (int i = 0; i < files.length; i++) {
+            RepFonctionnel = (RepertoireFonctionnel)  RepertoireFonctionnel.readJSON(RepertoireFonctionnel.class ,files[i].toString());
+        }
+        if (RepFonctionnel ==null){
+            RepFonctionnel = new RepertoireFonctionnel();
+            RepertoireFonctionnel.writeJSON(RepFonctionnel,"RepertoireFonctionnel.json");
+        } else {
+            RepertoireFonctionnel.reWriteJSON(RepFonctionnel);
+        }
     }
 
     public List<String> getArrayNomSubdirectoryRejet() {

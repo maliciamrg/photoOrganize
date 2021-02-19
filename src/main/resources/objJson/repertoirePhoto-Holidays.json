@@ -5,19 +5,19 @@
   "nbMaxParUniteDeJour" : 21,
   "maxStar" : [ 25, 12, 5, 2, 1 ],
   "pZone" : [ {
-    "valeurDefaut" : "*",
+    "valeurDefault" : "*",
     "validationFacultative" : true,
     "editable" : false
   }, {
-    "valeurDefaut" : "*",
+    "valeurDefault" : "*",
     "validationFacultative" : true,
     "editable" : true
   }, {
-    "valeurDefaut" : "*",
+    "valeurDefault" : "*",
     "validationFacultative" : true,
     "editable" : true
   }, {
-    "valeurDefaut" : "*",
+    "valeurDefault" : "*",
     "validationFacultative" : true,
     "editable" : true
   } ]
