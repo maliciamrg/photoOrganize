@@ -32,12 +32,9 @@ public class Main {
             dbLr = Database.chargeDatabaseLR();
             //*
 
-            if (isInWork) {
-                throw new IllegalStateException("Under Construct");
-            }
-
             //En Fonction De La Strategies De Rangement
             rangerLesRejets();
+            _____________is___________In_______________Work____________();
             renommerLesRepertoires();
             regrouperLesNouvellesPhoto();
             //*
@@ -59,6 +56,12 @@ public class Main {
             exceptionLog(e, LOGGER);
         }
 
+    }
+
+    private static void _____________is___________In_______________Work____________() {
+        if (isInWork) {
+            throw new IllegalStateException("Under Construct");
+        }
     }
 
     private static void chargeLog4j() {
@@ -142,19 +145,19 @@ public class Main {
 
 
     private static void rangerLesRejets() {
-        List<File> arrayFichierRejet = workWithFiles.getFilesFromRepertory(ctx.getArrayNomSubdirectoryRejet());
+        List<File> arrayFichierRejet = workWithFiles.getFilesFromRepertoryWithFilter(ctx.getRepertoire50Phototheque(), ctx.getArrayNomSubdirectoryRejet(), ctx.getParamElementsRejet().getExtFileRejet());
 
         ListIterator<File> arrayFichierRejetIterator = arrayFichierRejet.listIterator();
         while (arrayFichierRejetIterator.hasNext()) {
             File fichier = arrayFichierRejetIterator.next();
-            switch (FilenameUtils.getExtension(fichier.getName()).toLowerCase()) {
-                case "zip":
-                    workWithFiles.extractZipFile(fichier);
-                    break;
-                case "rejet":
-                    break;
-                default:
-                    workWithFiles.renameFile(fichier.getName(), workWithFiles.changeExtensionTo(fichier.getName(), "rejet"));
+            String fileExt = FilenameUtils.getExtension(fichier.getName()).toLowerCase();
+
+            if (fileExt.toLowerCase().compareTo("zip") == 0) {
+                workWithFiles.extractZipFile(fichier);
+            }
+
+            if (ctx.getParamElementsRejet().getArrayNomFileRejet().contains(fileExt.toLowerCase())) {
+                workWithFiles.renameFile(fichier.toString(), fichier.toString() + "." + ctx.getParamElementsRejet().getExtFileRejet());
             }
         }
     }

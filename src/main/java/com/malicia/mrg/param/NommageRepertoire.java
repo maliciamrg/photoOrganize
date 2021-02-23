@@ -1,5 +1,9 @@
 package com.malicia.mrg.param;
 
-public class NommageRepertoire {
-    //todo
+import com.malicia.mrg.util.Serialize;
+
+public class NommageRepertoire extends Serialize {
+
+    public NommageRepertoire() {
+    }
 }

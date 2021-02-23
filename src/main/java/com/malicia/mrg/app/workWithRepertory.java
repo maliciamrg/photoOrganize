@@ -1,5 +1,6 @@
 package com.malicia.mrg.app;
 
+import com.malicia.mrg.param.ElementsRejet;
 import com.malicia.mrg.param.NommageRepertoire;
 import com.malicia.mrg.param.RepertoirePhoto;
 import org.apache.logging.log4j.LogManager;
