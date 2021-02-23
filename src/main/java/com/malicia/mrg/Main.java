@@ -92,14 +92,14 @@ public class Main {
     }
 
     private static void sauvegardeStudioPhoto2Réseaux() {
-        //todo
+        //TODO
     }
 
     private static void regrouperLesNouvellesPhoto() {
-        //todo
+        //TODO
     }
 
-    private static void renommerLesRepertoires() {
+    private static void renommerLesRepertoires() throws IOException {
         List<RepertoirePhoto> arrayRepertoirePhoto = ctx.getArrayRepertoirePhoto();
 
         ListIterator<RepertoirePhoto> repertoirePhotoIterator = arrayRepertoirePhoto.listIterator();
@@ -111,14 +111,8 @@ public class Main {
             while (repertoireIterator.hasNext()) {
                 String repertoire = repertoireIterator.next();
                 String newRepertoire = workWithRepertory.newNameRepertoire(repertoire, repPhoto, ctx.getParamNommageRepertoire());
-                renommerRepertoire(repertoire, newRepertoire);
+                workWithRepertory.renommerRepertoire(repertoire, newRepertoire);
             }
-        }
-    }
-
-    private static void renommerRepertoire(String repertoire, String newRepertoire) {
-        if (repertoire.compareTo(newRepertoire) != 0) {
-            //Todo
         }
     }
 
@@ -144,7 +138,7 @@ public class Main {
     }
 
 
-    private static void rangerLesRejets() {
+    private static void rangerLesRejets() throws IOException {
         List<File> arrayFichierRejet = workWithFiles.getFilesFromRepertoryWithFilter(ctx.getRepertoire50Phototheque(), ctx.getArrayNomSubdirectoryRejet(), ctx.getParamElementsRejet().getExtFileRejet());
 
         ListIterator<File> arrayFichierRejetIterator = arrayFichierRejet.listIterator();

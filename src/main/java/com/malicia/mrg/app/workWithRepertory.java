@@ -1,12 +1,13 @@
 package com.malicia.mrg.app;
 
-import com.malicia.mrg.param.ElementsRejet;
+import com.malicia.mrg.data.Database;
 import com.malicia.mrg.param.NommageRepertoire;
 import com.malicia.mrg.param.RepertoirePhoto;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class workWithRepertory {
@@ -41,4 +42,27 @@ public class workWithRepertory {
         //TODO
         return null;
     }
+
+    public static void renommerRepertoire(String repertoire, String newRepertoire) throws IOException {
+        if (repertoire.compareTo(newRepertoire) != 0) {
+            Database.renommerRepertoireLogique(repertoire, newRepertoire);
+
+            // File (or directory) with old name
+            File dir = new File("repertoire");
+            // File (or directory) with new name
+            File dir2 = new File("newRepertoire");
+
+            if (dir2.exists()) {
+                throw new java.io.IOException("dir exists");
+            }
+
+            // Rename file (or directory)
+            boolean success = dir.renameTo(dir2);
+            if (!success) {
+                // File was not successfully renamed
+                throw new java.io.IOException("dir was not successfully renamed");
+            }
+        }
+    }
+
 }

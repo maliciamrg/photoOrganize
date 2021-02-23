@@ -1,10 +1,12 @@
 package com.malicia.mrg.app;
 
+import com.malicia.mrg.data.Database;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,10 +41,28 @@ public class workWithFiles {
         return Arrays.stream(items).anyMatch(inputStr::contains);
     }
 
-    public static void renameFile(String oldName, String newName) {
-        System.out.println("oldName:" + oldName);
-        System.out.println("newName:" + newName);
-        //TODO
+    public static void renameFile(String oldName, String newName) throws IOException {
+        if (oldName.compareTo(newName) != 0) {
+            System.out.println("oldName:" + oldName);
+            System.out.println("newName:" + newName);
+            Database.renameFileLogique(oldName, newName);
+
+            // File (or directory) with old name
+            File file = new File("oldName");
+            // File (or directory) with new name
+            File file2 = new File("newName");
+
+            if (file2.exists()) {
+                throw new java.io.IOException("file exists");
+            }
+
+            // Rename file (or directory)
+            boolean success = file.renameTo(file2);
+            if (!success) {
+                // File was not successfully renamed
+                throw new java.io.IOException("file was not successfully renamed");
+            }
+        }
     }
 
     public static String changeExtensionTo(String filename, String extension) {

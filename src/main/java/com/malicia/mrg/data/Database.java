@@ -3,10 +3,19 @@ package com.malicia.mrg.data;
 public class Database {
 
     private Database() {
+        //TODO
     }
 
     public static Database chargeDatabaseLR() {
+        //TODO
         return null;
     }
-    //todo
+
+    public static void renameFileLogique(String oldName, String newName) {
+        //TODO
+    }
+
+    public static void renommerRepertoireLogique(String repertoire, String newRepertoire) {
+        //TODO
+    }
 }
