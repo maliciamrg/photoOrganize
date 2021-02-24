@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import net.lingala.zip4j.ZipFile;
 
 import java.io.*;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -29,7 +30,7 @@ public class Main {
 
             /// chargement application
             ctx = Context.chargeParam();
-            dbLr = Database.chargeDatabaseLR();
+            dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat());
             //*
 
             //En Fonction De La Strategies De Rangement
@@ -51,7 +52,7 @@ public class Main {
             //sauvegarde Vers Réseaux Pour Cloud
             sauvegardeStudioPhoto2Réseaux();
 
-        } catch (IOException e) {
+        } catch (IOException | SQLException e) {
             e.printStackTrace();
             exceptionLog(e, LOGGER);
         }
@@ -99,7 +100,7 @@ public class Main {
         //TODO
     }
 
-    private static void renommerLesRepertoires() throws IOException {
+    private static void renommerLesRepertoires() throws IOException, SQLException {
         List<RepertoirePhoto> arrayRepertoirePhoto = ctx.getArrayRepertoirePhoto();
 
         ListIterator<RepertoirePhoto> repertoirePhotoIterator = arrayRepertoirePhoto.listIterator();
@@ -111,7 +112,10 @@ public class Main {
             while (repertoireIterator.hasNext()) {
                 String repertoire = repertoireIterator.next();
                 String newRepertoire = workWithRepertory.newNameRepertoire(repertoire, repPhoto, ctx.getParamNommageRepertoire());
+
                 workWithRepertory.renommerRepertoire(repertoire, newRepertoire);
+                dbLr.renommerRepertoireLogique(repertoire, newRepertoire);
+
             }
         }
     }
@@ -138,7 +142,7 @@ public class Main {
     }
 
 
-    private static void rangerLesRejets() throws IOException {
+    private static void rangerLesRejets() throws IOException, SQLException {
         List<File> arrayFichierRejet = workWithFiles.getFilesFromRepertoryWithFilter(ctx.getRepertoire50Phototheque(), ctx.getArrayNomSubdirectoryRejet(), ctx.getParamElementsRejet().getExtFileRejet());
 
         ListIterator<File> arrayFichierRejetIterator = arrayFichierRejet.listIterator();
@@ -151,7 +155,12 @@ public class Main {
             }
 
             if (ctx.getParamElementsRejet().getArrayNomFileRejet().contains(fileExt.toLowerCase())) {
-                workWithFiles.renameFile(fichier.toString(), fichier.toString() + "." + ctx.getParamElementsRejet().getExtFileRejet());
+                String oldName = fichier.toString();
+                String newName = oldName + "." + ctx.getParamElementsRejet().getExtFileRejet();
+
+                workWithFiles.renameFile(oldName, newName);
+                dbLr.renameFileLogique(oldName,newName);
+
             }
         }
     }
@@ -164,4 +173,6 @@ public class Main {
         stringWriter.flush();
         loggerOrigine.fatal("theException = " + "\n" + stringWriter.toString());
     }
+
+
 }

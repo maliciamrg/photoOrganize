@@ -9,12 +9,21 @@ public class RepertoireFonctionnel extends Serialize {
     private String repertoire50Phototheque;
     private String repertoire00NEW;
     private String repertoireCatalog;
+    private String catalogLrcat;
 
     public RepertoireFonctionnel() {
 //        this.repertoireDestZip = null; //"D:\95_Boite_a_outils\LightroomConfigSauve\LightroomSauve-00%num%.zip"
 //        this.repertoireRoamingAdobeLightroom = null; //"C:\Users\professorX\AppData\Roaming\Adobe\Lightroom"
 //        this.repertoire50Phototheque = null; //"D:\50_Phototheque\"
 //        this.repertoire00NEW = null; //"P:\00_NEW" "P:\50_Phototheque" "P:\20_Portfolio"
+    }
+
+    public String getCatalogLrcat() {
+        return catalogLrcat;
+    }
+
+    public void setCatalogLrcat(String catalogLrcat) {
+        this.catalogLrcat = catalogLrcat;
     }
 
     public String getRepertoireDestZip() {

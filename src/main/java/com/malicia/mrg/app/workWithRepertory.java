@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 
 public class workWithRepertory {
@@ -43,26 +44,19 @@ public class workWithRepertory {
         return null;
     }
 
-    public static void renommerRepertoire(String repertoire, String newRepertoire) throws IOException {
-        if (repertoire.compareTo(newRepertoire) != 0) {
-            Database.renommerRepertoireLogique(repertoire, newRepertoire);
-
-            // File (or directory) with old name
-            File dir = new File("repertoire");
-            // File (or directory) with new name
-            File dir2 = new File("newRepertoire");
-
-            if (dir2.exists()) {
-                throw new java.io.IOException("dir exists");
+    public static void renommerRepertoire(String source, String destination) throws IOException {
+        File fsource = new File(source);
+        File fdest = new File(destination);
+        if (fsource.compareTo(fdest) != 0) {
+            if (!fsource.exists() || !fsource.isDirectory() ) {
+                throw new IllegalStateException("non existence : " + fsource.toString());
+            }
+            if (fdest.exists()) {
+                throw new IllegalStateException("existence     : " + fdest.toString());
             }
 
-            // Rename file (or directory)
-            boolean success = dir.renameTo(dir2);
-            if (!success) {
-                // File was not successfully renamed
-                throw new java.io.IOException("dir was not successfully renamed");
-            }
+            LOGGER.debug(() -> "move_repertoire p=" + fsource.toString() + " -> " + fdest.toString());
+            Files.move(fsource.toPath(), fdest.toPath());
         }
     }
-
 }

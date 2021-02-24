@@ -143,4 +143,8 @@ public class Context {
     public List<String> getArrayNomSubdirectoryRejet() {
         return paramElementsRejet.getArrayNomSubdirectoryRejet();
     }
+
+    public String getCatalogLrcat() {
+        return RepFonctionnel.getRepertoireCatalog() + File.separator + RepFonctionnel.getCatalogLrcat() ;
+    }
 }

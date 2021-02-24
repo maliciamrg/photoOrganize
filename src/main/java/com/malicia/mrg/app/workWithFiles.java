@@ -45,12 +45,11 @@ public class workWithFiles {
         if (oldName.compareTo(newName) != 0) {
             System.out.println("oldName:" + oldName);
             System.out.println("newName:" + newName);
-            Database.renameFileLogique(oldName, newName);
 
             // File (or directory) with old name
-            File file = new File("oldName");
+            File file = new File(oldName);
             // File (or directory) with new name
-            File file2 = new File("newName");
+            File file2 = new File(newName);
 
             if (file2.exists()) {
                 throw new java.io.IOException("file exists");
