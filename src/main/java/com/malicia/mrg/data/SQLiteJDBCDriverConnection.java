@@ -122,7 +122,7 @@ public class SQLiteJDBCDriverConnection {
         stmt = conn.createStatement();
         LOGGER.debug(sql);
         int ret = stmt.executeUpdate(sql);
-        LOGGER.debug(stmt.toString());
+//        LOGGER.debug(stmt.toString());
         LOGGER.debug("ret=>" + ret);
         return ret;
 

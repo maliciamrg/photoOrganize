@@ -1,6 +1,6 @@
 {
   "fileName" : "D:\\JavaProjet\\photoOrganize\\target\\classes\\objJson\\repertoirePhoto-Sauvegarde.json",
-  "repertoire" : "!!Collections\\##Sauvegarde 999 j",
+  "repertoire" : "01-Cataloque_Photo\\!!Collections\\##Sauvegarde 999 j",
   "uniteDeJour" : 1,
   "nbMaxParUniteDeJour" : 999,
   "maxStar" : [ 0, 0, 0, 0, 0 ],

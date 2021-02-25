@@ -1,6 +1,6 @@
 {
   "fileName" : "D:\\JavaProjet\\photoOrganize\\target\\classes\\objJson\\repertoirePhoto-Autoconstruction.json",
-  "repertoire" : "!!Collections\\##Autoconstruction 03-05 j",
+  "repertoire" : "01-Cataloque_Photo\\!!Collections\\##Autoconstruction 03-05 j",
   "uniteDeJour" : 1,
   "nbMaxParUniteDeJour" : 5,
   "maxStar" : [ 25, 12, 5, 2, 1 ],

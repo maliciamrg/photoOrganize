@@ -3,6 +3,8 @@ package com.malicia.mrg.app;
 import com.malicia.mrg.data.Database;
 import com.malicia.mrg.param.NommageRepertoire;
 import com.malicia.mrg.param.RepertoirePhoto;
+import javafx.collections.FXCollections;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,9 +36,15 @@ public class workWithRepertory {
         return isFinished;
     }
 
-    public static List<String> listRepertoireEligible(RepertoirePhoto repPhoto) {
-        //TODO
-        return null;
+    public static List<String> listRepertoireEligible(String repertoire50Phototheque, RepertoirePhoto repPhoto) {
+        List<String> ret = FXCollections.observableArrayList();
+        File[] files = new File(repertoire50Phototheque+repPhoto.getRepertoire()).listFiles();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                ret.add(file.toString());
+            }
+        }
+        return ret;
     }
 
     public static String newNameRepertoire(String repertoire, RepertoirePhoto repPhoto, NommageRepertoire paramNommageRepertoire) {

@@ -12,8 +12,7 @@ import net.lingala.zip4j.ZipFile;
 
 import java.io.*;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 public class Main {
 
@@ -35,8 +34,8 @@ public class Main {
 
             //En Fonction De La Strategies De Rangement
             rangerLesRejets();
-            _____________is___________In_______________Work____________();
             renommerLesRepertoires();
+            _____________is___________In_______________Work____________();
             regrouperLesNouvellesPhoto();
             //*
 
@@ -106,15 +105,20 @@ public class Main {
         ListIterator<RepertoirePhoto> repertoirePhotoIterator = arrayRepertoirePhoto.listIterator();
         while (repertoirePhotoIterator.hasNext()) {
             RepertoirePhoto repPhoto = repertoirePhotoIterator.next();
-            List<String> listRep = workWithRepertory.listRepertoireEligible(repPhoto);
+            List<String> listRep = workWithRepertory.listRepertoireEligible(ctx.getRepertoire50Phototheque(), repPhoto);
 
             ListIterator<String> repertoireIterator = listRep.listIterator();
             while (repertoireIterator.hasNext()) {
                 String repertoire = repertoireIterator.next();
                 String newRepertoire = workWithRepertory.newNameRepertoire(repertoire, repPhoto, ctx.getParamNommageRepertoire());
 
-                workWithRepertory.renommerRepertoire(repertoire, newRepertoire);
-                dbLr.renommerRepertoireLogique(repertoire, newRepertoire);
+                if (newRepertoire != null
+                        && newRepertoire.compareTo(repertoire) != 0
+                        && newRepertoire.contains(ctx.getRepertoire50Phototheque()+repPhoto.getRepertoire())) {
+                        LOGGER.info(repertoire +"=>"+newRepertoire);
+//                    workWithRepertory.renommerRepertoire(repertoire, newRepertoire);
+//                    dbLr.renommerRepertoireLogique(repertoire, newRepertoire);
+                }
 
             }
         }
@@ -145,10 +149,19 @@ public class Main {
     private static void rangerLesRejets() throws IOException, SQLException {
         List<File> arrayFichierRejet = workWithFiles.getFilesFromRepertoryWithFilter(ctx.getRepertoire50Phototheque(), ctx.getArrayNomSubdirectoryRejet(), ctx.getParamElementsRejet().getExtFileRejet());
 
+        Map<String, Integer> countExt = new HashMap<>();
+        LOGGER.info("arrayFichierRejet     => " + arrayFichierRejet.size());
+
         ListIterator<File> arrayFichierRejetIterator = arrayFichierRejet.listIterator();
         while (arrayFichierRejetIterator.hasNext()) {
             File fichier = arrayFichierRejetIterator.next();
             String fileExt = FilenameUtils.getExtension(fichier.getName()).toLowerCase();
+
+            if (countExt.containsKey(fileExt)) {
+                boolean res = countExt.replace(fileExt, countExt.get(fileExt), countExt.get(fileExt) + 1);
+            } else {
+                countExt.put(fileExt, 1);
+            }
 
             if (fileExt.toLowerCase().compareTo("zip") == 0) {
                 workWithFiles.extractZipFile(fichier);
@@ -159,10 +172,17 @@ public class Main {
                 String newName = oldName + "." + ctx.getParamElementsRejet().getExtFileRejet();
 
                 workWithFiles.renameFile(oldName, newName);
-                dbLr.renameFileLogique(oldName,newName);
-
+                dbLr.renameFileLogique(oldName, newName);
             }
         }
+
+        Iterator it = countExt.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            LOGGER.info("arrayFichierRejet." + pair.getKey() + " => " + pair.getValue());
+        }
+
+
     }
 
     public static void exceptionLog(Exception theException, Logger loggerOrigine) {

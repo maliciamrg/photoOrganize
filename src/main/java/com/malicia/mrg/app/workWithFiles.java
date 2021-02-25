@@ -43,8 +43,8 @@ public class workWithFiles {
 
     public static void renameFile(String oldName, String newName) throws IOException {
         if (oldName.compareTo(newName) != 0) {
-            System.out.println("oldName:" + oldName);
-            System.out.println("newName:" + newName);
+//            System.out.println("oldName:" + oldName);
+//            System.out.println("newName:" + newName);
 
             // File (or directory) with old name
             File file = new File(oldName);
