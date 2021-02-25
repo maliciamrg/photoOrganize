@@ -3,7 +3,7 @@
   "repertoire" : "01-Cataloque_Photo\\##Events 10-15 j",
   "uniteDeJour" : 1,
   "nbMaxParUniteDeJour" : 15,
-  "maxStar" : [ 25, 12, 5, 2, 1 ],
+  "ratioStarMax" : [ 25, 12, 5, 2, 1 ],
   "pZone" : [ {
     "valeurDefault" : "*",
     "validationFacultative" : true,

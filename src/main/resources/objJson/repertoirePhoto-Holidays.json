@@ -3,7 +3,7 @@
   "repertoire" : "01-Cataloque_Photo\\##Holidays 20-30 sem",
   "uniteDeJour" : 3,
   "nbMaxParUniteDeJour" : 21,
-  "maxStar" : [ 25, 12, 5, 2, 1 ],
+  "ratioStarMax" : [ 25, 12, 5, 2, 1 ],
   "pZone" : [ {
     "valeurDefault" : "*",
     "validationFacultative" : true,

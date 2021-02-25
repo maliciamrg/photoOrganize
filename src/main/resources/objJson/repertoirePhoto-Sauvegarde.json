@@ -3,7 +3,7 @@
   "repertoire" : "01-Cataloque_Photo\\!!Collections\\##Sauvegarde 999 j",
   "uniteDeJour" : 1,
   "nbMaxParUniteDeJour" : 999,
-  "maxStar" : [ 0, 0, 0, 0, 0 ],
+  "ratioStarMax" : [ 0, 0, 0, 0, 0 ],
   "pZone" : [ {
     "valeurDefault" : "*",
     "validationFacultative" : false,

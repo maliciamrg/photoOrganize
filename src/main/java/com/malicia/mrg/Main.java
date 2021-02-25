@@ -110,7 +110,7 @@ public class Main {
             ListIterator<String> repertoireIterator = listRep.listIterator();
             while (repertoireIterator.hasNext()) {
                 String repertoire = repertoireIterator.next();
-                String newRepertoire = workWithRepertory.newNameRepertoire(repertoire, repPhoto, ctx.getParamNommageRepertoire());
+                String newRepertoire = workWithRepertory.newNameRepertoire(dbLr ,repertoire, repPhoto, ctx.getParamNommageRepertoire());
 
                 if (newRepertoire != null
                         && newRepertoire.compareTo(repertoire) != 0

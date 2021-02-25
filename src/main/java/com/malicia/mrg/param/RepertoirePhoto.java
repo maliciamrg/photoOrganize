@@ -11,7 +11,7 @@ public class RepertoirePhoto extends Serialize {
     private String repertoire;
     private int uniteDeJour;
     private int nbMaxParUniteDeJour;
-    private List<Integer> maxStar;
+    private List<Integer> ratioStarMax;
     private List<ParamZone> pZone;
 
     public RepertoirePhoto() {
@@ -22,7 +22,7 @@ public class RepertoirePhoto extends Serialize {
         repertoire = repertoireIn;
         uniteDeJour = uniteDeJourIn;
         nbMaxParUniteDeJour = nbMaxParUniteDeJourIn;
-        maxStar = FXCollections.observableArrayList();
+        ratioStarMax = FXCollections.observableArrayList();
         pZone = FXCollections.observableArrayList();
     }
 
@@ -42,12 +42,12 @@ public class RepertoirePhoto extends Serialize {
         this.nbMaxParUniteDeJour = nbMaxParUniteDeJour;
     }
 
-    public List<Integer> getMaxStar() {
-        return maxStar;
+    public List<Integer> getratioStarMax() {
+        return ratioStarMax;
     }
 
-    public void setMaxStar(List<Integer> maxStar) {
-        this.maxStar = maxStar;
+    public void setratioStarMax(List<Integer> ratioStarMax) {
+        this.ratioStarMax = ratioStarMax;
     }
 
     public List<ParamZone> getpZone() {
@@ -66,14 +66,14 @@ public class RepertoirePhoto extends Serialize {
         this.repertoire = repertoire;
     }
 
-    public void addMaxStar(int maxStarIn) {
-        maxStar.add(maxStarIn);
+    public void addratioStarMax(int ratioStarMaxIn) {
+        ratioStarMax.add(ratioStarMaxIn);
     }
 
-    public void addMaxStar(String maxStarInVirgule) {
-        String[] ratioMaxStar = maxStarInVirgule.split(",");
-        for (int i = 0; i < ratioMaxStar.length; i++) {
-            maxStar.add(Integer.parseInt(ratioMaxStar[i]));
+    public void addratioStarMax(String ratioStarMaxInVirgule) {
+        String[] ratioratioStarMax = ratioStarMaxInVirgule.split(",");
+        for (int i = 0; i < ratioratioStarMax.length; i++) {
+            ratioStarMax.add(Integer.parseInt(ratioratioStarMax[i]));
         }
     }
 

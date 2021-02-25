@@ -3,7 +3,7 @@
   "repertoire" : "99-Rejet",
   "uniteDeJour" : 1,
   "nbMaxParUniteDeJour" : 999,
-  "maxStar" : [ 0, 0, 0, 0, 0 ],
+  "ratioStarMax" : [ 0, 0, 0, 0, 0 ],
   "pZone" : [ {
     "valeurDefault" : "*",
     "validationFacultative" : true,

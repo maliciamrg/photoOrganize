@@ -11,7 +11,10 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class workWithRepertory {
 
@@ -47,7 +50,20 @@ public class workWithRepertory {
         return ret;
     }
 
-    public static String newNameRepertoire(String repertoire, RepertoirePhoto repPhoto, NommageRepertoire paramNommageRepertoire) {
+    public static String newNameRepertoire(Database dbLr, String repertoire, RepertoirePhoto repPhoto, NommageRepertoire paramNommageRepertoire) throws SQLException {
+        long idLocalRep = dbLr.getIdlocalforRep(repertoire);
+
+        Map<String, Integer> starValue = dbLr.getStarValue(idLocalRep);
+
+        int nb = 0;
+        List<String> ret = FXCollections.observableArrayList();
+        File[] files = new File(repertoire).listFiles();
+        for (File file : files) {
+            if (!file.isDirectory()) {
+                nb++;
+            }
+        }
+
         //TODO
         return null;
     }

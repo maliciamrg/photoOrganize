@@ -3,7 +3,7 @@
   "repertoire" : "01-Cataloque_Photo\\!!Collections\\##Autoconstruction 03-05 j",
   "uniteDeJour" : 1,
   "nbMaxParUniteDeJour" : 5,
-  "maxStar" : [ 25, 12, 5, 2, 1 ],
+  "ratioStarMax" : [ 25, 12, 5, 2, 1 ],
   "pZone" : [ {
     "valeurDefault" : "*",
     "validationFacultative" : true,
