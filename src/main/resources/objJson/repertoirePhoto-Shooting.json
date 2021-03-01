@@ -20,5 +20,6 @@
     "valeurDefault" : "*",
     "validationFacultative" : true,
     "editable" : true
-  } ]
+  } ],
+  "nomRepertoire" : [ "£DATE£", " @00_PHOTOGRAPHY@", "@00_WHERE@", "@00_WHAT|00_WHO@" ]
 }

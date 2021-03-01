@@ -64,6 +64,10 @@ public class workWithRepertory {
             }
         }
 
+        int limitemaxfolder = (int) (agLibraryRootFolder.nbmaxCat * Math.ceil((double) nbjourfolder / agLibraryRootFolder.nbjouCat));
+        nbSelectionner > 0 (nb pick == 1)
+        nbphotoapurger = 0 (nbSelectionner - limitemaxfolder)
+
         //TODO
         return null;
     }

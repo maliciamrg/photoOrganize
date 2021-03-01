@@ -13,6 +13,7 @@ public class RepertoirePhoto extends Serialize {
     private int nbMaxParUniteDeJour;
     private List<Integer> ratioStarMax;
     private List<ParamZone> pZone;
+    private List<String> nomRepertoire;
 
     public RepertoirePhoto() {
         super();
@@ -24,6 +25,23 @@ public class RepertoirePhoto extends Serialize {
         nbMaxParUniteDeJour = nbMaxParUniteDeJourIn;
         ratioStarMax = FXCollections.observableArrayList();
         pZone = FXCollections.observableArrayList();
+        nomRepertoire = FXCollections.observableArrayList();
+    }
+
+    public List<Integer> getRatioStarMax() {
+        return ratioStarMax;
+    }
+
+    public void setRatioStarMax(List<Integer> ratioStarMax) {
+        this.ratioStarMax = ratioStarMax;
+    }
+
+    public List<String> getNomRepertoire() {
+        return nomRepertoire;
+    }
+
+    public void setNomRepertoire(List<String> nomRepertoire) {
+        this.nomRepertoire = nomRepertoire;
     }
 
     public int getUniteDeJour() {
@@ -87,9 +105,9 @@ public class RepertoirePhoto extends Serialize {
         String[] arrisValditationFacultativeVirgule = isValditationFacultativeVirgule.split(",");
         for (int i = 0; i < arrEditableVirgule.length; i++) {
             pZone.add(new ParamZone(
-                    arrEditableVirgule[i].compareTo("Close") == 0 ? false : true,
+                    arrEditableVirgule[i].compareTo("Close") != 0,
                     arrvaleurParDefautVirgule[i],
-                    arrisValditationFacultativeVirgule[i].compareTo("Facul") == 0 ? false : true));
+                    arrisValditationFacultativeVirgule[i].compareTo("Facul") != 0));
         }
 
     }

@@ -20,5 +20,6 @@
     "valeurDefault" : "*",
     "validationFacultative" : true,
     "editable" : true
-  } ]
+  } ] ,
+  "nomRepertoire" : [ "£DATE£", "@10_Action@", "@10_Piece@", "@10_Chantier@" ]
 }

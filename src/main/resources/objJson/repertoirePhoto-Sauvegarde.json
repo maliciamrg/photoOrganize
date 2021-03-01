@@ -20,5 +20,6 @@
     "valeurDefault" : "*",
     "validationFacultative" : false,
     "editable" : true
-  } ]
+  } ],
+  "nomRepertoire" : [ "£DATE£", "", "", "" ]
 }

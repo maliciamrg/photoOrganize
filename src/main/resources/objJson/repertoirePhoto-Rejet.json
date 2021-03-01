@@ -20,5 +20,6 @@
     "valeurDefault" : "Space",
     "validationFacultative" : false,
     "editable" : false
-  } ]
+  } ],
+  "nomRepertoire" : [ "£DATE£", "", "", "" ]
 }
