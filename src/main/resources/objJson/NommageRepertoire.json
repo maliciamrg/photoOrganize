@@ -1,3 +1,5 @@
 {
-  "fileName" : "D:\\JavaProjet\\photoOrganize\\target\\classes\\objJson\\NommageRepertoire.json"
+  "fileName" : "D:\\JavaProjet\\photoOrganize\\target\\classes\\objJson\\NommageRepertoire.json",
+  "formatNomRepertoire" : [ "RepertoirePhoto_nomRepertoire", "starValue", "nbSelectionner", "nbphotoapurger", "limitemaxfolder" ],
+  "champsList" : [ "RepertoirePhoto_nomRepertoire", "£DATE£", "@10_Action@", "@10_Piece@", "@10_Chantier@", "@00_EVENT@", "@00_PHOTOGRAPHY@", "@00_WHERE@", "@00_WHAT@", "@00_WHO@", "starValue@", "nbSelectionner", "nbphotoapurger", "limitemaxfolder" ]
 }

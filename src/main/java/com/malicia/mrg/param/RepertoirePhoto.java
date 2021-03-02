@@ -28,14 +28,6 @@ public class RepertoirePhoto extends Serialize {
         nomRepertoire = FXCollections.observableArrayList();
     }
 
-    public List<Integer> getRatioStarMax() {
-        return ratioStarMax;
-    }
-
-    public void setRatioStarMax(List<Integer> ratioStarMax) {
-        this.ratioStarMax = ratioStarMax;
-    }
-
     public List<String> getNomRepertoire() {
         return nomRepertoire;
     }

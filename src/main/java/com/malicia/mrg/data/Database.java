@@ -123,4 +123,24 @@ public class Database extends SQLiteJDBCDriverConnection {
         }
         return idlocal;
     }
+
+    public int nbjourfolder(long idLocalRep) {
+        //todo
+        return 0;
+    }
+
+    public int nb_pick(long idLocalRep) {
+        //todo
+        return 0;
+    }
+
+    public String getDate(long idLocalRep) {
+        //todo
+        return "";
+    }
+
+    public Boolean isValueInTag(String getoValue, String tagAction) {
+        //todo
+        return true;
+    }
 }
