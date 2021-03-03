@@ -1,11 +1,13 @@
 package com.malicia.mrg.data;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.malicia.mrg.param.NommageRepertoire;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -129,18 +131,45 @@ public class Database extends SQLiteJDBCDriverConnection {
         return 0;
     }
 
-    public int nb_pick(long idLocalRep) {
-        //todo
-        return 0;
+    public int nb_pick(long idLocalRep) throws SQLException {
+
+        ResultSet rsexist = select(
+                " select  count(*) as result" +
+                        " from AgLibraryFile a  " +
+                        " inner join Adobe_images e " +
+                        " on a.id_local = e.rootFile " +
+                        " where " + idLocalRep + " = a.folder " +
+                        " and e.pick >= 0 " +
+                        ";");
+
+        int nbpick = 0;
+        while (rsexist.next()) {
+            nbpick = rsexist.getString("result")==null?0:rsexist.getInt("result");
+        }
+        return nbpick;
     }
 
-    public String getDate(long idLocalRep) {
-        //todo
-        return "";
+    public String getDate(long idLocalRep) throws SQLException {
+
+        ResultSet rsexist = select(
+                " select min(strftime('%s', e.captureTime)) as captureTime" +
+                        " from AgLibraryFile a" +
+                        " inner join Adobe_images e" +
+                        " on a.id_local = e.rootFile" +
+                        " where " + idLocalRep + " = a.folder" +
+                        " and e.pick >= 0" +
+                        " ;");
+
+        long captureTime = 0;
+        while (rsexist.next()) {
+            captureTime = rsexist.getLong("captureTime");
+        }
+        SimpleDateFormat repDateFormat = new SimpleDateFormat(NommageRepertoire.FORMATDATE_YYYY_MM_DD);
+        return repDateFormat.format(new Date(captureTime * 1000));
     }
 
     public Boolean isValueInTag(String getoValue, String tagAction) {
         //todo
-        return true;
+        return false;
     }
 }

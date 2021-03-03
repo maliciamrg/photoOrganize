@@ -52,6 +52,7 @@ public class workWithRepertory {
     public static String newNameRepertoire(Database dbLr, String repertoire, RepertoirePhoto repPhoto, NommageRepertoire paramNommageRepertoire) throws SQLException {
         long idLocalRep = dbLr.getIdlocalforRep(repertoire);
 
+        String newNameRepertoire;
         String oldNameRepertoire = new File(repertoire).getName();
         String[] oldChamp = oldNameRepertoire.split(NommageRepertoire.CARAC_SEPARATEUR);
 
@@ -77,12 +78,14 @@ public class workWithRepertory {
             }
         }
 
+        newNameRepertoire = oldNameRepertoire;
         int limitemaxfolder = 0;
         int nbSelectionner = 0;
         int nbphotoapurger = 0;
         int nbelements = 0;
         ListIterator<EleChamp> champIte = listOfChamp.listIterator();
         while (champIte.hasNext()) {
+            //todo
             EleChamp elechamp = champIte.next();
             switch (elechamp.getcChamp()) {
                 case NommageRepertoire.£_DATE_£:
@@ -96,15 +99,27 @@ public class workWithRepertory {
                 case NommageRepertoire.TAG_WHERE:
                 case NommageRepertoire.TAG_WHAT:
                 case NommageRepertoire.TAG_WHO:
-                    if (dbLr.isValueInTag(elechamp.getoValue(), NommageRepertoire.TAG_ACTION)) {
+                    if (dbLr.isValueInTag(elechamp.getoValue(), elechamp.getcChamp())) {
                         elechamp.setnValue(elechamp.getoValue());
                     } else {
-                        elechamp.setnValue("");
-                    };
+                        elechamp.setnValue(elechamp.getcChamp());
+                    }
                     break;
                 case NommageRepertoire.NB_STAR_VALUE:
                     nbSelectionner = dbLr.nb_pick(idLocalRep);
                     Map<String, Integer> starValue = dbLr.getStarValue(idLocalRep);
+                    List<Integer> ratio = repPhoto.getratioStarMax();
+                    String res = "";
+                    for (int i = 0; i < 5; i++) {
+                        int nbmax = (ratio.get(i) * nbSelectionner) / 100;
+                        LOGGER.info("(" + i + ")" + " ---star-: " + starValue.get(String.valueOf(i)) + " ---ratio-: " + ratio.get(i) + " ---nbmax-: " + nbmax);
+                        res = res + "(" + "S" + i + ")";
+                        if (starValue.get(String.valueOf(i)) > nbmax) {
+                            res = res + (nbmax - starValue.get(String.valueOf(i)));
+                        }
+                        res = res + NommageRepertoire.CARAC_SEPARATEUR;
+                    }
+                    elechamp.setnValue(res);
                     break;
                 case NommageRepertoire.NB_ELEMENTS:
                     nbelements = 0;
@@ -127,12 +142,14 @@ public class workWithRepertory {
                     limitemaxfolder = (int) ((repPhoto.getNbMaxParUniteDeJour() * Math.ceil(dbLr.nbjourfolder(idLocalRep))) / repPhoto.getUniteDeJour());
                     break;
                 default:
-                    // code block
+                    String txt = "elechamp.getcChamp()=" + elechamp.getcChamp() + " inconnu ";
+                    LOGGER.debug(() -> txt);
+                    throw new IllegalStateException(txt);
             }
+            newNameRepertoire = newNameRepertoire.concat(NommageRepertoire.CARAC_SEPARATEUR + elechamp.getnValue());
         }
-
-        //TODO
-        return null;
+        newNameRepertoire = newNameRepertoire.replace(" ", NommageRepertoire.CARAC_SEPARATEUR);
+        return newNameRepertoire;
     }
 
     public static void renommerRepertoire(String source, String destination) throws IOException {

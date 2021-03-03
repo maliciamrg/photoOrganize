@@ -24,6 +24,7 @@ public class NommageRepertoire extends Serialize {
     public static final String NB_LIMITEMAXFOLDER = "limitemaxfolder";
     public static final String CARAC_SEPARATEUR = "_";
     public static final String CARAC_VOID = "-";
+    public static final String FORMATDATE_YYYY_MM_DD = "yyyy-MM-dd";
 
     private final List<String> formatNomRepertoire;
     private List<String> champsList;
