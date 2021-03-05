@@ -39,7 +39,6 @@ public class Serialize {
 
     public static Object readJSON(Class aClass, String FileName) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.registerSubtypes(RepertoirePhoto.ParamZone.class);
         Object objret = mapper.readValue(new File(FileName), aClass);
         ((Serialize)objret).fileName = FileName;
         return objret ;

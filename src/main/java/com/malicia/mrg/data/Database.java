@@ -124,7 +124,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                         ";");
 
         while (rsexist.next()) {
-            String rating = rsexist.getString("rating") == null ? "0" : rsexist.getString("rating");
+            String rating = String.valueOf(rsexist.getLong("rating")) == null ? "0" : String.valueOf(rsexist.getLong("rating"));
             boolean res = idlocal.replace(rating, idlocal.get(rating), idlocal.get(rating) + rsexist.getInt("result"));
         }
         return idlocal;
@@ -148,7 +148,7 @@ public class Database extends SQLiteJDBCDriverConnection {
             captureTimeMin = new DateTime (rsexist.getLong("captureTimeMin") * 1000);
             captureTimeMax = new DateTime (rsexist.getLong("captureTimeMax") * 1000);
         }
-        int days = Days.daysBetween(captureTimeMin, captureTimeMax).getDays();
+        int days = Days.daysBetween(captureTimeMin, captureTimeMax).getDays()+1;
         return days;
     }
 

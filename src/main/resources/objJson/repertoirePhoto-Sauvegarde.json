@@ -1,20 +1,16 @@
 {
-  "fileName" : "D:\\JavaProjet\\photoOrganize\\target\\classes\\objJson\\repertoirePhoto-Sauvegarde.json",
-  "repertoire" : "01-Cataloque_Photo\\!!Collections\\##Sauvegarde 999 j",
-  "uniteDeJour" : 1,
-  "nbMaxParUniteDeJour" : 999,
-  "ratioStarMax" : [ 0, 0, 0, 0, 0 ],
-  "pZone" : [ {
-    "valeurAdmise" : "£DATE£",
-    "obligatoire" : true
-  }, {
-    "valeurAdmise" : "",
-    "obligatoire" : false
-  }, {
-    "valeurAdmise" : "",
-    "obligatoire" : false
-  }, {
-    "valeurAdmise" : "",
-    "obligatoire" : false
-  } ]
+  "fileName": "D:\\JavaProjet\\photoOrganize\\target\\classes\\objJson\\repertoirePhoto-Sauvegarde.json",
+  "repertoire": "01-Cataloque_Photo\\!!Collections\\##Sauvegarde 999 j",
+  "uniteDeJour": 1,
+  "nbMaxParUniteDeJour": 999,
+  "ratioStarMax": [
+    100,
+    100,
+    100,
+    100,
+    100
+  ],
+  "zoneValeurAdmise": [
+    "£DATE£"
+  ]
 }

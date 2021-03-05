@@ -1,20 +1,16 @@
 {
-  "fileName" : "D:\\JavaProjet\\photoOrganize\\target\\classes\\objJson\\repertoirePhoto-Rejet.json",
-  "repertoire" : "99-Rejet",
-  "uniteDeJour" : 1,
-  "nbMaxParUniteDeJour" : 999,
-  "ratioStarMax" : [ 0, 0, 0, 0, 0 ],
-  "pZone" : [ {
-    "valeurAdmise" : "£DATE£",
-    "obligatoire" : true
-  }, {
-    "valeurAdmise" : "",
-    "obligatoire" : false
-  }, {
-    "valeurAdmise" : "",
-    "obligatoire" : false
-  }, {
-    "valeurAdmise" : "",
-    "obligatoire" : false
-  } ]
+  "fileName": "D:\\JavaProjet\\photoOrganize\\target\\classes\\objJson\\repertoirePhoto-Rejet.json",
+  "repertoire": "99-Rejet",
+  "uniteDeJour": 1,
+  "nbMaxParUniteDeJour": 999,
+  "ratioStarMax": [
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "zoneValeurAdmise": [
+    "£DATE£"
+  ]
 }

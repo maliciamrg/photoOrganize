@@ -1,20 +1,19 @@
 {
-  "fileName" : "D:\\JavaProjet\\photoOrganize\\target\\classes\\objJson\\repertoirePhoto-Events.json",
-  "repertoire" : "01-Cataloque_Photo\\##Events 10-15 j",
-  "uniteDeJour" : 1,
-  "nbMaxParUniteDeJour" : 15,
-  "ratioStarMax" : [ 25, 12, 5, 2, 1 ],
-  "pZone" : [ {
-    "valeurAdmise" : "£DATE£",
-    "obligatoire" : true
-  }, {
-    "valeurAdmise" : "@00_EVENT@",
-    "obligatoire" : true
-  }, {
-    "valeurAdmise" : "@00_WHERE@",
-    "obligatoire" : true
-  }, {
-    "valeurAdmise" : "@00_WHAT|00_WHO@",
-    "obligatoire" : true
-  } ]
+  "fileName": "D:\\JavaProjet\\photoOrganize\\target\\classes\\objJson\\repertoirePhoto-Events.json",
+  "repertoire": "01-Cataloque_Photo\\##Events 10-15 j",
+  "uniteDeJour": 1,
+  "nbMaxParUniteDeJour": 15,
+  "ratioStarMax": [
+    25,
+    12,
+    5,
+    2,
+    1
+  ],
+  "zoneValeurAdmise": [
+    "£DATE£",
+    "@00_EVENT@",
+    "@00_WHERE@",
+    "@00_WHAT@|@00_WHO@"
+  ]
 }

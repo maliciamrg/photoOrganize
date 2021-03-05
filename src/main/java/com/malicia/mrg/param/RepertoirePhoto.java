@@ -12,7 +12,7 @@ public class RepertoirePhoto extends Serialize {
     private int uniteDeJour;
     private int nbMaxParUniteDeJour;
     private List<Integer> ratioStarMax;
-    private List<ParamZone> pZone;
+    private List<String> zoneValeurAdmise;
     private List<String> nomRepertoire;
 
     public RepertoirePhoto() {
@@ -24,7 +24,7 @@ public class RepertoirePhoto extends Serialize {
         uniteDeJour = uniteDeJourIn;
         nbMaxParUniteDeJour = nbMaxParUniteDeJourIn;
         ratioStarMax = FXCollections.observableArrayList();
-        pZone = FXCollections.observableArrayList();
+        zoneValeurAdmise = FXCollections.observableArrayList();
         nomRepertoire = FXCollections.observableArrayList();
     }
 
@@ -60,12 +60,12 @@ public class RepertoirePhoto extends Serialize {
         this.ratioStarMax = ratioStarMax;
     }
 
-    public List<ParamZone> getpZone() {
-        return pZone;
+    public List<String> getZoneValeurAdmise() {
+        return zoneValeurAdmise;
     }
 
-    public void setpZone(List<ParamZone> pZone) {
-        this.pZone = pZone;
+    public void setZoneValeurAdmise(List<String> zoneValeurAdmise) {
+        this.zoneValeurAdmise = zoneValeurAdmise;
     }
 
     public String getRepertoire() {
@@ -76,53 +76,4 @@ public class RepertoirePhoto extends Serialize {
         this.repertoire = repertoire;
     }
 
-    public void addratioStarMax(int ratioStarMaxIn) {
-        ratioStarMax.add(ratioStarMaxIn);
-    }
-
-    public void addratioStarMax(String ratioStarMaxInVirgule) {
-        String[] ratioratioStarMax = ratioStarMaxInVirgule.split(",");
-        for (int i = 0; i < ratioratioStarMax.length; i++) {
-            ratioStarMax.add(Integer.parseInt(ratioratioStarMax[i]));
-        }
-    }
-
-    public void addParamZone(String valeurParDefaut, Boolean isValditationFacultative) {
-        pZone.add(new ParamZone(valeurParDefaut, isValditationFacultative));
-    }
-
-    public void addParamZone( String valeurParDefautVirgule, String isValditationFacultativeVirgule) {
-        String[] arrvaleurParDefautVirgule = valeurParDefautVirgule.split(",");
-        String[] arrisValditationFacultativeVirgule = isValditationFacultativeVirgule.split(",");
-        for (int i = 0; i < arrvaleurParDefautVirgule.length; i++) {
-            pZone.add(new ParamZone(
-                    arrvaleurParDefautVirgule[i],
-                    arrisValditationFacultativeVirgule[i].compareTo("Facul") != 0));
-        }
-
-    }
-
-    public static class ParamZone {
-
-        public String valeurAdmise;
-
-        public Boolean getObligatoire() {
-            return obligatoire;
-        }
-
-        public void setObligatoire(Boolean obligatoire) {
-            this.obligatoire = obligatoire;
-        }
-
-        public Boolean obligatoire;
-
-        public ParamZone() {
-            super();
-        }
-
-        public ParamZone(String valeurParDefaut, Boolean isValidatationFacultative) {
-            valeurAdmise = valeurParDefaut;
-            obligatoire = isValidatationFacultative;
-        }
-    }
 }
