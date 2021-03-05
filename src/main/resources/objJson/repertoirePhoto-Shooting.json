@@ -5,21 +5,16 @@
   "nbMaxParUniteDeJour" : 6,
   "ratioStarMax" : [ 25, 12, 5, 2, 1 ],
   "pZone" : [ {
-    "valeurDefault" : "*",
-    "validationFacultative" : true,
-    "editable" : false
+    "valeurAdmise" : "£DATE£",
+    "obligatoire" : true
   }, {
-    "valeurDefault" : "*",
-    "validationFacultative" : true,
-    "editable" : true
+    "valeurAdmise" : "@00_EVENT@",
+    "obligatoire" : true
   }, {
-    "valeurDefault" : "*",
-    "validationFacultative" : true,
-    "editable" : true
+    "valeurAdmise" : "@00_WHERE@",
+    "obligatoire" : true
   }, {
-    "valeurDefault" : "*",
-    "validationFacultative" : true,
-    "editable" : true
-  } ],
-  "nomRepertoire" : [ "£DATE£", "@00_PHOTOGRAPHY@", "@00_WHERE@", "@00_WHAT|00_WHO@" ]
+    "valeurAdmise" : "@00_WHAT|00_WHO@",
+    "obligatoire" : true
+  } ]
 }

@@ -1,7 +1,11 @@
 package com.malicia.mrg.data;
 
-import com.malicia.mrg.param.NommageRepertoire;
+import com.malicia.mrg.param.ControleRepertoire;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.apache.commons.io.FilenameUtils;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 
 import java.io.File;
 import java.sql.ResultSet;
@@ -99,14 +103,14 @@ public class Database extends SQLiteJDBCDriverConnection {
         return idlocal;
     }
 
-    public  Map<String, Integer> getStarValue(long idLocalRep) throws SQLException {
+    public Map<String, Integer> getStarValue(long idLocalRep) throws SQLException {
         Map<String, Integer> idlocal = new HashMap<>();
-        idlocal.put("0",0);
-        idlocal.put("1",0);
-        idlocal.put("2",0);
-        idlocal.put("3",0);
-        idlocal.put("4",0);
-        idlocal.put("5",0);
+        idlocal.put("0", 0);
+        idlocal.put("1", 0);
+        idlocal.put("2", 0);
+        idlocal.put("3", 0);
+        idlocal.put("4", 0);
+        idlocal.put("5", 0);
 
         ResultSet rsexist = select(
                 "select " +
@@ -120,15 +124,32 @@ public class Database extends SQLiteJDBCDriverConnection {
                         ";");
 
         while (rsexist.next()) {
-            String rating = rsexist.getString("rating")==null?"0":rsexist.getString("rating");
+            String rating = rsexist.getString("rating") == null ? "0" : rsexist.getString("rating");
             boolean res = idlocal.replace(rating, idlocal.get(rating), idlocal.get(rating) + rsexist.getInt("result"));
         }
         return idlocal;
     }
 
-    public int nbjourfolder(long idLocalRep) {
-        //todo
-        return 0;
+    public long nbjourfolder(long idLocalRep) throws SQLException {
+        ResultSet rsexist = select(
+                " select min(strftime('%s', e.captureTime)) as captureTimeMin , " +
+                        " max(strftime('%s', e.captureTime)) as captureTimeMax " +
+                        " from AgLibraryFile a" +
+                        " inner join Adobe_images e" +
+                        " on a.id_local = e.rootFile" +
+                        " where " + idLocalRep + " = a.folder" +
+                        " and e.pick >= 0" +
+                        " ;");
+
+        SimpleDateFormat repDateFormat = new SimpleDateFormat(ControleRepertoire.FORMATDATE_YYYY_MM_DD);
+        DateTime captureTimeMin = null;
+        DateTime captureTimeMax = null;
+        while (rsexist.next()) {
+            captureTimeMin = new DateTime (rsexist.getLong("captureTimeMin") * 1000);
+            captureTimeMax = new DateTime (rsexist.getLong("captureTimeMax") * 1000);
+        }
+        int days = Days.daysBetween(captureTimeMin, captureTimeMax).getDays();
+        return days;
     }
 
     public int nb_pick(long idLocalRep) throws SQLException {
@@ -144,7 +165,7 @@ public class Database extends SQLiteJDBCDriverConnection {
 
         int nbpick = 0;
         while (rsexist.next()) {
-            nbpick = rsexist.getString("result")==null?0:rsexist.getInt("result");
+            nbpick = rsexist.getString("result") == null ? 0 : rsexist.getInt("result");
         }
         return nbpick;
     }
@@ -164,12 +185,27 @@ public class Database extends SQLiteJDBCDriverConnection {
         while (rsexist.next()) {
             captureTime = rsexist.getLong("captureTime");
         }
-        SimpleDateFormat repDateFormat = new SimpleDateFormat(NommageRepertoire.FORMATDATE_YYYY_MM_DD);
+        SimpleDateFormat repDateFormat = new SimpleDateFormat(ControleRepertoire.FORMATDATE_YYYY_MM_DD);
         return repDateFormat.format(new Date(captureTime * 1000));
     }
 
-    public Boolean isValueInTag(String getoValue, String tagAction) {
-        //todo
-        return false;
+    public Boolean isValueInTag(String getoValue, String tagAction) throws SQLException {
+        ObservableList<String> listTag = getValueForTag(tagAction);
+        return listTag.contains(getoValue);
+    }
+
+    public ObservableList<String> getValueForTag(String getcChamp) throws SQLException {
+        ObservableList<String> listLcName = FXCollections.observableArrayList();
+        ResultSet rs = select("select lc_name " +
+                "from AgLibraryKeyword " +
+                "where genealogy like ( " +
+                "select '/%_' || id_local || '/%' " +
+                "from  AgLibraryKeyword " +
+                "where lc_name = '" + getcChamp.toLowerCase() + "' ) " +
+                ";");
+        while (rs.next()) {
+            listLcName.add(rs.getString("lc_name"));
+        }
+        return listLcName;
     }
 }

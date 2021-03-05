@@ -1,14 +1,19 @@
 package com.malicia.mrg.app;
 
 import com.malicia.mrg.data.Database;
+import com.malicia.mrg.util.UnzipUtility;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class workWithFiles {
 
@@ -72,7 +77,8 @@ public class workWithFiles {
         return filename;
     }
 
-    public static void extractZipFile(File fichier) {
-        //TODO
+    public static void extractZipFile(File fichier) throws IOException {
+        UnzipUtility uZip = new UnzipUtility();
+        uZip.unzip(fichier.toString(),fichier.getParent());
     }
 }

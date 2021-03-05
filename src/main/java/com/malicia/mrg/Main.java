@@ -34,7 +34,7 @@ public class Main {
 
             //En Fonction De La Strategies De Rangement
             rangerLesRejets();
-            renommerLesRepertoires();
+            topperLesRepertoires();
             _____________is___________In_______________Work____________();
             regrouperLesNouvellesPhoto();
             //*
@@ -99,7 +99,7 @@ public class Main {
         //TODO
     }
 
-    private static void renommerLesRepertoires() throws IOException, SQLException {
+    private static void topperLesRepertoires() throws IOException, SQLException {
         List<RepertoirePhoto> arrayRepertoirePhoto = ctx.getArrayRepertoirePhoto();
 
         ListIterator<RepertoirePhoto> repertoirePhotoIterator = arrayRepertoirePhoto.listIterator();
@@ -110,12 +110,10 @@ public class Main {
             ListIterator<String> repertoireIterator = listRep.listIterator();
             while (repertoireIterator.hasNext()) {
                 String repertoire = repertoireIterator.next();
-                String newRepertoire = workWithRepertory.newNameRepertoire(dbLr ,repertoire, repPhoto, ctx.getParamNommageRepertoire());
 
-                if (newRepertoire != null
-                        && newRepertoire.compareTo(repertoire) != 0
-                        && newRepertoire.contains(ctx.getRepertoire50Phototheque()+repPhoto.getRepertoire())) {
-                        LOGGER.info(repertoire +"=>"+newRepertoire);
+                if (!workWithRepertory.isRepertoireOk(dbLr ,repertoire, repPhoto, ctx.getParamControleRepertoire())) {
+                        LOGGER.info(repertoire +"=>"+"ko");
+                        //todo
 //                    workWithRepertory.renommerRepertoire(repertoire, newRepertoire);
 //                    dbLr.renommerRepertoireLogique(repertoire, newRepertoire);
                 }
@@ -164,6 +162,7 @@ public class Main {
             }
 
             if (fileExt.toLowerCase().compareTo("zip") == 0) {
+                LOGGER.info("unzip :" + fichier);
                 workWithFiles.extractZipFile(fichier);
             }
 

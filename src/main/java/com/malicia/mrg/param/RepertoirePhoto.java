@@ -87,17 +87,15 @@ public class RepertoirePhoto extends Serialize {
         }
     }
 
-    public void addParamZone(Boolean isEditable, String valeurParDefaut, Boolean isValditationFacultative) {
-        pZone.add(new ParamZone(isEditable, valeurParDefaut, isValditationFacultative));
+    public void addParamZone(String valeurParDefaut, Boolean isValditationFacultative) {
+        pZone.add(new ParamZone(valeurParDefaut, isValditationFacultative));
     }
 
-    public void addParamZone(String isEditableVirgule, String valeurParDefautVirgule, String isValditationFacultativeVirgule) {
-        String[] arrEditableVirgule = isEditableVirgule.split(",");
+    public void addParamZone( String valeurParDefautVirgule, String isValditationFacultativeVirgule) {
         String[] arrvaleurParDefautVirgule = valeurParDefautVirgule.split(",");
         String[] arrisValditationFacultativeVirgule = isValditationFacultativeVirgule.split(",");
-        for (int i = 0; i < arrEditableVirgule.length; i++) {
+        for (int i = 0; i < arrvaleurParDefautVirgule.length; i++) {
             pZone.add(new ParamZone(
-                    arrEditableVirgule[i].compareTo("Close") != 0,
                     arrvaleurParDefautVirgule[i],
                     arrisValditationFacultativeVirgule[i].compareTo("Facul") != 0));
         }
@@ -106,18 +104,25 @@ public class RepertoirePhoto extends Serialize {
 
     public static class ParamZone {
 
-        public String valeurDefault;
-        public Boolean validationFacultative;
-        public Boolean editable;
+        public String valeurAdmise;
+
+        public Boolean getObligatoire() {
+            return obligatoire;
+        }
+
+        public void setObligatoire(Boolean obligatoire) {
+            this.obligatoire = obligatoire;
+        }
+
+        public Boolean obligatoire;
 
         public ParamZone() {
             super();
         }
 
-        public ParamZone(Boolean isEditable, String valeurParDefaut, Boolean isValidatationFacultative) {
-            editable = isEditable;
-            valeurDefault = valeurParDefaut;
-            validationFacultative = isValidatationFacultative;
+        public ParamZone(String valeurParDefaut, Boolean isValidatationFacultative) {
+            valeurAdmise = valeurParDefaut;
+            obligatoire = isValidatationFacultative;
         }
     }
 }

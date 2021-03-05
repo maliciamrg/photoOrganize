@@ -1,7 +1,7 @@
 package com.malicia.mrg;
 
 import com.malicia.mrg.param.ElementsRejet;
-import com.malicia.mrg.param.NommageRepertoire;
+import com.malicia.mrg.param.ControleRepertoire;
 import com.malicia.mrg.param.RepertoireFonctionnel;
 import com.malicia.mrg.param.RepertoirePhoto;
 import javafx.collections.FXCollections;
@@ -14,7 +14,7 @@ import java.text.NumberFormat;
 import java.util.List;
 
 public class Context {
-    private NommageRepertoire paramNommageRepertoire;
+    private ControleRepertoire paramControleRepertoire;
     private List<RepertoirePhoto> arrayRepertoirePhoto = FXCollections.observableArrayList();
     private RepertoireFonctionnel RepFonctionnel;
     private ElementsRejet paramElementsRejet;
@@ -23,7 +23,7 @@ public class Context {
         chargeElementsRejet();
         chargeRepertoirePhoto();
         chargeRepertoireFonctionnel();
-        chargeNommageRepertoire();
+        chargeControleRepertoire();
     }
 
     public static Context chargeParam() throws IOException {
@@ -49,29 +49,29 @@ public class Context {
         }
     }
 
-    private void chargeNommageRepertoire() throws IOException {
+    private void chargeControleRepertoire() throws IOException {
         String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
         File f = new File(rootPath + "objJson\\");
         FilenameFilter filter = new FilenameFilter() {
             @Override
             public boolean accept(File f, String name) {
-                return (name.startsWith("NommageRepertoire") && name.endsWith(".json"));
+                return (name.startsWith("ControleRepertoire") && name.endsWith(".json"));
             }
         };
         File[] files = f.listFiles(filter);
         for (int i = 0; i < files.length; i++) {
-            paramNommageRepertoire = (NommageRepertoire) NommageRepertoire.readJSON(NommageRepertoire.class, files[i].toString());
+            paramControleRepertoire = (ControleRepertoire) ControleRepertoire.readJSON(ControleRepertoire.class, files[i].toString());
         }
-        if (paramNommageRepertoire == null) {
-            paramNommageRepertoire = new NommageRepertoire();
-            ElementsRejet.writeJSON(paramNommageRepertoire, "NommageRepertoire.json");
+        if (paramControleRepertoire == null) {
+            paramControleRepertoire = new ControleRepertoire();
+            ElementsRejet.writeJSON(paramControleRepertoire, "ControleRepertoire.json");
         } else {
-            ElementsRejet.reWriteJSON(paramNommageRepertoire);
+            ElementsRejet.reWriteJSON(paramControleRepertoire);
         }
     }
 
-    public NommageRepertoire getParamNommageRepertoire() {
-        return paramNommageRepertoire;
+    public ControleRepertoire getParamControleRepertoire() {
+        return paramControleRepertoire;
     }
 
     public List<RepertoirePhoto> getArrayRepertoirePhoto() {
