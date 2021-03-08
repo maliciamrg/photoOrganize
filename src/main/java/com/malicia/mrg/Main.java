@@ -4,7 +4,6 @@ import com.malicia.mrg.app.workWithFiles;
 import com.malicia.mrg.app.workWithRepertory;
 import com.malicia.mrg.model.Database;
 import com.malicia.mrg.model.elementFichier;
-import com.malicia.mrg.param.importJson.ControleRepertoire;
 import com.malicia.mrg.param.importJson.RepertoirePhoto;
 import com.malicia.mrg.param.importJson.TriNew;
 import com.malicia.mrg.util.Serialize;
@@ -19,9 +18,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
-import static com.malicia.mrg.app.workWithRepertory.sqlMkdirRepertory;
-import static com.malicia.mrg.param.importJson.TriNew.FORMATDATE_YYYY_MM_DD;
 
 public class Main {
 
@@ -40,6 +36,10 @@ public class Main {
             ctx = Context.chargeParam();
             dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat());
             //*
+
+            //Maintenance database lr
+            maintenanceDatabase();
+            _____________is___________In_______________Work____________();
 
             //En Fonction De La Strategies De Rangement
             rangerLesRejets();
@@ -69,6 +69,15 @@ public class Main {
         }
 
     }
+
+    private static void maintenanceDatabase() throws SQLException {
+        LOGGER.info(dbLr.pathAbsentPhysique());
+        LOGGER.info(dbLr.folderWithoutRoot());
+        LOGGER.info(dbLr.folderAbsentPhysique());
+        LOGGER.info(dbLr.fileWithoutFolder());
+    }
+
+
 
     private static void _____________is___________In_______________Work____________() {
         if (isInWork) {

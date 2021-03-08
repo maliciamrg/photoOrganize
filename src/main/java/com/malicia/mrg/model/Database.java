@@ -335,4 +335,136 @@ public class Database extends SQLiteJDBCDriverConnection {
     }
 
 
+    public String pathAbsentPhysique() throws SQLException {
+            String sql = "select " +
+                    "c.absolutePath , " +
+                    "b.pathFromRoot , " +
+                    "a.lc_idx_filename as lc_idx_filename , " +
+                    "c.id_local as path_id_local , " +
+                    "b.id_local as folder_id_local , " +
+                    "a.id_local as file_id_local  , " +
+                    "b.rootFolder " +
+                    "from AgLibraryFile a  " +
+                    "inner join AgLibraryFolder b   " +
+                    " on a.folder = b.id_local  " +
+                    "inner join AgLibraryRootFolder c   " +
+                    " on b.rootFolder = c.id_local  " +
+                    ";";
+            ResultSet rs = select(sql);
+            String txtret = "";
+            int nb = 0;
+            int ko = 0;
+            int koCor = 0;
+            while (rs.next()) {
+                File filepath = new File(rs.getString("absolutePath") + rs.getString("pathFromRoot") + rs.getString("lc_idx_filename"));
+                nb += 1;
+                if (!filepath.exists()) {
+                    txtret += "ko = " + "file_id_local" + "(" + rs.getString("file_id_local") + ")" +  filepath.toString() + "\n";
+                    ko += 1;
+                    koCor += sqlDeleteFile(rs.getString("file_id_local"));
+                }
+
+            }
+            txtret += " nb path logique = " + nb + " : absent physique = " + ko + "\n";
+            txtret += "    --- corrige         = " + koCor + "\n";
+        return txtret;
+    }
+
+    public String folderAbsentPhysique() throws SQLException {
+        String sql = "select " +
+                "c.absolutePath , " +
+                "b.pathFromRoot , " +
+                "c.id_local as path_id_local , " +
+                "b.id_local as folder_id_local , " +
+                "b.rootFolder " +
+                "from AgLibraryFolder b   " +
+                "inner join AgLibraryRootFolder c   " +
+                " on b.rootFolder = c.id_local  " +
+                ";";
+        ResultSet rs = select(sql);
+        String txtret = "";
+        int nb = 0;
+        int ko = 0;
+        int koCor = 0;
+        while (rs.next()) {
+            File filepath = new File(rs.getString("absolutePath") + rs.getString("pathFromRoot") );
+            nb += 1;
+            if (!filepath.exists()) {
+                txtret += "ko = " + "folder_id_local" + "(" + rs.getString("folder_id_local") + ")" + filepath.toString() + "\n";
+                ko += 1;
+                koCor += sqlDeleteRepertory(rs.getString("folder_id_local"));
+            }
+
+        }
+        txtret += " nb folder logique = " + nb + " : absent physique = " + ko + "\n";
+        txtret += "    --- corrige         = " + koCor + "\n";
+        return txtret;
+    }
+
+    public String fileWithoutFolder() throws SQLException {
+        String sql = "select " +
+                " b.pathFromRoot , " +
+                " a.lc_idx_filename as lc_idx_filename , " +
+                " b.id_local as folder_id_local , " +
+                " a.id_local as file_id_local  , " +
+                " b.rootFolder " +
+                "from AgLibraryFile a " +
+                "left join AgLibraryFolder b " +
+                " on a.folder = b.id_local " +
+                "WHERE b.pathFromRoot is NULL" +
+                ";";
+        ResultSet rs = select(sql);
+        String txtret = "";
+        int ko = 0;
+        int koCor = 0;
+        while (rs.next()) {
+            txtret += "ko = " + "file_id_local" + "(" + rs.getString("file_id_local") + ")" + " lc_idx_filename => " + rs.getString("lc_idx_filename") + "\n";
+            ko += 1;
+            koCor += sqlDeleteFile(rs.getString("file_id_local"));
+        }
+        txtret += " nb file without Folder = " + ko + "\n";
+        txtret += "    --- corrige         = " + koCor + "\n";
+        return txtret;
+    }
+
+    public String folderWithoutRoot() throws SQLException {
+        String sql = "select c.absolutePath , " +
+                "b.pathFromRoot , " +
+                "c.id_local as path_id_local , " +
+                "b.id_local as folder_id_local , " +
+                "b.rootFolder " +
+                " from AgLibraryFolder b   " +
+                " LEFT join AgLibraryRootFolder c " +
+                "  on b.rootFolder = c.id_local " +
+                " WHERE c.absolutePath is NULL" +
+                ";";
+        ResultSet rs = select(sql);
+        String txtret = "";
+        int ko = 0;
+        int koCor = 0;
+        while (rs.next()) {
+                txtret += "ko = " + "folder_id_local" + "(" + rs.getString("folder_id_local") + ")" + " pathFromRoot => " + rs.getString("pathFromRoot") + "\n";
+                ko += 1;
+                koCor += sqlDeleteRepertory(rs.getString("folder_id_local"));
+        }
+        txtret += " nb folder without Root = " + ko + "\n";
+        txtret += "    --- corrige         = " + koCor + "\n";
+        return txtret;
+    }
+
+    private int sqlDeleteRepertory(String folder_id_local) throws SQLException {
+        String sql = " delete " +
+                "from AgLibraryFolder  " +
+                " where id_local = '" + folder_id_local + "' " +
+                " ; ";
+        return executeUpdate(sql);
+    }
+    private int sqlDeleteFile(String file_id_local) throws SQLException {
+        String sql = " delete " +
+                "from AgLibraryFile  " +
+                " where id_local = '" + file_id_local + "' " +
+                " ; ";
+        return executeUpdate(sql);
+    }
 }
+
