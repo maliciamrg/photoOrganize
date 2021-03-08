@@ -1,9 +1,6 @@
 package com.malicia.mrg;
 
-import com.malicia.mrg.param.ElementsRejet;
-import com.malicia.mrg.param.ControleRepertoire;
-import com.malicia.mrg.param.RepertoireFonctionnel;
-import com.malicia.mrg.param.RepertoirePhoto;
+import com.malicia.mrg.param.importJson.*;
 import javafx.collections.FXCollections;
 
 import java.io.File;
@@ -14,16 +11,24 @@ import java.text.NumberFormat;
 import java.util.List;
 
 public class Context {
+    private static final String JSON = ".json";
     private ControleRepertoire paramControleRepertoire;
     private List<RepertoirePhoto> arrayRepertoirePhoto = FXCollections.observableArrayList();
     private RepertoireFonctionnel RepFonctionnel;
     private ElementsRejet paramElementsRejet;
+
+    public TriNew getParamTriNew() {
+        return paramTriNew;
+    }
+
+    private TriNew paramTriNew;
 
     public Context() throws IOException {
         chargeElementsRejet();
         chargeRepertoirePhoto();
         chargeRepertoireFonctionnel();
         chargeControleRepertoire();
+        chargeParamTriNew();
     }
 
     public static Context chargeParam() throws IOException {
@@ -34,13 +39,36 @@ public class Context {
         return paramElementsRejet;
     }
 
+    private void chargeParamTriNew() throws IOException {
+        String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+        File f = new File(rootPath + "objJson\\");
+        final String triNew = "TriNew";
+        FilenameFilter filter = new FilenameFilter() {
+            @Override
+            public boolean accept(File f, String name) {
+                return (name.startsWith(triNew) && name.endsWith(JSON));
+            }
+        };
+        File[] files = f.listFiles(filter);
+        for (int i = 0; i < files.length; i++) {
+            paramTriNew = (TriNew) TriNew.readJSON(TriNew.class, files[i].toString());
+        }
+        if (paramTriNew == null) {
+            paramTriNew = new TriNew();
+            TriNew.writeJSON(paramTriNew, triNew + JSON);
+        } else {
+            TriNew.reWriteJSON(paramTriNew);
+        }
+    }
+
     private void chargeRepertoirePhoto() throws IOException {
         String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
         File f = new File(rootPath + "objJson\\");
         FilenameFilter filter = new FilenameFilter() {
             @Override
             public boolean accept(File f, String name) {
-                return (name.startsWith("repertoirePhoto") && name.endsWith(".json"));
+                String repertoirePhoto = "repertoirePhoto";
+                return (name.startsWith(repertoirePhoto) && name.endsWith(JSON));
             }
         };
         File[] files = f.listFiles(filter);
@@ -52,10 +80,11 @@ public class Context {
     private void chargeControleRepertoire() throws IOException {
         String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
         File f = new File(rootPath + "objJson\\");
+        final String controleRepertoire = "ControleRepertoire";
         FilenameFilter filter = new FilenameFilter() {
             @Override
             public boolean accept(File f, String name) {
-                return (name.startsWith("ControleRepertoire") && name.endsWith(".json"));
+                return (name.startsWith(controleRepertoire) && name.endsWith(JSON));
             }
         };
         File[] files = f.listFiles(filter);
@@ -64,7 +93,7 @@ public class Context {
         }
         if (paramControleRepertoire == null) {
             paramControleRepertoire = new ControleRepertoire();
-            ElementsRejet.writeJSON(paramControleRepertoire, "ControleRepertoire.json");
+            ElementsRejet.writeJSON(paramControleRepertoire, controleRepertoire + JSON);
         } else {
             ElementsRejet.reWriteJSON(paramControleRepertoire);
         }
@@ -93,10 +122,11 @@ public class Context {
     private void chargeRepertoireFonctionnel() throws IOException {
         String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
         File f = new File(rootPath + "objJson\\");
+        final String repertoireFonctionnel = "RepertoireFonctionnel";
         FilenameFilter filter = new FilenameFilter() {
             @Override
             public boolean accept(File f, String name) {
-                return (name.startsWith("RepertoireFonctionnel") && name.endsWith(".json"));
+                return (name.startsWith(repertoireFonctionnel) && name.endsWith(JSON));
             }
         };
         File[] files = f.listFiles(filter);
@@ -105,7 +135,7 @@ public class Context {
         }
         if (RepFonctionnel == null) {
             RepFonctionnel = new RepertoireFonctionnel();
-            RepertoireFonctionnel.writeJSON(RepFonctionnel, "RepertoireFonctionnel.json");
+            RepertoireFonctionnel.writeJSON(RepFonctionnel, repertoireFonctionnel + JSON);
         } else {
             RepertoireFonctionnel.reWriteJSON(RepFonctionnel);
         }
@@ -114,10 +144,11 @@ public class Context {
     private void chargeElementsRejet() throws IOException {
         String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
         File f = new File(rootPath + "objJson\\");
+        final String elementsRejet = "ElementsRejet";
         FilenameFilter filter = new FilenameFilter() {
             @Override
             public boolean accept(File f, String name) {
-                return (name.startsWith("ElementsRejet") && name.endsWith(".json"));
+                return (name.startsWith(elementsRejet) && name.endsWith(JSON));
             }
         };
         File[] files = f.listFiles(filter);
@@ -126,7 +157,7 @@ public class Context {
         }
         if (paramElementsRejet == null) {
             paramElementsRejet = new ElementsRejet();
-            ElementsRejet.writeJSON(paramElementsRejet, "ElementsRejet.json");
+            ElementsRejet.writeJSON(paramElementsRejet, elementsRejet + JSON);
         } else {
             ElementsRejet.reWriteJSON(paramElementsRejet);
         }
@@ -145,6 +176,6 @@ public class Context {
     }
 
     public String getCatalogLrcat() {
-        return RepFonctionnel.getRepertoireCatalog() + File.separator + RepFonctionnel.getCatalogLrcat() ;
+        return RepFonctionnel.getRepertoireCatalog() + File.separator + RepFonctionnel.getCatalogLrcat();
     }
 }

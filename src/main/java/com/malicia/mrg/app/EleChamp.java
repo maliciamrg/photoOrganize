@@ -1,8 +1,8 @@
 package com.malicia.mrg.app;
 
-import com.malicia.mrg.data.Database;
-import com.malicia.mrg.param.ControleRepertoire;
-import com.malicia.mrg.param.RepertoirePhoto;
+import com.malicia.mrg.model.Database;
+import com.malicia.mrg.param.importJson.ControleRepertoire;
+import com.malicia.mrg.param.importJson.RepertoirePhoto;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,7 +40,7 @@ class EleChamp {
         return infoRetourControle;
     }
 
-    public void controleChamp(Database dbLr, String repertoire, RepertoirePhoto repPhoto, long idLocalRep) throws SQLException {
+    public void controleChamp(Database dbLr, String repertoire, RepertoirePhoto repPhoto) throws SQLException {
         LOGGER.debug("controleChamp : " + getcChamp());
 
         retourControle = false;
@@ -57,7 +57,7 @@ class EleChamp {
                 int nbelements = 0;
                 switch (elechamp) {
                     case ControleRepertoire.£_DATE_£:
-                        String date = dbLr.getDate(idLocalRep);
+                        String date = dbLr.getDate(repertoire);
                         setRetourToFalse(date);
                         if (date.compareTo(oValue) == 0) {
                             setRetourToTrue();
@@ -78,8 +78,8 @@ class EleChamp {
                         }
                         break;
                     case ControleRepertoire.NB_STAR_VALUE:
-                        nbSelectionner = dbLr.nb_pick(idLocalRep);
-                        Map<String, Integer> starValue = dbLr.getStarValue(idLocalRep);
+                        nbSelectionner = dbLr.nb_pick(repertoire);
+                        Map<String, Integer> starValue = dbLr.getStarValue(repertoire);
                         List<Integer> ratio = repPhoto.getratioStarMax();
                         String res = "";
                         boolean allStarGood = true;
@@ -112,15 +112,15 @@ class EleChamp {
                         }
                         break;
                     case ControleRepertoire.NB_SELECTIONNER:
-                        nbSelectionner = dbLr.nb_pick(idLocalRep);
+                        nbSelectionner = dbLr.nb_pick(repertoire);
                         setRetourToTrue();
                         if (nbSelectionner == 0) {
                             setRetourToFalse(String.valueOf(nbSelectionner));
                         }
                         break;
                     case ControleRepertoire.NB_PHOTOAPURGER:
-                        limitemaxfolder = (int) ((repPhoto.getNbMaxParUniteDeJour() * Math.ceil(dbLr.nbjourfolder(idLocalRep))) / Double.valueOf(repPhoto.getUniteDeJour()));
-                        nbSelectionner = dbLr.nb_pick(idLocalRep);
+                        limitemaxfolder = (int) ((repPhoto.getNbMaxParUniteDeJour() * Math.ceil(dbLr.nbjourfolder(repertoire))) / Double.valueOf(repPhoto.getUniteDeJour()));
+                        nbSelectionner = dbLr.nb_pick(repertoire);
                         nbphotoapurger = nbSelectionner - limitemaxfolder;
                         setRetourToTrue();
                         if (nbphotoapurger > 0) {
@@ -128,7 +128,7 @@ class EleChamp {
                         }
                         break;
                     case ControleRepertoire.NB_LIMITEMAXFOLDER:
-                        limitemaxfolder = (int) ((repPhoto.getNbMaxParUniteDeJour() * Math.ceil(dbLr.nbjourfolder(idLocalRep))) / Double.valueOf(repPhoto.getUniteDeJour()));
+                        limitemaxfolder = (int) ((repPhoto.getNbMaxParUniteDeJour() * Math.ceil(dbLr.nbjourfolder(repertoire))) / Double.valueOf(repPhoto.getUniteDeJour()));
                         setRetourToTrue();
                         if (limitemaxfolder == 0) {
                             setRetourToFalse(String.valueOf(limitemaxfolder));

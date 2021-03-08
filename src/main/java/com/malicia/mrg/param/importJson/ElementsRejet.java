@@ -1,4 +1,4 @@
-package com.malicia.mrg.param;
+package com.malicia.mrg.param.importJson;
 
 import com.malicia.mrg.util.Serialize;
 import javafx.collections.FXCollections;

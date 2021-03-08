@@ -1,7 +1,6 @@
 package com.malicia.mrg.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.malicia.mrg.param.RepertoirePhoto;
 
 import java.io.File;
 import java.io.IOException;

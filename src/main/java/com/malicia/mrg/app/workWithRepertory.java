@@ -1,9 +1,11 @@
 package com.malicia.mrg.app;
 
-import com.malicia.mrg.data.Database;
-import com.malicia.mrg.param.ControleRepertoire;
-import com.malicia.mrg.param.RepertoirePhoto;
+import com.malicia.mrg.Main;
+import com.malicia.mrg.model.Database;
+import com.malicia.mrg.param.importJson.ControleRepertoire;
+import com.malicia.mrg.param.importJson.RepertoirePhoto;
 import com.malicia.mrg.util.Serialize;
+import com.malicia.mrg.util.SystemFiles;
 import javafx.collections.FXCollections;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,7 +26,7 @@ public class workWithRepertory {
         File folder = new File(fileLocation);
         File[] listFiles = folder.listFiles();
         if (listFiles.length == 0) {
-            LOGGER.trace("Folder Name :: " + folder.getAbsolutePath() + " is deleted.");
+            LOGGER.debug("Folder Name :: " + folder.getAbsolutePath() + " is deleted.");
             folder.delete();
             isFinished = false;
         } else {
@@ -40,7 +42,11 @@ public class workWithRepertory {
 
     public static List<String> listRepertoireEligible(String repertoire50Phototheque, RepertoirePhoto repPhoto) {
         List<String> ret = FXCollections.observableArrayList();
-        File[] files = new File(repertoire50Phototheque + repPhoto.getRepertoire()).listFiles();
+        String pathname = repertoire50Phototheque + repPhoto.getRepertoire();
+        File[] files = new File(pathname).listFiles();
+
+        SystemFiles.mkdir(pathname);
+
         for (File file : files) {
             if (file.isDirectory()) {
                 ret.add(file.toString());
@@ -50,9 +56,7 @@ public class workWithRepertory {
     }
 
     public static boolean isRepertoireOk(Database dbLr, String repertoire, RepertoirePhoto repPhoto, ControleRepertoire paramControleRepertoire) throws SQLException, IOException {
-        LOGGER.info("isRepertoireOk : " + repertoire);
-
-        long idLocalRep = dbLr.getIdlocalforRep(repertoire);
+        LOGGER.debug("isRepertoireOk : " + repertoire);
 
         String oldNameRepertoire = new File(repertoire).getName();
         String oldcheminRepertoire = new File(repertoire).getParent();
@@ -72,7 +76,7 @@ public class workWithRepertory {
             } else {
                 EChamp = new EleChamp(valeurAdmise, "");
             }
-            EChamp.controleChamp(dbLr, repertoire, repPhoto, idLocalRep);
+            EChamp.controleChamp(dbLr, repertoire, repPhoto);
             listOfChamp.add(EChamp);
 
 
@@ -86,7 +90,7 @@ public class workWithRepertory {
             EleChamp EChamp = new EleChamp();
             String ele = listControleRepertoireIterator.next();
             EChamp.setcChamp(ele);
-            EChamp.controleChamp(dbLr, repertoire, repPhoto, idLocalRep);
+            EChamp.controleChamp(dbLr, repertoire, repPhoto);
             listOfChamp.add(EChamp);
         }
 
@@ -102,7 +106,7 @@ public class workWithRepertory {
         File f = new File(repertoire + "\\" + "photoOrganizeAnalyse.json");
         if (!retour) {
             Serialize.writeJSON(listOfChamp, f);
-            LOGGER.info("ecriture fichier ->" + f.toString());
+            LOGGER.debug("ecriture fichier ->" + f.toString());
         } else {
             f.delete();
         }
@@ -125,6 +129,14 @@ public class workWithRepertory {
             LOGGER.debug(() -> "move_repertoire p=" + fsource.toString() + " -> " + fdest.toString());
             Files.move(fsource.toPath(), fdest.toPath());
         }
+    }
+
+
+    public static void sqlMkdirRepertory(String directoryName,Database dbLr) throws SQLException {
+
+        SystemFiles.mkdir(directoryName);
+
+        dbLr.makeRepertory(directoryName);
     }
 
 }

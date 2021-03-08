@@ -2,8 +2,12 @@ package com.malicia.mrg;
 
 import com.malicia.mrg.app.workWithFiles;
 import com.malicia.mrg.app.workWithRepertory;
-import com.malicia.mrg.data.Database;
-import com.malicia.mrg.param.RepertoirePhoto;
+import com.malicia.mrg.model.Database;
+import com.malicia.mrg.model.elementFichier;
+import com.malicia.mrg.param.importJson.ControleRepertoire;
+import com.malicia.mrg.param.importJson.RepertoirePhoto;
+import com.malicia.mrg.param.importJson.TriNew;
+import com.malicia.mrg.util.Serialize;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
@@ -11,8 +15,13 @@ import org.apache.logging.log4j.Logger;
 import net.lingala.zip4j.ZipFile;
 
 import java.io.*;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static com.malicia.mrg.app.workWithRepertory.sqlMkdirRepertory;
+import static com.malicia.mrg.param.importJson.TriNew.FORMATDATE_YYYY_MM_DD;
 
 public class Main {
 
@@ -35,15 +44,18 @@ public class Main {
             //En Fonction De La Strategies De Rangement
             rangerLesRejets();
             topperLesRepertoires();
-            _____________is___________In_______________Work____________();
             regrouperLesNouvellesPhoto();
             //*
 
             //Nettoyage repertoires Local
             PurgeDesRepertoireVide50Photothèque();
+            //*
 
             //Nettoyage repertoires réseaux
             purgeDesRepertoireVide00NEW();
+            //*
+
+            _____________is___________In_______________Work____________();
 
             //Sauvegarde Lightroom sur Local
             SauvegardeLightroomConfigSauve();
@@ -95,8 +107,97 @@ public class Main {
         //TODO
     }
 
-    private static void regrouperLesNouvellesPhoto() {
-        //TODO
+    private static void regrouperLesNouvellesPhoto() throws SQLException, IOException {
+
+        //Regroupement
+        ResultSet rsele = dbLr.sqlgetListelementnewaclasser(ctx.getParamTriNew().getTempsAdherence(), ctx.getParamTriNew().getRepertoire50NEW());
+
+        grpPhoto listFileBazar = new grpPhoto();
+        grpPhoto listElekidz = new grpPhoto();
+        List<grpPhoto> listGrpEletmp = new ArrayList();
+        grpPhoto listEletmp = new grpPhoto();
+
+
+        List<String> listkidsModel = ctx.getParamTriNew().getListeModelKidz();
+        long maxprev = 0;
+        while (rsele.next()) {
+
+            // Recuperer les info de l'elements
+            String file_id_local = rsele.getString("file_id_local");
+            String file_id_global = rsele.getString("id_global");
+            String folder_id_local = rsele.getString("folder_id_local");
+            String absolutePath = rsele.getString("absolutePath");
+            String pathFromRoot = rsele.getString("pathFromRoot");
+            String lcIdxFilename = rsele.getString("lc_idx_filename");
+            String cameraModel = rsele.getString("CameraModel");
+            long mint = rsele.getLong("mint");
+            long maxt = rsele.getLong("maxt");
+            Double rating = rsele.getDouble("rating");
+            Double pick = rsele.getDouble("pick");
+            String fileformat = rsele.getString("fileformat");
+            String orientation = rsele.getString("orientation");
+            long captureTime = rsele.getLong("captureTime");
+
+            elementFichier eleFile = new elementFichier(absolutePath, pathFromRoot, lcIdxFilename, file_id_local, folder_id_local, cameraModel, captureTime, mint, maxt, rating, pick);
+
+            if (listkidsModel.contains(cameraModel)) {
+                listElekidz.add(eleFile);
+            } else {
+                if (mint > maxprev) {
+
+                    if (listEletmp.size() > ctx.getParamTriNew().getThresholdNew()) {
+                        listGrpEletmp.add(listEletmp);
+                    } else {
+                        listFileBazar.addAll(listEletmp);
+                    }
+
+                    listEletmp = new grpPhoto();
+
+                }
+                maxprev = maxt;
+                listEletmp.setFirstDate(captureTime);
+                listEletmp.add(eleFile);
+            }
+
+        }
+        if (listEletmp.size() > ctx.getParamTriNew().getThresholdNew()) {
+            listGrpEletmp.add(listEletmp);
+        } else {
+            listFileBazar.addAll(listEletmp);
+        }
+
+
+        //deplacement des group d'elements New Trier
+        int nbtot = 0;
+        LOGGER.info("listGrpEletmp       => " + String.format("%05d", listGrpEletmp.size()));
+        for (grpPhoto listEle : listGrpEletmp) {
+            nbtot = +listEle.lstEleFile.size();
+            SimpleDateFormat repDateFormat = new SimpleDateFormat(TriNew.FORMATDATE_YYYY_MM_DD);
+            String nomRep = repDateFormat.format(new Date(listEle.getFirstDate() * 1000)) + "_(" + String.format("%05d", listEle.lstEleFile.size()) + ")";
+            for (elementFichier eleGrp : listEle.lstEleFile) {
+
+                String newName = ctx.getParamTriNew().getRepertoire50NEW() + nomRep + File.separator + eleGrp.getLcIdxFilename();
+                workWithFiles.moveFileintoFolder(eleGrp, newName, dbLr);
+
+            }
+        }
+        LOGGER.info("listGrpEletmp nbtot => " + String.format("%05d", nbtot));
+
+        //deplacement des group d'elements Kidz
+        LOGGER.info("listElekidz         => " + String.format("%05d", listElekidz.lstEleFile.size()));
+        for (elementFichier eleGrp : listElekidz.lstEleFile) {
+            String newName = ctx.getParamTriNew().getRepertoireKidz() + File.separator + eleGrp.getLcIdxFilename();
+            workWithFiles.moveFileintoFolder(eleGrp, newName, dbLr);
+        }
+
+        //deplacement des group d'elements Bazar
+        LOGGER.info("listFileBazar       => " + String.format("%05d", listFileBazar.lstEleFile.size()));
+        for (elementFichier eleGrp : listFileBazar.lstEleFile) {
+            String newName = ctx.getParamTriNew().getRepertoireBazar() + File.separator + eleGrp.getLcIdxFilename();
+            workWithFiles.moveFileintoFolder(eleGrp, newName, dbLr);
+        }
+
+
     }
 
     private static void topperLesRepertoires() throws IOException, SQLException {
@@ -105,20 +206,23 @@ public class Main {
         ListIterator<RepertoirePhoto> repertoirePhotoIterator = arrayRepertoirePhoto.listIterator();
         while (repertoirePhotoIterator.hasNext()) {
             RepertoirePhoto repPhoto = repertoirePhotoIterator.next();
+            LOGGER.info("topperLesRepertoires = > " + ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire());
             List<String> listRep = workWithRepertory.listRepertoireEligible(ctx.getRepertoire50Phototheque(), repPhoto);
 
             ListIterator<String> repertoireIterator = listRep.listIterator();
             while (repertoireIterator.hasNext()) {
                 String repertoire = repertoireIterator.next();
 
-                if (!workWithRepertory.isRepertoireOk(dbLr ,repertoire, repPhoto, ctx.getParamControleRepertoire())) {
-                        LOGGER.info(repertoire +"=>"+"ko");
-                        //todo
-//                    workWithRepertory.renommerRepertoire(repertoire, newRepertoire);
-//                    dbLr.renommerRepertoireLogique(repertoire, newRepertoire);
+                if (!workWithRepertory.isRepertoireOk(dbLr, repertoire, repPhoto, ctx.getParamControleRepertoire())) {
+                    LOGGER.debug(repertoire + "=>" + "ko");
                 }
 
             }
+
+            File f = new File(ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire() + "\\" + new File(repPhoto.getRepertoire()).getName() +  ".svg.json");
+            Serialize.writeJSON(repPhoto, f);
+            LOGGER.debug("ecriture fichier ->" + f.toString());
+
         }
     }
 
@@ -169,9 +273,10 @@ public class Main {
             if (ctx.getParamElementsRejet().getArrayNomFileRejet().contains(fileExt.toLowerCase())) {
                 String oldName = fichier.toString();
                 String newName = oldName + "." + ctx.getParamElementsRejet().getExtFileRejet();
-
-                workWithFiles.renameFile(oldName, newName);
-                dbLr.renameFileLogique(oldName, newName);
+                File fsource = new File(oldName);
+                if (!fsource.exists() || !fsource.isFile()) {
+                    workWithFiles.renameFile(oldName, newName, dbLr);
+                }
             }
         }
 
