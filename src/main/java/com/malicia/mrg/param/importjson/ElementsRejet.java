@@ -1,4 +1,4 @@
-package com.malicia.mrg.param.importJson;
+package com.malicia.mrg.param.importjson;
 
 import com.malicia.mrg.util.Serialize;
 import javafx.collections.FXCollections;
@@ -12,6 +12,7 @@ public class ElementsRejet extends Serialize {
     private String extFileRejet;
 
     public ElementsRejet() {
+        // Do nothing because of X and Y
     }
 
     public List<String> getArrayNomFileRejet() {

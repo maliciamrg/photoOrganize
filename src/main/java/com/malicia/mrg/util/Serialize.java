@@ -17,15 +17,15 @@ public class Serialize {
         fileName = fileNameIn;
     }
 
-    public static void writeJSON(Object o, File FileName) throws IOException {
+    public static void writeJSON(Object o, File fileName) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.writerWithDefaultPrettyPrinter().writeValue(FileName, o);
+        mapper.writerWithDefaultPrettyPrinter().writeValue(fileName, o);
     }
 
-    public static void writeJSON(Object o, String FileName) throws IOException {
+    public static void writeJSON(Object o, String fileName) throws IOException {
 
         String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
-        File f = new File(rootPath + "objJson\\" + FileName);
+        File f = new File(rootPath + "objJson\\" + fileName);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.writerWithDefaultPrettyPrinter().writeValue(f, o);
@@ -36,10 +36,10 @@ public class Serialize {
         mapper.writerWithDefaultPrettyPrinter().writeValue(new File(((Serialize)o).fileName), o);
     }
 
-    public static Object readJSON(Class aClass, String FileName) throws IOException {
+    public static Object readJSON(Class aClass, String fileName) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        Object objret = mapper.readValue(new File(FileName), aClass);
-        ((Serialize)objret).fileName = FileName;
+        Object objret = mapper.readValue(new File(fileName), aClass);
+        ((Serialize)objret).fileName = fileName;
         return objret ;
 
     }

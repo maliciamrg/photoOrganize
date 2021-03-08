@@ -1,4 +1,4 @@
-package com.malicia.mrg.param.importJson;
+package com.malicia.mrg.param.importjson;
 
 import com.malicia.mrg.util.Serialize;
 import javafx.collections.FXCollections;
@@ -7,7 +7,7 @@ import java.util.List;
 
 public class ControleRepertoire extends Serialize {
 
-    public static final String £_DATE_£ = "£DATE£";
+    public static final String DATE_DATE = "£DATE£";
     public static final String TAG_ACTION = "@10_Action@";
     public static final String TAG_PIECE = "@10_Piece@";
     public static final String TAG_CHANTIER = "@10_Chantier@";

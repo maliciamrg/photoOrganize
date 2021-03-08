@@ -1,6 +1,6 @@
 package com.malicia.mrg;
 
-import com.malicia.mrg.param.importJson.*;
+import com.malicia.mrg.param.importjson.*;
 import javafx.collections.FXCollections;
 
 import java.io.File;
@@ -14,7 +14,7 @@ public class Context {
     private static final String JSON = ".json";
     private ControleRepertoire paramControleRepertoire;
     private List<RepertoirePhoto> arrayRepertoirePhoto = FXCollections.observableArrayList();
-    private RepertoireFonctionnel RepFonctionnel;
+    private RepertoireFonctionnel repFonctionnel;
     private ElementsRejet paramElementsRejet;
 
     public TriNew getParamTriNew() {
@@ -108,14 +108,14 @@ public class Context {
     }
 
     public String getRepertoireDestZip() {
-        int n = (int) Math.floor(Math.random() * 100000 + 1);
+        int n = (int) Math.floor(Math.random() * Double.valueOf(repFonctionnel.getNbRotateRepertoireDestZip()) + 1);
         NumberFormat formatter = new DecimalFormat("00000");
         String number = formatter.format(n);
-        return RepFonctionnel.getRepertoireDestZip().replace("%num%", number);
+        return repFonctionnel.getRepertoireDestZip().replace("%num%", number);
     }
 
     public String getRepertoireRoamingAdobeLightroom() {
-        return RepFonctionnel.getRepertoireRoamingAdobeLightroom();
+        return repFonctionnel.getRepertoireRoamingAdobeLightroom();
     }
 
 
@@ -131,13 +131,13 @@ public class Context {
         };
         File[] files = f.listFiles(filter);
         for (int i = 0; i < files.length; i++) {
-            RepFonctionnel = (RepertoireFonctionnel) RepertoireFonctionnel.readJSON(RepertoireFonctionnel.class, files[i].toString());
+            repFonctionnel = (RepertoireFonctionnel) RepertoireFonctionnel.readJSON(RepertoireFonctionnel.class, files[i].toString());
         }
-        if (RepFonctionnel == null) {
-            RepFonctionnel = new RepertoireFonctionnel();
-            RepertoireFonctionnel.writeJSON(RepFonctionnel, repertoireFonctionnel + JSON);
+        if (repFonctionnel == null) {
+            repFonctionnel = new RepertoireFonctionnel();
+            RepertoireFonctionnel.writeJSON(repFonctionnel, repertoireFonctionnel + JSON);
         } else {
-            RepertoireFonctionnel.reWriteJSON(RepFonctionnel);
+            RepertoireFonctionnel.reWriteJSON(repFonctionnel);
         }
     }
 
@@ -164,11 +164,11 @@ public class Context {
     }
 
     public String getRepertoire50Phototheque() {
-        return RepFonctionnel.getRepertoire50Phototheque();
+        return repFonctionnel.getRepertoire50Phototheque();
     }
 
     public String getRepertoire00NEW() {
-        return RepFonctionnel.getRepertoire00NEW();
+        return repFonctionnel.getRepertoire00NEW();
     }
 
     public List<String> getArrayNomSubdirectoryRejet() {
@@ -176,6 +176,6 @@ public class Context {
     }
 
     public String getCatalogLrcat() {
-        return RepFonctionnel.getRepertoireCatalog() + File.separator + RepFonctionnel.getCatalogLrcat();
+        return repFonctionnel.getRepertoireCatalog() + File.separator + repFonctionnel.getCatalogLrcat();
     }
 }

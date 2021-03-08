@@ -1,11 +1,11 @@
 package com.malicia.mrg;
 
-import com.malicia.mrg.app.workWithFiles;
-import com.malicia.mrg.app.workWithRepertory;
+import com.malicia.mrg.app.WorkWithFiles;
+import com.malicia.mrg.app.WorkWithRepertory;
 import com.malicia.mrg.model.Database;
-import com.malicia.mrg.model.elementFichier;
-import com.malicia.mrg.param.importJson.RepertoirePhoto;
-import com.malicia.mrg.param.importJson.TriNew;
+import com.malicia.mrg.model.ElementFichier;
+import com.malicia.mrg.param.importjson.RepertoirePhoto;
+import com.malicia.mrg.param.importjson.TriNew;
 import com.malicia.mrg.util.Serialize;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FilenameUtils;
@@ -23,7 +23,7 @@ public class Main {
 
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
     //Work In Progress ??????
-    private static final Boolean isInWork = Boolean.TRUE;
+    private static final Boolean IS_IN_WORK = Boolean.TRUE;
 
     private static Context ctx;
     private static Database dbLr;
@@ -47,7 +47,7 @@ public class Main {
             //*
 
             //Nettoyage repertoires Local
-            PurgeDesRepertoireVide50Photothèque();
+            purgeDesRepertoireVide50Phototheque();
             //*
 
             //Nettoyage repertoires réseaux
@@ -55,12 +55,12 @@ public class Main {
             //*
 
             //Sauvegarde Lightroom sur Local
-            SauvegardeLightroomConfigSauve();
+            sauvegardeLightroomConfigSauve();
 
-            _____________is___________In_______________Work____________();
+            isInWork();
 
             //sauvegarde Vers Réseaux Pour Cloud
-            sauvegardeStudioPhoto2Réseaux();
+            sauvegardeStudioPhoto2Reseaux();
 
         } catch (IOException | SQLException e) {
             e.printStackTrace();
@@ -78,8 +78,8 @@ public class Main {
 
 
 
-    private static void _____________is___________In_______________Work____________() {
-        if (isInWork) {
+    private static void isInWork() {
+        if (IS_IN_WORK) {
             throw new IllegalStateException("Under Construct");
         }
     }
@@ -111,7 +111,26 @@ public class Main {
         LOGGER.info("Start");
     }
 
-    private static void sauvegardeStudioPhoto2Réseaux() {
+    private static void sauvegardeStudioPhoto2Reseaux() {
+//        RSync rsync = new RSync()
+//                .source("/home/arth/DataSourceFolder/a.txt")
+//                .destination("/home/arth/DataDestinationFolder/")
+//                .recursive(true);
+//        // or if you prefer using commandline options:
+//        // rsync.setOptions(new String[]{"-r", "/one/place/", "/other/place/"});
+//        CollectingProcessOutput output = null;
+//        try {
+//            System.out.println("Inside try");
+//            output = rsync.execute();
+//            System.out.println("End of try");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        System.out.println(output.getStdOut());
+//        System.out.println("Exit code: " + output.getExitCode());
+//        if (output.getExitCode() > 0)
+//            System.err.println(output.getStdErr());
+
         //TODO
     }
 
@@ -120,10 +139,10 @@ public class Main {
         //Regroupement
         ResultSet rsele = dbLr.sqlgetListelementnewaclasser(ctx.getParamTriNew().getTempsAdherence(), ctx.getParamTriNew().getRepertoire50NEW());
 
-        grpPhoto listFileBazar = new grpPhoto();
-        grpPhoto listElekidz = new grpPhoto();
-        List<grpPhoto> listGrpEletmp = new ArrayList();
-        grpPhoto listEletmp = new grpPhoto();
+        GrpPhoto listFileBazar = new GrpPhoto();
+        GrpPhoto listElekidz = new GrpPhoto();
+        List<GrpPhoto> listGrpEletmp = new ArrayList();
+        GrpPhoto listEletmp = new GrpPhoto();
 
 
         List<String> listkidsModel = ctx.getParamTriNew().getListeModelKidz();
@@ -131,22 +150,16 @@ public class Main {
         while (rsele.next()) {
 
             // Recuperer les info de l'elements
-            String file_id_local = rsele.getString("file_id_local");
-            String file_id_global = rsele.getString("id_global");
-            String folder_id_local = rsele.getString("folder_id_local");
+            String fileIdLocal = rsele.getString("file_id_local");
             String absolutePath = rsele.getString("absolutePath");
             String pathFromRoot = rsele.getString("pathFromRoot");
             String lcIdxFilename = rsele.getString("lc_idx_filename");
             String cameraModel = rsele.getString("CameraModel");
             long mint = rsele.getLong("mint");
             long maxt = rsele.getLong("maxt");
-            Double rating = rsele.getDouble("rating");
-            Double pick = rsele.getDouble("pick");
-            String fileformat = rsele.getString("fileformat");
-            String orientation = rsele.getString("orientation");
             long captureTime = rsele.getLong("captureTime");
 
-            elementFichier eleFile = new elementFichier(absolutePath, pathFromRoot, lcIdxFilename, file_id_local, folder_id_local, cameraModel, captureTime, mint, maxt, rating, pick);
+            ElementFichier eleFile = new ElementFichier(absolutePath, pathFromRoot, lcIdxFilename, fileIdLocal);
 
             if (listkidsModel.contains(cameraModel)) {
                 listElekidz.add(eleFile);
@@ -159,7 +172,7 @@ public class Main {
                         listFileBazar.addAll(listEletmp);
                     }
 
-                    listEletmp = new grpPhoto();
+                    listEletmp = new GrpPhoto();
 
                 }
                 maxprev = maxt;
@@ -174,18 +187,22 @@ public class Main {
             listFileBazar.addAll(listEletmp);
         }
 
+        deplacementDesGroupes(listFileBazar, listElekidz, listGrpEletmp);
 
+    }
+
+    private static void deplacementDesGroupes(GrpPhoto listFileBazar, GrpPhoto listElekidz, List<GrpPhoto> listGrpEletmp) throws IOException, SQLException {
         //deplacement des group d'elements New Trier
         int nbtot = 0;
         LOGGER.info("listGrpEletmp       => " + String.format("%05d", listGrpEletmp.size()));
-        for (grpPhoto listEle : listGrpEletmp) {
+        for (GrpPhoto listEle : listGrpEletmp) {
             nbtot += listEle.lstEleFile.size();
             SimpleDateFormat repDateFormat = new SimpleDateFormat(TriNew.FORMATDATE_YYYY_MM_DD);
             String nomRep = repDateFormat.format(new Date(listEle.getFirstDate() * 1000)) + "_(" + String.format("%05d", listEle.lstEleFile.size()) + ")";
-            for (elementFichier eleGrp : listEle.lstEleFile) {
+            for (ElementFichier eleGrp : listEle.lstEleFile) {
 
                 String newName = ctx.getParamTriNew().getRepertoire50NEW() + nomRep + File.separator + eleGrp.getLcIdxFilename();
-                workWithFiles.moveFileintoFolder(eleGrp, newName, dbLr);
+                WorkWithFiles.moveFileintoFolder(eleGrp, newName, dbLr);
 
             }
         }
@@ -193,19 +210,17 @@ public class Main {
 
         //deplacement des group d'elements Kidz
         LOGGER.info("listElekidz         => " + String.format("%05d", listElekidz.lstEleFile.size()));
-        for (elementFichier eleGrp : listElekidz.lstEleFile) {
+        for (ElementFichier eleGrp : listElekidz.lstEleFile) {
             String newName = ctx.getParamTriNew().getRepertoireKidz() + File.separator + eleGrp.getLcIdxFilename();
-            workWithFiles.moveFileintoFolder(eleGrp, newName, dbLr);
+            WorkWithFiles.moveFileintoFolder(eleGrp, newName, dbLr);
         }
 
         //deplacement des group d'elements Bazar
         LOGGER.info("listFileBazar       => " + String.format("%05d", listFileBazar.lstEleFile.size()));
-        for (elementFichier eleGrp : listFileBazar.lstEleFile) {
+        for (ElementFichier eleGrp : listFileBazar.lstEleFile) {
             String newName = ctx.getParamTriNew().getRepertoireBazar() + File.separator + eleGrp.getLcIdxFilename();
-            workWithFiles.moveFileintoFolder(eleGrp, newName, dbLr);
+            WorkWithFiles.moveFileintoFolder(eleGrp, newName, dbLr);
         }
-
-
     }
 
     private static void topperLesRepertoires() throws IOException, SQLException {
@@ -215,13 +230,13 @@ public class Main {
         while (repertoirePhotoIterator.hasNext()) {
             RepertoirePhoto repPhoto = repertoirePhotoIterator.next();
             LOGGER.info("topperLesRepertoires = > " + ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire());
-            List<String> listRep = workWithRepertory.listRepertoireEligible(ctx.getRepertoire50Phototheque(), repPhoto);
+            List<String> listRep = WorkWithRepertory.listRepertoireEligible(ctx.getRepertoire50Phototheque(), repPhoto);
 
             ListIterator<String> repertoireIterator = listRep.listIterator();
             while (repertoireIterator.hasNext()) {
                 String repertoire = repertoireIterator.next();
 
-                if (!workWithRepertory.isRepertoireOk(dbLr, repertoire, repPhoto, ctx.getParamControleRepertoire())) {
+                if (!WorkWithRepertory.isRepertoireOk(dbLr, repertoire, repPhoto, ctx.getParamControleRepertoire())) {
                     LOGGER.debug(repertoire + "=>" + "ko");
                 }
 
@@ -234,30 +249,30 @@ public class Main {
         }
     }
 
-    private static void SauvegardeLightroomConfigSauve() throws ZipException {
+    private static void sauvegardeLightroomConfigSauve() throws ZipException {
         // zip file with a folder
         new ZipFile(ctx.getRepertoireDestZip()).addFolder(new File(ctx.getRepertoireRoamingAdobeLightroom()));
     }
 
-    private static void PurgeDesRepertoireVide50Photothèque() {
-        String FOLDER_LOCATION = ctx.getRepertoire50Phototheque();
+    private static void purgeDesRepertoireVide50Phototheque() {
+        String folderlocation = ctx.getRepertoire50Phototheque();
         boolean isFinished = false;
         do {
-            isFinished = workWithRepertory.deleteEmptyRep(FOLDER_LOCATION);
+            isFinished = WorkWithRepertory.deleteEmptyRep(folderlocation);
         } while (!isFinished);
     }
 
     private static void purgeDesRepertoireVide00NEW() {
-        String FOLDER_LOCATION = ctx.getRepertoire00NEW();
+        String folderlocation = ctx.getRepertoire00NEW();
         boolean isFinished = false;
         do {
-            isFinished = workWithRepertory.deleteEmptyRep(FOLDER_LOCATION);
+            isFinished = WorkWithRepertory.deleteEmptyRep(folderlocation);
         } while (!isFinished);
     }
 
 
     private static void rangerLesRejets() throws IOException, SQLException {
-        List<File> arrayFichierRejet = workWithFiles.getFilesFromRepertoryWithFilter(ctx.getRepertoire50Phototheque(), ctx.getArrayNomSubdirectoryRejet(), ctx.getParamElementsRejet().getExtFileRejet());
+        List<File> arrayFichierRejet = WorkWithFiles.getFilesFromRepertoryWithFilter(ctx.getRepertoire50Phototheque(), ctx.getArrayNomSubdirectoryRejet(), ctx.getParamElementsRejet().getExtFileRejet());
 
         Map<String, Integer> countExt = new HashMap<>();
         LOGGER.info("arrayFichierRejet     => " + arrayFichierRejet.size());
@@ -275,7 +290,7 @@ public class Main {
 
             if (fileExt.toLowerCase().compareTo("zip") == 0) {
                 LOGGER.info("unzip :" + fichier);
-                workWithFiles.extractZipFile(fichier);
+                WorkWithFiles.extractZipFile(fichier);
             }
 
             if (ctx.getParamElementsRejet().getArrayNomFileRejet().contains(fileExt.toLowerCase())) {
@@ -283,7 +298,7 @@ public class Main {
                 String newName = oldName + "." + ctx.getParamElementsRejet().getExtFileRejet();
                 File fsource = new File(oldName);
                 if (!fsource.exists() || !fsource.isFile()) {
-                    workWithFiles.renameFile(oldName, newName, dbLr);
+                    WorkWithFiles.renameFile(oldName, newName, dbLr);
                 }
             }
         }

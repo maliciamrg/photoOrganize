@@ -1,4 +1,4 @@
-package com.malicia.mrg.param.importJson;
+package com.malicia.mrg.param.importjson;
 
 
 import com.malicia.mrg.util.Serialize;

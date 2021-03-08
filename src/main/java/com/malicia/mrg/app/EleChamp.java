@@ -1,8 +1,8 @@
 package com.malicia.mrg.app;
 
 import com.malicia.mrg.model.Database;
-import com.malicia.mrg.param.importJson.ControleRepertoire;
-import com.malicia.mrg.param.importJson.RepertoirePhoto;
+import com.malicia.mrg.param.importjson.ControleRepertoire;
+import com.malicia.mrg.param.importjson.RepertoirePhoto;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -61,7 +61,7 @@ class EleChamp {
         int nbphotoapurger = 0;
         int nbelements = 0;
         switch (elechamp) {
-            case ControleRepertoire.£_DATE_£:
+            case ControleRepertoire.DATE_DATE:
                 String date = dbLr.getDate(repertoire);
                 setRetourToFalse(date);
                 if (date.compareTo(oValue) == 0) {
@@ -92,7 +92,7 @@ class EleChamp {
                 }
                 break;
             case ControleRepertoire.NB_SELECTIONNER:
-                nbSelectionner = dbLr.nb_pick(repertoire);
+                nbSelectionner = dbLr.nbPick(repertoire);
                 setRetourToTrue();
                 if (nbSelectionner == 0) {
                     setRetourToFalse(String.valueOf(nbSelectionner));
@@ -100,7 +100,7 @@ class EleChamp {
                 break;
             case ControleRepertoire.NB_PHOTOAPURGER:
                 limitemaxfolder = (int) ((Double.valueOf(repPhoto.getNbMaxParUniteDeJour()) * dbLr.nbjourfolder(repertoire)) / Double.valueOf(repPhoto.getUniteDeJour()));
-                nbSelectionner = dbLr.nb_pick(repertoire);
+                nbSelectionner = dbLr.nbPick(repertoire);
                 nbphotoapurger = nbSelectionner - limitemaxfolder;
                 setRetourToTrue();
                 if (nbphotoapurger > 0) {
@@ -135,7 +135,7 @@ class EleChamp {
 
     private void controleRepertoireNBSTARVALUE(Database dbLr, String repertoire, RepertoirePhoto repPhoto) throws SQLException {
         int nbSelectionner;
-        nbSelectionner = dbLr.nb_pick(repertoire);
+        nbSelectionner = dbLr.nbPick(repertoire);
         Map<String, Integer> starValue = dbLr.getStarValue(repertoire);
         List<Integer> ratio = repPhoto.getratioStarMax();
         StringBuilder res = new StringBuilder();

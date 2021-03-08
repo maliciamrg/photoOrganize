@@ -1,4 +1,4 @@
-package com.malicia.mrg.param.importJson;
+package com.malicia.mrg.param.importjson;
 
 import com.malicia.mrg.util.Serialize;
 import javafx.collections.FXCollections;
@@ -17,7 +17,7 @@ public class TriNew extends Serialize {
 
 
     public TriNew() {
-
+        // Do nothing because of X and Y
     }
 
     public String getRepertoireBazar() {

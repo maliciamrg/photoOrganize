@@ -1,6 +1,6 @@
 package com.malicia.mrg.model;
 
-import com.malicia.mrg.param.importJson.ControleRepertoire;
+import com.malicia.mrg.param.importjson.ControleRepertoire;
 import com.malicia.mrg.util.SQLiteJDBCDriverConnection;
 import com.malicia.mrg.util.SystemFiles;
 import javafx.collections.FXCollections;
@@ -65,7 +65,7 @@ public class Database extends SQLiteJDBCDriverConnection {
 
     }
 
-    public void sqlmovefile(elementFichier source, String destination) throws IOException, SQLException {
+    public void sqlmovefile(ElementFichier source, String destination) throws IOException, SQLException {
 
         File fdest = new File(destination);
 
@@ -78,7 +78,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                 " baseName =  '" + FilenameUtils.getBaseName(destination) + "' , " +
                 " idx_filename =  '" + fdest.getName() + "' , " +
                 " lc_idx_filename =  '" + fdest.getName().toLowerCase() + "'  " +
-                "where id_local =  " + source.getFile_id_local() + " " +
+                "where id_local =  " + source.getFileIdLocal() + " " +
                 ";";
         executeUpdate(sql);
 
@@ -114,8 +114,8 @@ public class Database extends SQLiteJDBCDriverConnection {
     }
 
     public void renameFileLogique(String oldName, String newName) throws SQLException {
-        long id_Local = getIdlocalforFilePath(oldName).get("idlocal");
-        if (id_Local > 0) {
+        long idlocal = getIdlocalforFilePath(oldName).get("idlocal");
+        if (idlocal > 0) {
             File fdest = new File(newName);
             String sql;
             String baseName = FilenameUtils.getBaseName(newName);
@@ -128,7 +128,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                     " extension =  '" + ext + "' , " +
                     " lc_idx_filename =  '" + fdest.getName().toLowerCase() + "' , " +
                     " lc_idx_filenameExtension =  '" + ext.toLowerCase() + "'  " +
-                    "where id_local =  " + id_Local + " " +
+                    "where id_local =  " + idlocal + " " +
                     ";";
             executeUpdate(sql);
         }
@@ -230,7 +230,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         return days;
     }
 
-    public int nb_pick(String repertoire) throws SQLException {
+    public int nbPick(String repertoire) throws SQLException {
         Map<String, String> idLocalRep = getIdlocalforRep(repertoire);
         ResultSet rsexist = select(
                 " select  count(*) as result" +
@@ -452,17 +452,17 @@ public class Database extends SQLiteJDBCDriverConnection {
         return txtret;
     }
 
-    private int sqlDeleteRepertory(String folder_id_local) throws SQLException {
+    private int sqlDeleteRepertory(String folderIdLocal) throws SQLException {
         String sql = " delete " +
                 "from AgLibraryFolder  " +
-                " where id_local = '" + folder_id_local + "' " +
+                " where id_local = '" + folderIdLocal + "' " +
                 " ; ";
         return executeUpdate(sql);
     }
-    private int sqlDeleteFile(String file_id_local) throws SQLException {
+    private int sqlDeleteFile(String fileIdLocal) throws SQLException {
         String sql = " delete " +
                 "from AgLibraryFile  " +
-                " where id_local = '" + file_id_local + "' " +
+                " where id_local = '" + fileIdLocal + "' " +
                 " ; ";
         return executeUpdate(sql);
     }

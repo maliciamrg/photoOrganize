@@ -1,23 +1,27 @@
-package com.malicia.mrg.param.importJson;
+package com.malicia.mrg.param.importjson;
 
 import com.malicia.mrg.util.Serialize;
 
 public class RepertoireFonctionnel extends Serialize {
 
     private String repertoireDestZip;
+    private String nbRotateRepertoireDestZip;
     private String repertoireRoamingAdobeLightroom;
     private String repertoire50Phototheque;
     private String repertoire50NEW;
     private String catalogLrcat;
-
     private String repertoire00NEW;
     private String repertoireCatalog;
-
     public RepertoireFonctionnel() {
-//        this.repertoireDestZip = null; //"D:\95_Boite_a_outils\LightroomConfigSauve\LightroomSauve-00%num%.zip"
-//        this.repertoireRoamingAdobeLightroom = null; //"C:\Users\professorX\AppData\Roaming\Adobe\Lightroom"
-//        this.repertoire50Phototheque = null; //"D:\50_Phototheque\"
-//        this.repertoire00NEW = null; //"P:\00_NEW" "P:\50_Phototheque" "P:\20_Portfolio"
+        // Do nothing because of X and Y
+    }
+
+    public String getNbRotateRepertoireDestZip() {
+        return nbRotateRepertoireDestZip;
+    }
+
+    public void setNbRotateRepertoireDestZip(String nbRotateRepertoireDestZip) {
+        this.nbRotateRepertoireDestZip = nbRotateRepertoireDestZip;
     }
 
     public String getRepertoire50NEW() {
@@ -75,4 +79,5 @@ public class RepertoireFonctionnel extends Serialize {
     public void setRepertoireCatalog(String repertoireCatalog) {
         this.repertoireCatalog = repertoireCatalog;
     }
+
 }

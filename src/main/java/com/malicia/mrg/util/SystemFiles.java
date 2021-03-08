@@ -1,6 +1,5 @@
 package com.malicia.mrg.util;
 
-import com.malicia.mrg.model.elementFichier;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

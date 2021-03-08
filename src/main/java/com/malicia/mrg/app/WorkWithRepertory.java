@@ -1,9 +1,8 @@
 package com.malicia.mrg.app;
 
-import com.malicia.mrg.Main;
 import com.malicia.mrg.model.Database;
-import com.malicia.mrg.param.importJson.ControleRepertoire;
-import com.malicia.mrg.param.importJson.RepertoirePhoto;
+import com.malicia.mrg.param.importjson.ControleRepertoire;
+import com.malicia.mrg.param.importjson.RepertoirePhoto;
 import com.malicia.mrg.util.Serialize;
 import com.malicia.mrg.util.SystemFiles;
 import javafx.collections.FXCollections;
@@ -17,9 +16,13 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.ListIterator;
 
-public class workWithRepertory {
+public class WorkWithRepertory {
 
-    private static final Logger LOGGER = LogManager.getLogger(workWithRepertory.class);
+    private WorkWithRepertory() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static final Logger LOGGER = LogManager.getLogger(WorkWithRepertory.class);
 
     public static boolean deleteEmptyRep(String fileLocation) {
         boolean isFinished = true;
@@ -59,7 +62,6 @@ public class workWithRepertory {
         LOGGER.debug("isRepertoireOk : " + repertoire);
 
         String oldNameRepertoire = new File(repertoire).getName();
-        String oldcheminRepertoire = new File(repertoire).getParent();
         String[] oldChamp = oldNameRepertoire.split(ControleRepertoire.CARAC_SEPARATEUR);
 
         List<EleChamp> listOfChamp = FXCollections.observableArrayList();
@@ -70,14 +72,14 @@ public class workWithRepertory {
         while (nomRepertoireIterator.hasNext()) {
             String valeurAdmise = nomRepertoireIterator.next();
 
-            EleChamp EChamp;
+            EleChamp eChamp;
             if (i < oldChamp.length) {
-                EChamp = new EleChamp(valeurAdmise, oldChamp[i]);
+                eChamp = new EleChamp(valeurAdmise, oldChamp[i]);
             } else {
-                EChamp = new EleChamp(valeurAdmise, "");
+                eChamp = new EleChamp(valeurAdmise, "");
             }
-            EChamp.controleChamp(dbLr, repertoire, repPhoto);
-            listOfChamp.add(EChamp);
+            eChamp.controleChamp(dbLr, repertoire, repPhoto);
+            listOfChamp.add(eChamp);
 
 
             i++;
@@ -87,11 +89,11 @@ public class workWithRepertory {
         //controle contenu du repertoire
         ListIterator<String> listControleRepertoireIterator = paramControleRepertoire.getlistControleRepertoire().listIterator();
         while (listControleRepertoireIterator.hasNext()) {
-            EleChamp EChamp = new EleChamp();
+            EleChamp eChamp = new EleChamp();
             String ele = listControleRepertoireIterator.next();
-            EChamp.setcChamp(ele);
-            EChamp.controleChamp(dbLr, repertoire, repPhoto);
-            listOfChamp.add(EChamp);
+            eChamp.setcChamp(ele);
+            eChamp.controleChamp(dbLr, repertoire, repPhoto);
+            listOfChamp.add(eChamp);
         }
 
 
@@ -132,11 +134,13 @@ public class workWithRepertory {
     }
 
 
-    public static void sqlMkdirRepertory(String directoryName,Database dbLr) throws SQLException {
+    public static void sqlMkdirRepertory(String directoryName, Database dbLr) throws SQLException {
 
-        SystemFiles.mkdir(directoryName);
-
-        dbLr.makeRepertory(directoryName);
+        File fdirectoryName = new File(directoryName);
+        if (!fdirectoryName.exists()) {
+            SystemFiles.mkdir(directoryName);
+            dbLr.makeRepertory(directoryName);
+        }
     }
 
 }
