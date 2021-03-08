@@ -39,7 +39,6 @@ public class Main {
 
             //Maintenance database lr
             maintenanceDatabase();
-            _____________is___________In_______________Work____________();
 
             //En Fonction De La Strategies De Rangement
             rangerLesRejets();
@@ -55,10 +54,10 @@ public class Main {
             purgeDesRepertoireVide00NEW();
             //*
 
-            _____________is___________In_______________Work____________();
-
             //Sauvegarde Lightroom sur Local
             SauvegardeLightroomConfigSauve();
+
+            _____________is___________In_______________Work____________();
 
             //sauvegarde Vers Réseaux Pour Cloud
             sauvegardeStudioPhoto2Réseaux();
@@ -180,7 +179,7 @@ public class Main {
         int nbtot = 0;
         LOGGER.info("listGrpEletmp       => " + String.format("%05d", listGrpEletmp.size()));
         for (grpPhoto listEle : listGrpEletmp) {
-            nbtot = +listEle.lstEleFile.size();
+            nbtot += listEle.lstEleFile.size();
             SimpleDateFormat repDateFormat = new SimpleDateFormat(TriNew.FORMATDATE_YYYY_MM_DD);
             String nomRep = repDateFormat.format(new Date(listEle.getFirstDate() * 1000)) + "_(" + String.format("%05d", listEle.lstEleFile.size()) + ")";
             for (elementFichier eleGrp : listEle.lstEleFile) {

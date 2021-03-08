@@ -207,7 +207,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         return idlocal;
     }
 
-    public long nbjourfolder(String repertoire) throws SQLException {
+    public double nbjourfolder(String repertoire) throws SQLException {
         Map<String, String> idLocalRep = getIdlocalforRep(repertoire);
         ResultSet rsexist = select(
                 " select min(strftime('%s', e.captureTime)) as captureTimeMin , " +
@@ -226,7 +226,7 @@ public class Database extends SQLiteJDBCDriverConnection {
             captureTimeMin = new DateTime (rsexist.getLong("captureTimeMin") * 1000);
             captureTimeMax = new DateTime (rsexist.getLong("captureTimeMax") * 1000);
         }
-        int days = Days.daysBetween(captureTimeMin, captureTimeMax).getDays()+1;
+        double days = Days.daysBetween(captureTimeMin, captureTimeMax).getDays()+1;
         return days;
     }
 
