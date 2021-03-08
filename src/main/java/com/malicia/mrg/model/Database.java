@@ -40,7 +40,7 @@ public class Database extends SQLiteJDBCDriverConnection {
 
         Map<String, String> idlocalforNewRep = getIdlocalforRep(directoryName);
 
-        if (idlocalforNewRep.get("idlocal").compareTo("0") == 0) {
+        if (idlocalforNewRep.get("Folderidlocal").compareTo("0") == 0) {
 
             long newIdlocalforNewRep = sqlGetPrevIdlocalforFolder();
 
@@ -74,7 +74,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         String sql;
         sql = "" +
                 "update AgLibraryFile " +
-                "set folder =  " + dst.get("rootFolder") + " ," +
+                "set folder =  " + dst.get("Folderidlocal") + " ," +
                 " baseName =  '" + FilenameUtils.getBaseName(destination) + "' , " +
                 " idx_filename =  '" + fdest.getName() + "' , " +
                 " lc_idx_filename =  '" + fdest.getName().toLowerCase() + "'  " +
@@ -170,9 +170,9 @@ public class Database extends SQLiteJDBCDriverConnection {
                         "and '" + SystemFiles.normalizePath(repertoire + File.separator) + "' = p.absolutePath || fo.pathFromRoot  " +
                         ";");
         Map<String, String> ret = new HashMap<>();
-        ret.put("idlocal", "0");
+        ret.put("Folderidlocal", "0");
         while (rsexist.next()) {
-            ret.replace("idlocal", rsexist.getString("result"));
+            ret.replace("Folderidlocal", rsexist.getString("result"));
             ret.put("rootFolder",rsexist.getString("rootFolder"));
             ret.put("absolutePath",rsexist.getString("absolutePath"));
         }
@@ -196,7 +196,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                         "from AgLibraryFile a  " +
                         "inner join Adobe_images e  " +
                         " on a.id_local = e.rootFile    " +
-                        " where " + idLocalRep.get("idlocal") + " = a.folder  " +
+                        " where " + idLocalRep.get("Folderidlocal") + " = a.folder  " +
                         " group by e.rating " +
                         ";");
 
@@ -215,7 +215,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                         " from AgLibraryFile a" +
                         " inner join Adobe_images e" +
                         " on a.id_local = e.rootFile" +
-                        " where " + idLocalRep.get("idlocal") + " = a.folder" +
+                        " where " + idLocalRep.get("Folderidlocal") + " = a.folder" +
                         " and e.pick >= 0" +
                         " ;");
 
@@ -237,7 +237,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                         " from AgLibraryFile a  " +
                         " inner join Adobe_images e " +
                         " on a.id_local = e.rootFile " +
-                        " where " + idLocalRep.get("idlocal") + " = a.folder " +
+                        " where " + idLocalRep.get("Folderidlocal") + " = a.folder " +
                         " and e.pick >= 0 " +
                         ";");
 
@@ -255,7 +255,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                         " from AgLibraryFile a" +
                         " inner join Adobe_images e" +
                         " on a.id_local = e.rootFile" +
-                        " where " + idLocalRep.get("idlocal") + " = a.folder" +
+                        " where " + idLocalRep.get("Folderidlocal") + " = a.folder" +
                         " and e.pick >= 0" +
                         " ;");
 
