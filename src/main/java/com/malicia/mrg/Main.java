@@ -28,7 +28,7 @@ public class Main {
 
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
     //Work In Progress ??????
-    private static final Boolean IS_IN_WORK = Boolean.TRUE;
+    private static final Boolean IS_IN_WORK = Boolean.FALSE;
 
     private static Context ctx;
     private static Database dbLr;
@@ -42,11 +42,7 @@ public class Main {
             dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat());
             //*
 
-            //**************************************
-            sauvegardeStudioPhoto2Reseaux();
             isInWork();
-            //**************************************
-
 
             //Maintenance database lr
             maintenanceDatabase();
@@ -68,8 +64,6 @@ public class Main {
             //Sauvegarde Lightroom sur Local
             sauvegardeLightroomConfigSauve();
             //*
-
-            isInWork();
 
             //sauvegarde Vers Réseaux Pour Cloud
             sauvegardeStudioPhoto2Reseaux();
@@ -125,16 +119,13 @@ public class Main {
     }
 
     private static void sauvegardeStudioPhoto2Reseaux() throws Exception {
-        List<String> s = new ArrayList<>();
-        s.add("/first/place");
-        s.add("/second/place");
 
         RSync rsync = new RSync()
-                .source("D:\\90_Corbeille\\")
-                .destination("P:\\D90_Corbeille")
+                .sources(ctx.getRepFonctionnel().getRepertoiresyncsource())
+                .destination(ctx.getRepFonctionnel().getRepertoiresyncdest())
                 .recursive(true)
-                .include()
-                .exclude()
+                .exclude(ctx.getRepFonctionnel().getRsyncexclude())
+//                .dryRun(true)
                 .archive(true)
                 .delete(true)
                 .verbose(true);

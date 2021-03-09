@@ -1,7 +1,6 @@
 package com.malicia.mrg.param.importjson;
 
 import com.malicia.mrg.util.Serialize;
-import javafx.collections.FXCollections;
 
 import java.util.List;
 
@@ -15,26 +14,44 @@ public class RepertoireFonctionnel extends Serialize {
     private String catalogLrcat;
     private String repertoire00NEW;
     private String repertoireCatalog;
-    private List<String> rsyncinclude = FXCollections.observableArrayList();
-    private List<String> rsyncexclude = FXCollections.observableArrayList();
+    private String[] rsyncinclude;
+    private String[] rsyncexclude;
+    private String[] repertoiresyncsource;
+    private String repertoiresyncdest;
 
     public RepertoireFonctionnel() {
         // Do nothing because of X and Y
     }
 
-    public List<String> getRsyncinclude() {
+    public String[] getRepertoiresyncsource() {
+        return repertoiresyncsource;
+    }
+
+    public void setRepertoiresyncsource(String[] repertoiresyncsource) {
+        this.repertoiresyncsource = repertoiresyncsource;
+    }
+
+    public String getRepertoiresyncdest() {
+        return repertoiresyncdest;
+    }
+
+    public void setRepertoiresyncdest(String repertoiresyncdest) {
+        this.repertoiresyncdest = repertoiresyncdest;
+    }
+
+    public String[] getRsyncinclude() {
         return rsyncinclude;
     }
 
-    public void setRsyncinclude(List<String> rsyncinclude) {
+    public void setRsyncinclude(String[] rsyncinclude) {
         this.rsyncinclude = rsyncinclude;
     }
 
-    public List<String> getRsyncexclude() {
+    public String[] getRsyncexclude() {
         return rsyncexclude;
     }
 
-    public void setRsyncexclude(List<String> rsyncexclude) {
+    public void setRsyncexclude(String[] rsyncexclude) {
         this.rsyncexclude = rsyncexclude;
     }
 

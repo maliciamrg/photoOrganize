@@ -7,6 +7,7 @@
   "repertoireCatalog": "D:\\70_Catalogs\\70_Catalog_Phototheque",
   "catalogLrcat": "70_Catalog_Phototheque-2.lrcat",
   "nbRotateRepertoireDestZip": "5",
-  "rsyncinclude": [ "\\00_Elements_organizer","\\50_Phototheque","\\59_Phototheque_Kidzs","\\70_Catalogs","\\80_Logiciel_Windows","\\95_Boite_a_outils" ],
-  "rsyncexclude": [ "\\System Volume Information\\","\\$Recycle.Bin\\","\\RECYCLER\\","\\RECYCLED\\","*\\desktop.ini","*\\thumbs.db","*.lrdata","\\90_Corbeille","\\95_Boite_a_outils\\log" ]
+  "rsyncexclude": [ "*\\System Volume Information\\*","*\\$RECYCLE.BIN\\*","*\\$Recycle.Bin\\*","*\\RECYCLER\\*","*\\RECYCLED\\*","*\\desktop.ini","*\\thumbs.db","*.lrdata","*\\log\\*" ],
+  "repertoiresyncsource": [ "D:\\50_Phototheque","D:\\70_Catalogs","D:\\80_Logiciel_Windows","D:\\95_Boite_a_outils" ],
+  "repertoiresyncdest": "\\\\LEGION-2\\20-photo\\"
 }

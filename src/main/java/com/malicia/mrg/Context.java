@@ -13,6 +13,11 @@ import java.util.List;
 public class Context {
     private static final String JSON = ".json";
     private ControleRepertoire paramControleRepertoire;
+
+    public RepertoireFonctionnel getRepFonctionnel() {
+        return repFonctionnel;
+    }
+
     private List<RepertoirePhoto> arrayRepertoirePhoto = FXCollections.observableArrayList();
     private RepertoireFonctionnel repFonctionnel;
     private ElementsRejet paramElementsRejet;

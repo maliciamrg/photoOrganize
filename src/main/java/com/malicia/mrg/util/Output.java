@@ -18,7 +18,7 @@ public class Output implements StreamingProcessOwner {
 
     public void processOutput(String line, boolean stdout) {
         if (stdout) {
-            if (line.contains("total size is") || line.contains("bytes  received")) {
+            if (line.contains("total size is") || line.contains("bytes  received") || line.contains("deleting")) {
                 LOGGER.info(line);
             } else {
                 LOGGER.debug(line);
