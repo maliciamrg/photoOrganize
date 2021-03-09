@@ -1,6 +1,9 @@
 package com.malicia.mrg.param.importjson;
 
 import com.malicia.mrg.util.Serialize;
+import javafx.collections.FXCollections;
+
+import java.util.List;
 
 public class RepertoireFonctionnel extends Serialize {
 
@@ -12,8 +15,27 @@ public class RepertoireFonctionnel extends Serialize {
     private String catalogLrcat;
     private String repertoire00NEW;
     private String repertoireCatalog;
+    private List<String> rsyncinclude = FXCollections.observableArrayList();
+    private List<String> rsyncexclude = FXCollections.observableArrayList();
+
     public RepertoireFonctionnel() {
         // Do nothing because of X and Y
+    }
+
+    public List<String> getRsyncinclude() {
+        return rsyncinclude;
+    }
+
+    public void setRsyncinclude(List<String> rsyncinclude) {
+        this.rsyncinclude = rsyncinclude;
+    }
+
+    public List<String> getRsyncexclude() {
+        return rsyncexclude;
+    }
+
+    public void setRsyncexclude(List<String> rsyncexclude) {
+        this.rsyncexclude = rsyncexclude;
     }
 
     public String getNbRotateRepertoireDestZip() {

@@ -51,9 +51,11 @@
         </dependency>
         <dependency>
             <groupId>com.github.fracpete</groupId>
-            <artifactId>rsync4j-core</artifactId>
+            <artifactId>rsync4j-all</artifactId>
             <version>3.2.3-1</version>
         </dependency>
+
+
     </dependencies>
     <properties>
         <maven.compiler.source>8</maven.compiler.source>

@@ -1,11 +1,16 @@
 package com.malicia.mrg;
 
+import com.github.fracpete.processoutput4j.output.CollectingProcessOutput;
+import com.github.fracpete.processoutput4j.output.ConsoleOutputProcessOutput;
+import com.github.fracpete.processoutput4j.output.StreamingProcessOutput;
+import com.github.fracpete.rsync4j.RSync;
 import com.malicia.mrg.app.WorkWithFiles;
 import com.malicia.mrg.app.WorkWithRepertory;
 import com.malicia.mrg.model.Database;
 import com.malicia.mrg.model.ElementFichier;
 import com.malicia.mrg.param.importjson.RepertoirePhoto;
 import com.malicia.mrg.param.importjson.TriNew;
+import com.malicia.mrg.util.Output;
 import com.malicia.mrg.util.Serialize;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FilenameUtils;
@@ -37,6 +42,12 @@ public class Main {
             dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat());
             //*
 
+            //**************************************
+            sauvegardeStudioPhoto2Reseaux();
+            isInWork();
+            //**************************************
+
+
             //Maintenance database lr
             maintenanceDatabase();
 
@@ -56,13 +67,15 @@ public class Main {
 
             //Sauvegarde Lightroom sur Local
             sauvegardeLightroomConfigSauve();
+            //*
 
             isInWork();
 
             //sauvegarde Vers Réseaux Pour Cloud
             sauvegardeStudioPhoto2Reseaux();
+            //*
 
-        } catch (IOException | SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             exceptionLog(e, LOGGER);
         }
@@ -111,21 +124,28 @@ public class Main {
         LOGGER.info("Start");
     }
 
-    private static void sauvegardeStudioPhoto2Reseaux() {
-//        RSync rsync = new RSync()
-//                .source("/home/arth/DataSourceFolder/a.txt")
-//                .destination("/home/arth/DataDestinationFolder/")
-//                .recursive(true);
-//        // or if you prefer using commandline options:
-//        // rsync.setOptions(new String[]{"-r", "/one/place/", "/other/place/"});
-//        CollectingProcessOutput output = null;
-//        try {
-//            System.out.println("Inside try");
-//            output = rsync.execute();
-//            System.out.println("End of try");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+    private static void sauvegardeStudioPhoto2Reseaux() throws Exception {
+        List<String> s = new ArrayList<>();
+        s.add("/first/place");
+        s.add("/second/place");
+
+        RSync rsync = new RSync()
+                .source("D:\\90_Corbeille\\")
+                .destination("P:\\D90_Corbeille")
+                .recursive(true)
+                .include()
+                .exclude()
+                .archive(true)
+                .delete(true)
+                .verbose(true);
+        StreamingProcessOutput output = new StreamingProcessOutput(new Output());
+        output.monitor(rsync.builder());
+
+//        StreamingProcessOutput output = new StreamingProcessOutput(new Output());
+//        output.monitor(rsync.builder());
+//        rsync.execute();
+
+//        CollectingProcessOutput output = rsync.execute();
 //        System.out.println(output.getStdOut());
 //        System.out.println("Exit code: " + output.getExitCode());
 //        if (output.getExitCode() > 0)
