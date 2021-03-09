@@ -2,8 +2,6 @@ package com.malicia.mrg.param.importjson;
 
 import com.malicia.mrg.util.Serialize;
 
-import java.util.List;
-
 public class RepertoireFonctionnel extends Serialize {
 
     private String repertoireDestZip;

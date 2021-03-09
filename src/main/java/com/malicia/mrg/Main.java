@@ -1,7 +1,5 @@
 package com.malicia.mrg;
 
-import com.github.fracpete.processoutput4j.output.CollectingProcessOutput;
-import com.github.fracpete.processoutput4j.output.ConsoleOutputProcessOutput;
 import com.github.fracpete.processoutput4j.output.StreamingProcessOutput;
 import com.github.fracpete.rsync4j.RSync;
 import com.malicia.mrg.app.WorkWithFiles;
@@ -12,11 +10,11 @@ import com.malicia.mrg.param.importjson.RepertoirePhoto;
 import com.malicia.mrg.param.importjson.TriNew;
 import com.malicia.mrg.util.Output;
 import com.malicia.mrg.util.Serialize;
+import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import net.lingala.zip4j.ZipFile;
 
 import java.io.*;
 import java.sql.ResultSet;
@@ -86,14 +84,12 @@ public class Main {
 
 
     private static void isInWork() {
-        if (IS_IN_WORK) {
+        if (Boolean.TRUE.equals(IS_IN_WORK)) {
             throw new IllegalStateException("Under Construct");
         }
     }
 
     private static void chargeLog4j() {
-        InputStream stream = Context.class.getClassLoader().getResourceAsStream("log4j2.properties");
-//        LogManager.getLogManager().readConfiguration(stream);
         LOGGER.fatal("                                                                                    ");
         LOGGER.fatal("          <==============================================================>          ");
         LOGGER.fatal("    <===                                                                    ===>    ");
@@ -132,17 +128,6 @@ public class Main {
         StreamingProcessOutput output = new StreamingProcessOutput(new Output());
         output.monitor(rsync.builder());
 
-//        StreamingProcessOutput output = new StreamingProcessOutput(new Output());
-//        output.monitor(rsync.builder());
-//        rsync.execute();
-
-//        CollectingProcessOutput output = rsync.execute();
-//        System.out.println(output.getStdOut());
-//        System.out.println("Exit code: " + output.getExitCode());
-//        if (output.getExitCode() > 0)
-//            System.err.println(output.getStdErr());
-
-        //TODO
     }
 
     private static void regrouperLesNouvellesPhoto() throws SQLException, IOException {
@@ -294,7 +279,7 @@ public class Main {
             String fileExt = FilenameUtils.getExtension(fichier.getName()).toLowerCase();
 
             if (countExt.containsKey(fileExt)) {
-                boolean res = countExt.replace(fileExt, countExt.get(fileExt), countExt.get(fileExt) + 1);
+                countExt.replace(fileExt, countExt.get(fileExt), countExt.get(fileExt) + 1);
             } else {
                 countExt.put(fileExt, 1);
             }
