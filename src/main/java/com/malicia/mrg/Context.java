@@ -1,43 +1,53 @@
 package com.malicia.mrg;
 
 import com.malicia.mrg.param.importjson.*;
+import com.malicia.mrg.util.Output;
 import javafx.collections.FXCollections;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Context {
+
+    private static final Logger LOGGER = LogManager.getLogger(Context.class);
+
     private static final String JSON = ".json";
     private ControleRepertoire paramControleRepertoire;
+    private final List<RepertoirePhoto> arrayRepertoirePhoto = FXCollections.observableArrayList();
+    private RepertoireFonctionnel repFonctionnel;
+    private ElementsRejet paramElementsRejet;
+    private TriNew paramTriNew;
+
+    public Context() throws IOException {
+        paramElementsRejet = (ElementsRejet) ElementsRejet.readJSON(ElementsRejet.class, getResourceAsStream("ElementsRejet.json"));
+        arrayRepertoirePhoto.add((RepertoirePhoto) RepertoirePhoto.readJSON(RepertoirePhoto.class, getResourceAsStream("repertoirePhoto-Autoconstruction.json")));
+        arrayRepertoirePhoto.add((RepertoirePhoto) RepertoirePhoto.readJSON(RepertoirePhoto.class, getResourceAsStream("repertoirePhoto-Events.json")));
+        arrayRepertoirePhoto.add((RepertoirePhoto) RepertoirePhoto.readJSON(RepertoirePhoto.class, getResourceAsStream("repertoirePhoto-Holidays.json")));
+        arrayRepertoirePhoto.add((RepertoirePhoto) RepertoirePhoto.readJSON(RepertoirePhoto.class, getResourceAsStream("repertoirePhoto-Rejet.json")));
+        arrayRepertoirePhoto.add((RepertoirePhoto) RepertoirePhoto.readJSON(RepertoirePhoto.class, getResourceAsStream("repertoirePhoto-Sauvegarde.json")));
+        arrayRepertoirePhoto.add((RepertoirePhoto) RepertoirePhoto.readJSON(RepertoirePhoto.class, getResourceAsStream("repertoirePhoto-Shooting.json")));
+        repFonctionnel = (RepertoireFonctionnel) RepertoireFonctionnel.readJSON(RepertoireFonctionnel.class, getResourceAsStream("RepertoireFonctionnel.json"));
+        paramControleRepertoire = (ControleRepertoire) ControleRepertoire.readJSON(ControleRepertoire.class, getResourceAsStream("ControleRepertoire.json"));
+        paramTriNew = (TriNew) TriNew.readJSON(TriNew.class, getResourceAsStream("TriNew.json"));
+    }
+
+    public static Context chargeParam() throws IOException {
+        return new Context();
+    }
 
     public RepertoireFonctionnel getRepFonctionnel() {
         return repFonctionnel;
     }
 
-    private List<RepertoirePhoto> arrayRepertoirePhoto = FXCollections.observableArrayList();
-    private RepertoireFonctionnel repFonctionnel;
-    private ElementsRejet paramElementsRejet;
-
     public TriNew getParamTriNew() {
         return paramTriNew;
-    }
-
-    private TriNew paramTriNew;
-
-    public Context() throws IOException {
-        chargeElementsRejet();
-        chargeRepertoirePhoto();
-        chargeRepertoireFonctionnel();
-        chargeControleRepertoire();
-        chargeParamTriNew();
-    }
-
-    public static Context chargeParam() throws IOException {
-        return new Context();
     }
 
     public ElementsRejet getParamElementsRejet() {
@@ -146,28 +156,6 @@ public class Context {
         }
     }
 
-    private void chargeElementsRejet() throws IOException {
-        String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
-        File f = new File(rootPath + "objJson\\");
-        final String elementsRejet = "ElementsRejet";
-        FilenameFilter filter = new FilenameFilter() {
-            @Override
-            public boolean accept(File f, String name) {
-                return (name.startsWith(elementsRejet) && name.endsWith(JSON));
-            }
-        };
-        File[] files = f.listFiles(filter);
-        for (int i = 0; i < files.length; i++) {
-            paramElementsRejet = (ElementsRejet) ElementsRejet.readJSON(ElementsRejet.class, files[i].toString());
-        }
-        if (paramElementsRejet == null) {
-            paramElementsRejet = new ElementsRejet();
-            ElementsRejet.writeJSON(paramElementsRejet, elementsRejet + JSON);
-        } else {
-            ElementsRejet.reWriteJSON(paramElementsRejet);
-        }
-    }
-
     public String getRepertoire50Phototheque() {
         return repFonctionnel.getRepertoire50Phototheque();
     }
@@ -182,5 +170,32 @@ public class Context {
 
     public String getCatalogLrcat() {
         return repFonctionnel.getRepertoireCatalog() + File.separator + repFonctionnel.getCatalogLrcat();
+    }
+
+    private List<String> getResourceFiles(String path) throws IOException {
+        List<String> filenames = new ArrayList<>();
+
+        try (
+                InputStream in = getResourceAsStream(path);
+                BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
+            String resource;
+
+            while ((resource = br.readLine()) != null) {
+                filenames.add(resource);
+            }
+        }
+
+        return filenames;
+    }
+
+    private InputStream getResourceAsStream(String resource) {
+        final InputStream in
+                = getContextClassLoader().getResourceAsStream(resource);
+
+        return in == null ? getClass().getResourceAsStream(resource) : in;
+    }
+
+    private ClassLoader getContextClassLoader() {
+        return Thread.currentThread().getContextClassLoader();
     }
 }

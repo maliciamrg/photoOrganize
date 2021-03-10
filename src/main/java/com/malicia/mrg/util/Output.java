@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 public class Output implements StreamingProcessOwner {
 
-    private static final Logger LOGGER = LogManager.getLogger(Main.class);
+    private static final Logger LOGGER = LogManager.getLogger(Output.class);
 
     public StreamingProcessOutputType getOutputType() {
         return StreamingProcessOutputType.BOTH;

@@ -122,6 +122,7 @@ public class Main {
                 .recursive(true)
                 .exclude(ctx.getRepFonctionnel().getRsyncexclude())
 //                .dryRun(true)
+                .humanReadable(true)
                 .archive(true)
                 .delete(true)
                 .verbose(true);

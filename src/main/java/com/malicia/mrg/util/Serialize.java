@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class Serialize {
 
@@ -41,6 +42,12 @@ public class Serialize {
         Object objret = mapper.readValue(new File(fileName), aClass);
         ((Serialize)objret).fileName = fileName;
         return objret ;
+    }
 
+    public static Object readJSON(Class aClass, InputStream stream) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        Object objret = mapper.readValue(stream, aClass);
+        ((Serialize)objret).fileName = stream.toString();
+        return objret ;
     }
 }
