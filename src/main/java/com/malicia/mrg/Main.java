@@ -111,7 +111,7 @@ public class Main {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // set the frame size (you'll usually want to call frame.pack())
-        frame.setSize(new Dimension(800, 400));
+        frame.setSize(new Dimension(1024, 600));
 
         // center the frame
         frame.setLocationRelativeTo(null);
