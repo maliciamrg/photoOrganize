@@ -1,14 +1,15 @@
 package com.malicia.mrg.param.importjson;
 
 import com.malicia.mrg.util.Serialize;
-import javafx.collections.FXCollections;
 
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class ElementsRejet extends Serialize {
 
-    private List<String> arrayNomSubdirectoryRejet = FXCollections.observableArrayList();
-    private List<String> arrayNomFileRejet = FXCollections.observableArrayList();
+    private List<String> arrayNomSubdirectoryRejet = new ArrayList<>();
+    private List<String> arrayNomFileRejet = new ArrayList<>();
     private String extFileRejet;
 
     public ElementsRejet() {

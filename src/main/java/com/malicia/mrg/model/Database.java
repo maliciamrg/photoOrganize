@@ -3,8 +3,7 @@ package com.malicia.mrg.model;
 import com.malicia.mrg.param.importjson.ControleRepertoire;
 import com.malicia.mrg.util.SQLiteJDBCDriverConnection;
 import com.malicia.mrg.util.SystemFiles;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+
 import org.apache.commons.io.FilenameUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
@@ -14,10 +13,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static com.malicia.mrg.util.SystemFiles.normalizePath;
 
@@ -268,12 +264,12 @@ public class Database extends SQLiteJDBCDriverConnection {
     }
 
     public Boolean isValueInTag(String getoValue, String tagAction) throws SQLException {
-        ObservableList<String> listTag = getValueForTag(tagAction);
+        List<String> listTag = getValueForTag(tagAction);
         return listTag.contains(getoValue);
     }
 
-    public ObservableList<String> getValueForTag(String getcChamp) throws SQLException {
-        ObservableList<String> listLcName = FXCollections.observableArrayList();
+    public List<String> getValueForTag(String getcChamp) throws SQLException {
+        List<String> listLcName = new ArrayList<>();
         ResultSet rs = select("select lc_name " +
                 "from AgLibraryKeyword " +
                 "where genealogy like ( " +

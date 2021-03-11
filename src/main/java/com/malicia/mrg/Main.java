@@ -10,29 +10,35 @@ import com.malicia.mrg.param.importjson.RepertoirePhoto;
 import com.malicia.mrg.param.importjson.TriNew;
 import com.malicia.mrg.util.Output;
 import com.malicia.mrg.util.Serialize;
+import com.malicia.mrg.view.JTextAreaAppender;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.List;
 
 public class Main {
 
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
     //Work In Progress ??????
-    private static final Boolean IS_IN_WORK = Boolean.FALSE;
+    private static final Boolean IS_IN_WORK = Boolean.FALSE  ;
 
     private static Context ctx;
     private static Database dbLr;
 
     public static void main(String[] args) {
         try {
+            createLoggingPanel();
+
             chargeLog4j();
 
             /// chargement application
@@ -74,13 +80,56 @@ public class Main {
 
     }
 
-    private static void maintenanceDatabase() throws SQLException {
-        LOGGER.info(dbLr.pathAbsentPhysique());
-        LOGGER.info(dbLr.folderWithoutRoot());
-        LOGGER.info(dbLr.folderAbsentPhysique());
-        LOGGER.info(dbLr.fileWithoutFolder());
+    private static void createLoggingPanel() {
+
+    // Create logging panel
+        JTextArea jLoggingConsole = new JTextArea(5,0); // 5 lines high here
+        jLoggingConsole.setLineWrap(true);
+        jLoggingConsole.setWrapStyleWord(true);
+        jLoggingConsole.setEditable (false);
+        jLoggingConsole.setFont(new Font("Courier", Font.PLAIN, 12));
+
+        // Make scrollable console pane
+        JScrollPane jConsoleScroll = new JScrollPane(jLoggingConsole);
+        jConsoleScroll.setVerticalScrollBarPolicy ( ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS );
+
+        // Subscribe the text area to JTextAreaAppender
+        JTextAreaAppender.addLog4j2TextAreaAppender(jLoggingConsole);
+
+        //------------------------
+
+        // now add the scrollpane to the jframe's content pane, specifically
+        // placing it in the center of the jframe's borderlayout
+        JFrame frame = new JFrame("PhotoOrganize");
+        frame.getContentPane().add(jConsoleScroll, BorderLayout.CENTER);
+
+        // make it easy to close the application
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // set the frame size (you'll usually want to call frame.pack())
+        frame.setSize(new Dimension(800, 400));
+
+        // center the frame
+        frame.setLocationRelativeTo(null);
+
+        // make it visible to the user
+        frame.setVisible(true);
     }
 
+    private static void maintenanceDatabase() throws SQLException {
+
+        Split_LOGGER_info(dbLr.pathAbsentPhysique());
+        Split_LOGGER_info(dbLr.folderWithoutRoot());
+        Split_LOGGER_info(dbLr.folderAbsentPhysique());
+        Split_LOGGER_info(dbLr.fileWithoutFolder());
+    }
+
+    private static void Split_LOGGER_info(String txt) {
+        String[] atxt = txt.split("\n");
+        for (String s: atxt) {
+            LOGGER.info(s);
+        }
+    }
 
 
     private static void isInWork() {

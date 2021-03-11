@@ -7,10 +7,15 @@ import com.malicia.mrg.Main;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 
 public class Output implements StreamingProcessOwner {
 
     private static final Logger LOGGER = LogManager.getLogger(Output.class);
+    private static int i = 0;
+    NumberFormat formatter = new DecimalFormat("00000");
 
     public StreamingProcessOutputType getOutputType() {
         return StreamingProcessOutputType.BOTH;
@@ -18,10 +23,16 @@ public class Output implements StreamingProcessOwner {
 
     public void processOutput(String line, boolean stdout) {
         if (stdout) {
+            i++;
+            String lline = "[" + formatter.format(i) + "] " + line;
             if (line.contains("total size is") || line.contains("bytes  received") || line.contains("deleting")) {
-                LOGGER.info(line);
+                LOGGER.info(lline);
             } else {
-                LOGGER.debug(line);
+                if ((i % 10) == 0) {
+                    LOGGER.info(lline);
+                } else {
+                    LOGGER.debug(lline);
+                }
             }
         } else {
             LOGGER.error(line);

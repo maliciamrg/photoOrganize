@@ -5,7 +5,7 @@ import com.malicia.mrg.param.importjson.ControleRepertoire;
 import com.malicia.mrg.param.importjson.RepertoirePhoto;
 import com.malicia.mrg.util.Serialize;
 import com.malicia.mrg.util.SystemFiles;
-import javafx.collections.FXCollections;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -44,7 +45,7 @@ public class WorkWithRepertory {
     }
 
     public static List<String> listRepertoireEligible(String repertoire50Phototheque, RepertoirePhoto repPhoto) {
-        List<String> ret = FXCollections.observableArrayList();
+        List<String> ret = new ArrayList<>();
         String pathname = repertoire50Phototheque + repPhoto.getRepertoire();
         File[] files = new File(pathname).listFiles();
 
@@ -64,7 +65,7 @@ public class WorkWithRepertory {
         String oldNameRepertoire = new File(repertoire).getName();
         String[] oldChamp = oldNameRepertoire.split(ControleRepertoire.CARAC_SEPARATEUR);
 
-        List<EleChamp> listOfChamp = FXCollections.observableArrayList();
+        List<EleChamp> listOfChamp = new ArrayList<>();
 
         //controle nom du repertoire
         int i = 0;

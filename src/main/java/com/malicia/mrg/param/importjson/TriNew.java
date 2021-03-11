@@ -1,8 +1,9 @@
 package com.malicia.mrg.param.importjson;
 
 import com.malicia.mrg.util.Serialize;
-import javafx.collections.FXCollections;
 
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class TriNew extends Serialize {
@@ -13,7 +14,7 @@ public class TriNew extends Serialize {
     private String repertoireBazar;
     private long thresholdNew;
     private String tempsAdherence;
-    private List<String> listeModelKidz = FXCollections.observableArrayList();
+    private List<String> listeModelKidz = new ArrayList<>();
 
 
     public TriNew() {

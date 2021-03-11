@@ -1,8 +1,9 @@
 package com.malicia.mrg.param.importjson;
 
 import com.malicia.mrg.util.Serialize;
-import javafx.collections.FXCollections;
 
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class ControleRepertoire extends Serialize {
@@ -29,7 +30,7 @@ public class ControleRepertoire extends Serialize {
     private final List<String> listControleRepertoire;
 
     public ControleRepertoire() {
-        listControleRepertoire = FXCollections.observableArrayList();
+        listControleRepertoire = new ArrayList<>();
         listControleRepertoire.add(NB_STAR_VALUE);
         listControleRepertoire.add(NB_SELECTIONNER);
         listControleRepertoire.add(NB_PHOTOAPURGER);

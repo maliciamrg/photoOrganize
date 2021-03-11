@@ -1,8 +1,6 @@
 package com.malicia.mrg;
 
 import com.malicia.mrg.param.importjson.*;
-import com.malicia.mrg.util.Output;
-import javafx.collections.FXCollections;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,7 +18,7 @@ public class Context {
 
     private static final String JSON = ".json";
     private ControleRepertoire paramControleRepertoire;
-    private final List<RepertoirePhoto> arrayRepertoirePhoto = FXCollections.observableArrayList();
+    private final List<RepertoirePhoto> arrayRepertoirePhoto = new ArrayList<>();
     private RepertoireFonctionnel repFonctionnel;
     private ElementsRejet paramElementsRejet;
     private TriNew paramTriNew;

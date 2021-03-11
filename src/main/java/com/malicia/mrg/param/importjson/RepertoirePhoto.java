@@ -2,8 +2,9 @@ package com.malicia.mrg.param.importjson;
 
 
 import com.malicia.mrg.util.Serialize;
-import javafx.collections.FXCollections;
 
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class RepertoirePhoto extends Serialize {
@@ -23,9 +24,9 @@ public class RepertoirePhoto extends Serialize {
         repertoire = repertoireIn;
         uniteDeJour = uniteDeJourIn;
         nbMaxParUniteDeJour = nbMaxParUniteDeJourIn;
-        ratioStarMax = FXCollections.observableArrayList();
-        zoneValeurAdmise = FXCollections.observableArrayList();
-        nomRepertoire = FXCollections.observableArrayList();
+        ratioStarMax = new ArrayList<>();
+        zoneValeurAdmise = new ArrayList<>();
+        nomRepertoire = new ArrayList<>();
     }
 
     public List<String> getNomRepertoire() {

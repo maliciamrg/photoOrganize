@@ -4,13 +4,14 @@ import com.malicia.mrg.model.Database;
 import com.malicia.mrg.model.ElementFichier;
 import com.malicia.mrg.util.SystemFiles;
 import com.malicia.mrg.util.UnzipUtility;
-import javafx.collections.FXCollections;
+
 import javafx.collections.ObservableList;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class WorkWithFiles {
     }
 
     public static List<File> getFilesFromRepertoryWithFilter(String repertory, List<String> arrayFiltreDeNomDeSubdirectory, String extFileFilter) {
-        ObservableList<File> ret = FXCollections.observableArrayList();
+        List<File> ret = new ArrayList<>();
         File[] files = new File(repertory).listFiles();
         showFiles(files, ret, arrayFiltreDeNomDeSubdirectory, extFileFilter, true);
         return ret;
