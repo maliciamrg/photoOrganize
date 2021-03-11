@@ -1,6 +1,7 @@
 package com.malicia.mrg;
 
 import com.malicia.mrg.param.importjson.*;
+import com.malicia.mrg.util.WhereIAm;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,6 +38,7 @@ public class Context {
     }
 
     public static Context chargeParam() throws IOException {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         return new Context();
     }
 

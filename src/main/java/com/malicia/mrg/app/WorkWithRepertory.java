@@ -6,6 +6,7 @@ import com.malicia.mrg.param.importjson.RepertoirePhoto;
 import com.malicia.mrg.util.Serialize;
 import com.malicia.mrg.util.SystemFiles;
 
+import com.malicia.mrg.util.WhereIAm;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

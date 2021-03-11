@@ -1,10 +1,14 @@
 package com.malicia.mrg.model;
 
+import com.malicia.mrg.Context;
 import com.malicia.mrg.param.importjson.ControleRepertoire;
 import com.malicia.mrg.util.SQLiteJDBCDriverConnection;
 import com.malicia.mrg.util.SystemFiles;
 
+import com.malicia.mrg.util.WhereIAm;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 
@@ -19,11 +23,15 @@ import static com.malicia.mrg.util.SystemFiles.normalizePath;
 
 public class Database extends SQLiteJDBCDriverConnection {
 
+    private static final Logger LOGGER = LogManager.getLogger(Database.class);
+
     private Database(String catalogLrcat) {
         super(catalogLrcat);
     }
 
     public static Database chargeDatabaseLR(String catalogLrcat) {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+
         return new Database(catalogLrcat);
     }
 

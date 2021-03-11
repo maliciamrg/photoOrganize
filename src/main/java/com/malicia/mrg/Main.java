@@ -10,6 +10,7 @@ import com.malicia.mrg.param.importjson.RepertoirePhoto;
 import com.malicia.mrg.param.importjson.TriNew;
 import com.malicia.mrg.util.Output;
 import com.malicia.mrg.util.Serialize;
+import com.malicia.mrg.util.WhereIAm;
 import com.malicia.mrg.view.JTextAreaAppender;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
@@ -30,26 +31,28 @@ public class Main {
 
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
     //Work In Progress ??????
-    private static final Boolean IS_IN_WORK = Boolean.FALSE  ;
+    private static final Boolean IS_IN_WORK = Boolean.FALSE;
 
     private static Context ctx;
     private static Database dbLr;
 
     public static void main(String[] args) {
         try {
+            //intialize logging
             createLoggingPanel();
-
             chargeLog4j();
-
-            /// chargement application
-            ctx = Context.chargeParam();
-            dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat());
             //*
 
             isInWork();
 
+            // chargement application
+            ctx = Context.chargeParam();
+            dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat());
+            //*
+
             //Maintenance database lr
             maintenanceDatabase();
+            //*
 
             //En Fonction De La Strategies De Rangement
             rangerLesRejets();
@@ -81,17 +84,18 @@ public class Main {
     }
 
     private static void createLoggingPanel() {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
-    // Create logging panel
-        JTextArea jLoggingConsole = new JTextArea(5,0); // 5 lines high here
+        // Create logging panel
+        JTextArea jLoggingConsole = new JTextArea(5, 0); // 5 lines high here
         jLoggingConsole.setLineWrap(true);
         jLoggingConsole.setWrapStyleWord(true);
-        jLoggingConsole.setEditable (false);
+        jLoggingConsole.setEditable(false);
         jLoggingConsole.setFont(new Font("Courier", Font.PLAIN, 12));
 
         // Make scrollable console pane
         JScrollPane jConsoleScroll = new JScrollPane(jLoggingConsole);
-        jConsoleScroll.setVerticalScrollBarPolicy ( ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS );
+        jConsoleScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         // Subscribe the text area to JTextAreaAppender
         JTextAreaAppender.addLog4j2TextAreaAppender(jLoggingConsole);
@@ -117,6 +121,7 @@ public class Main {
     }
 
     private static void maintenanceDatabase() throws SQLException {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         Split_LOGGER_info(dbLr.pathAbsentPhysique());
         Split_LOGGER_info(dbLr.folderWithoutRoot());
@@ -126,7 +131,7 @@ public class Main {
 
     private static void Split_LOGGER_info(String txt) {
         String[] atxt = txt.split("\n");
-        for (String s: atxt) {
+        for (String s : atxt) {
             LOGGER.info(s);
         }
     }
@@ -139,6 +144,7 @@ public class Main {
     }
 
     private static void chargeLog4j() {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         LOGGER.fatal("                                                                                    ");
         LOGGER.fatal("          <==============================================================>          ");
         LOGGER.fatal("    <===                                                                    ===>    ");
@@ -164,6 +170,7 @@ public class Main {
     }
 
     private static void sauvegardeStudioPhoto2Reseaux() throws Exception {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         RSync rsync = new RSync()
                 .sources(ctx.getRepFonctionnel().getRepertoiresyncsource())
@@ -181,6 +188,7 @@ public class Main {
     }
 
     private static void regrouperLesNouvellesPhoto() throws SQLException, IOException {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         //Regroupement
         ResultSet rsele = dbLr.sqlgetListelementnewaclasser(ctx.getParamTriNew().getTempsAdherence(), ctx.getParamTriNew().getRepertoire50NEW());
@@ -270,6 +278,8 @@ public class Main {
     }
 
     private static void topperLesRepertoires() throws IOException, SQLException {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+
         List<RepertoirePhoto> arrayRepertoirePhoto = ctx.getArrayRepertoirePhoto();
 
         ListIterator<RepertoirePhoto> repertoirePhotoIterator = arrayRepertoirePhoto.listIterator();
@@ -288,7 +298,7 @@ public class Main {
 
             }
 
-            File f = new File(ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire() + "\\" + new File(repPhoto.getRepertoire()).getName() +  ".svg.json");
+            File f = new File(ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire() + "\\" + new File(repPhoto.getRepertoire()).getName() + ".svg.json");
             Serialize.writeJSON(repPhoto, f);
             LOGGER.debug("ecriture fichier ->" + f.toString());
 
@@ -296,11 +306,15 @@ public class Main {
     }
 
     private static void sauvegardeLightroomConfigSauve() throws ZipException {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+
         // zip file with a folder
         new ZipFile(ctx.getRepertoireDestZip()).addFolder(new File(ctx.getRepertoireRoamingAdobeLightroom()));
     }
 
     private static void purgeDesRepertoireVide50Phototheque() {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+
         String folderlocation = ctx.getRepertoire50Phototheque();
         boolean isFinished = false;
         do {
@@ -309,6 +323,8 @@ public class Main {
     }
 
     private static void purgeDesRepertoireVide00NEW() {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+
         String folderlocation = ctx.getRepertoire00NEW();
         boolean isFinished = false;
         do {
@@ -318,6 +334,8 @@ public class Main {
 
 
     private static void rangerLesRejets() throws IOException, SQLException {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+
         List<File> arrayFichierRejet = WorkWithFiles.getFilesFromRepertoryWithFilter(ctx.getRepertoire50Phototheque(), ctx.getArrayNomSubdirectoryRejet(), ctx.getParamElementsRejet().getExtFileRejet());
 
         Map<String, Integer> countExt = new HashMap<>();
