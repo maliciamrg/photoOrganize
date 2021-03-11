@@ -3,7 +3,6 @@ package com.malicia.mrg.util;
 
 import com.github.fracpete.processoutput4j.core.StreamingProcessOutputType;
 import com.github.fracpete.processoutput4j.core.StreamingProcessOwner;
-import com.malicia.mrg.Main;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,7 +13,7 @@ import java.text.NumberFormat;
 public class Output implements StreamingProcessOwner {
 
     private static final Logger LOGGER = LogManager.getLogger(Output.class);
-    private static int i = 0;
+    private int i = 0;
     NumberFormat formatter = new DecimalFormat("00000");
 
     public StreamingProcessOutputType getOutputType() {

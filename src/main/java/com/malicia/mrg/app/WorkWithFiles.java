@@ -4,8 +4,6 @@ import com.malicia.mrg.model.Database;
 import com.malicia.mrg.model.ElementFichier;
 import com.malicia.mrg.util.SystemFiles;
 import com.malicia.mrg.util.UnzipUtility;
-
-import javafx.collections.ObservableList;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;

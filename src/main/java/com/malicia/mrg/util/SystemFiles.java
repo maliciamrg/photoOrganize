@@ -1,5 +1,6 @@
 package com.malicia.mrg.util;
 
+import com.malicia.mrg.Context;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,7 +43,7 @@ public class SystemFiles {
      * @return the string
      */
     public static String normalizePath(String path) {
-        return path.replace("\\", "/").replace("//", "/");
+        return path.replace(Context.FOLDERDELIM, "/").replace("//", "/");
     }
 
     /**

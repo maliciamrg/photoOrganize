@@ -123,13 +123,13 @@ public class Main {
     private static void maintenanceDatabase() throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
-        Split_LOGGER_info(dbLr.pathAbsentPhysique());
-        Split_LOGGER_info(dbLr.folderWithoutRoot());
-        Split_LOGGER_info(dbLr.folderAbsentPhysique());
-        Split_LOGGER_info(dbLr.fileWithoutFolder());
+        splitLOGGERInfo(dbLr.pathAbsentPhysique());
+        splitLOGGERInfo(dbLr.folderWithoutRoot());
+        splitLOGGERInfo(dbLr.folderAbsentPhysique());
+        splitLOGGERInfo(dbLr.fileWithoutFolder());
     }
 
-    private static void Split_LOGGER_info(String txt) {
+    private static void splitLOGGERInfo(String txt) {
         String[] atxt = txt.split("\n");
         for (String s : atxt) {
             LOGGER.info(s);
@@ -298,7 +298,7 @@ public class Main {
 
             }
 
-            File f = new File(ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire() + "\\" + new File(repPhoto.getRepertoire()).getName() + ".svg.json");
+            File f = new File(ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire() + Context.FOLDERDELIM + new File(repPhoto.getRepertoire()).getName() + ".svg.json");
             Serialize.writeJSON(repPhoto, f);
             LOGGER.debug("ecriture fichier ->" + f.toString());
 

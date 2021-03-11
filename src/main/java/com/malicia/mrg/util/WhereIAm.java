@@ -9,6 +9,10 @@ public class WhereIAm {
     private static final String STR_REMP = "-";
     private static final String STR_VIDE = " ";
 
+    private WhereIAm() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static void displayWhereIAm(String methodName, Logger logger) {
 
         String ret = methodName;

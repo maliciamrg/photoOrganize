@@ -1,5 +1,6 @@
 package com.malicia.mrg.app;
 
+import com.malicia.mrg.Context;
 import com.malicia.mrg.model.Database;
 import com.malicia.mrg.param.importjson.ControleRepertoire;
 import com.malicia.mrg.param.importjson.RepertoirePhoto;
@@ -107,7 +108,7 @@ public class WorkWithRepertory {
             retour = retour && elechamp.isRetourControle();
         }
 
-        File f = new File(repertoire + "\\" + "photoOrganizeAnalyse.json");
+        File f = new File(repertoire + Context.FOLDERDELIM + "photoOrganizeAnalyse.json");
         if (!retour) {
             Serialize.writeJSON(listOfChamp, f);
             LOGGER.debug("ecriture fichier ->" + f.toString());

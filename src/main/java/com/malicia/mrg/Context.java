@@ -15,6 +15,7 @@ import java.util.List;
 
 public class Context {
 
+    public static final String FOLDERDELIM = "\\";
     private static final Logger LOGGER = LogManager.getLogger(Context.class);
 
     private static final String JSON = ".json";
