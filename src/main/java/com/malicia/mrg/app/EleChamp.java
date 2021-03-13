@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,18 +19,24 @@ class EleChamp {
     private String cChamp;
     private String oValue;
     private String infoRetourControle;
+    private List<String> compTagRetour;
     private boolean retourControle;
-
     public EleChamp() {
         this.cChamp = "";
         this.oValue = "";
         this.infoRetourControle = "";
+        this.compTagRetour = new ArrayList<String>();
     }
 
     public EleChamp(String codeChamp, String oldValue) {
         this.cChamp = codeChamp;
         this.oValue = oldValue;
         this.infoRetourControle = "";
+        this.compTagRetour = new ArrayList<String>();
+    }
+
+    public List<String> getCompTagRetour() {
+        return compTagRetour;
     }
 
     public boolean isRetourControle() {
@@ -63,7 +70,7 @@ class EleChamp {
         switch (elechamp) {
             case ControleRepertoire.DATE_DATE:
                 String date = dbLr.getDate(repertoire);
-                setRetourToFalse(date);
+                setRetourToFalse(date,"changenomrep_dateto_" + date);
                 if (date.compareTo(oValue) == 0) {
                     setRetourToTrue();
                 }
@@ -76,7 +83,7 @@ class EleChamp {
             case ControleRepertoire.TAG_WHERE:
             case ControleRepertoire.TAG_WHAT:
             case ControleRepertoire.TAG_WHO:
-                setRetourToFalse(dbLr.getValueForTag(nettoyageTag(elechamp)).toString());
+                setRetourToFalse(dbLr.getValueForTag(nettoyageTag(elechamp)).toString(),"changenomrep_"+elechamp);
                 if (Boolean.TRUE.equals(dbLr.isValueInTag(getoValue(), nettoyageTag(elechamp)))) {
                     setRetourToTrue();
                 }
@@ -88,14 +95,14 @@ class EleChamp {
                 nbelements = getNbelements(repertoire);
                 setRetourToTrue();
                 if (nbelements == 0) {
-                    setRetourToFalse(String.valueOf(nbelements));
+                    setRetourToFalse(String.valueOf(nbelements),"pbrepertoire_zeroelements");
                 }
                 break;
             case ControleRepertoire.NB_SELECTIONNER:
                 nbSelectionner = dbLr.nbPick(repertoire);
                 setRetourToTrue();
                 if (nbSelectionner == 0) {
-                    setRetourToFalse(String.valueOf(nbSelectionner));
+                    setRetourToFalse(String.valueOf(nbSelectionner),"pbrepertoire_zeroelements_selectionner");
                 }
                 break;
             case ControleRepertoire.NB_PHOTOAPURGER:
@@ -104,14 +111,14 @@ class EleChamp {
                 nbphotoapurger = nbSelectionner - limitemaxfolder;
                 setRetourToTrue();
                 if (nbphotoapurger > 0) {
-                    setRetourToFalse(String.valueOf(nbphotoapurger));
+                    setRetourToFalse(String.valueOf(nbphotoapurger),"pbrepertoire_purge_" + String.format("%05d",nbphotoapurger));
                 }
                 break;
             case ControleRepertoire.NB_LIMITEMAXFOLDER:
                 limitemaxfolder = (int) ((Double.valueOf(repPhoto.getNbMaxParUniteDeJour()) * dbLr.nbjourfolder(repertoire)) / Double.valueOf(repPhoto.getUniteDeJour()));
                 setRetourToTrue();
                 if (limitemaxfolder == 0) {
-                    setRetourToFalse(String.valueOf(limitemaxfolder));
+                    setRetourToFalse(String.valueOf(limitemaxfolder),"pbrepertoire_limitemaxazero");
                 }
                 break;
             default:
@@ -139,21 +146,25 @@ class EleChamp {
         Map<String, Integer> starValue = dbLr.getStarValue(repertoire);
         List<Integer> ratio = repPhoto.getratioStarMax();
         StringBuilder res = new StringBuilder();
+        StringBuilder tag = new StringBuilder();
         boolean allStarGood = true;
         for (int i = 1; i < 6; i++) {
             int nbmax = (int) Math.ceil((ratio.get(i - 1) * Double.valueOf(nbSelectionner)) / 100);
             String s = "(" + i + ")" + " ---star-: " + starValue.get(String.valueOf(i)) + " ---ratio-: " + ratio.get(i - 1) + " ---nbmax-: " + nbmax;
             LOGGER.debug(s);
-            res.append("(" + "S" + i + ")");
+            String starn = "(" + "S" + i + ")";
+            res.append(starn);
             if (starValue.get(String.valueOf(i)) > nbmax) {
                 allStarGood = false;
-                res.append((nbmax - starValue.get(String.valueOf(i))));
+                int i1 = nbmax - starValue.get(String.valueOf(i));
+                res.append(i1);
+                tag.append(starn + "_-" + String.format("%03d",i1));
             }
             res.append(ControleRepertoire.CARAC_SEPARATEUR);
         }
         setRetourToTrue();
         if (!allStarGood) {
-            setRetourToFalse(res.toString());
+            setRetourToFalse(res.toString(),tag.toString());
         }
     }
 
@@ -161,13 +172,15 @@ class EleChamp {
         return getcChamp.replace("@", "");
     }
 
-    private void setRetourToFalse(String iretourControle) {
+    private void setRetourToFalse(String iretourControle,String tagRetour) {
+        this.compTagRetour.add(tagRetour);
         this.infoRetourControle += iretourControle;
         retourControle = false;
     }
 
     private void setRetourToTrue() {
         this.infoRetourControle = ControleRepertoire.CARAC_EMPTY;
+        this.compTagRetour = new ArrayList<String>();
         retourControle = true;
     }
 

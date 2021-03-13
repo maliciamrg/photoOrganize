@@ -35,12 +35,29 @@ public class Database extends SQLiteJDBCDriverConnection {
         return new Database(catalogLrcat);
     }
 
+    public void taggerRep(String repertoire, String tag) {
+        //todo topper toute les photos du repertoire avec tag particulier (specifique au repertoire)
+    }
+
+    public static void taggerFichier(ElementFichier eleFile, String tag) {
+        //todo tagger fichier
+    }
+
+    public void topperARed(String repertoire) {
+        //todo  topperARed
+    }
+
+    public void MiseAzeroDesTagPOEtColorRed() {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        //todo MiseAzeroDesTagPOEtColorRed
+    }
+
     public void makeRepertory(String directoryName) throws SQLException {
 
         Map<String, String> idlocalforRep = getIdlocalforRep(new File(directoryName).getParent());
         String rootFolder = idlocalforRep.get("rootFolder");
 
-        String pathFromRoot = normalizePath(normalizePath(directoryName).replace(normalizePath(idlocalforRep.get("absolutePath")),""));
+        String pathFromRoot = normalizePath(normalizePath(directoryName).replace(normalizePath(idlocalforRep.get("absolutePath")), ""));
 
         Map<String, String> idlocalforNewRep = getIdlocalforRep(directoryName);
 
@@ -158,7 +175,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         Map<String, Long> ret = new HashMap<>();
         while (rsexist.next()) {
             ret.put("idlocal", rsexist.getLong("result"));
-            ret.put("rootFolder",rsexist.getLong("rootFolder"));
+            ret.put("rootFolder", rsexist.getLong("rootFolder"));
         }
         return ret;
     }
@@ -177,8 +194,8 @@ public class Database extends SQLiteJDBCDriverConnection {
         ret.put("Folderidlocal", "0");
         while (rsexist.next()) {
             ret.replace("Folderidlocal", rsexist.getString("result"));
-            ret.put("rootFolder",rsexist.getString("rootFolder"));
-            ret.put("absolutePath",rsexist.getString("absolutePath"));
+            ret.put("rootFolder", rsexist.getString("rootFolder"));
+            ret.put("absolutePath", rsexist.getString("absolutePath"));
         }
         return ret;
     }
@@ -227,10 +244,10 @@ public class Database extends SQLiteJDBCDriverConnection {
         DateTime captureTimeMin = null;
         DateTime captureTimeMax = null;
         while (rsexist.next()) {
-            captureTimeMin = new DateTime (rsexist.getLong("captureTimeMin") * 1000);
-            captureTimeMax = new DateTime (rsexist.getLong("captureTimeMax") * 1000);
+            captureTimeMin = new DateTime(rsexist.getLong("captureTimeMin") * 1000);
+            captureTimeMax = new DateTime(rsexist.getLong("captureTimeMax") * 1000);
         }
-        double days = Days.daysBetween(captureTimeMin, captureTimeMax).getDays()+1;
+        double days = Days.daysBetween(captureTimeMin, captureTimeMax).getDays() + 1;
         return days;
     }
 
@@ -295,12 +312,19 @@ public class Database extends SQLiteJDBCDriverConnection {
     /**
      * Sqlget listelementnewaclasser result set.
      *
-     * @param tempsAdherence the temps adherence
-     * @param repertoire
+     * @param tempsAdherence  the temps adherence
+     * @param repertoire50NEW
      * @return the result set
      * @throws SQLException the sql exception
      */
-    public ResultSet sqlgetListelementnewaclasser(String tempsAdherence, String repertoire) throws SQLException {
+    public ResultSet sqlgetListelementnewaclasser(String tempsAdherence, String repertoire50NEW) throws SQLException {
+        String CLAUSEWHERE = "";
+
+        if (repertoire50NEW.compareTo("") != 0) {
+            CLAUSEWHERE = "where '" + SystemFiles.normalizePath(repertoire50NEW) + "' like p.absolutePath || '%'  " +
+                    "and p.absolutePath || b.pathFromRoot like '" + SystemFiles.normalizePath(repertoire50NEW) + "' || '%' ";
+        }
+
         return select(
                 "select a.id_local as file_id_local, " +
                         "a.id_global , " +
@@ -316,7 +340,9 @@ public class Database extends SQLiteJDBCDriverConnection {
                         "e.pick , " +
                         "e.fileformat , " +
                         "e.orientation , " +
-                        "strftime('%s', e.captureTime) as captureTime " +
+                        "strftime('%s', e.captureTime) as captureTime , " +
+                        " ( '" + SystemFiles.normalizePath(repertoire50NEW) + "' like p.absolutePath || '%'  " +
+                        "and p.absolutePath || b.pathFromRoot like '" + SystemFiles.normalizePath(repertoire50NEW) + "' || '%' ) as isNew " +
                         "from AgLibraryFile a  " +
                         "inner join AgLibraryFolder b   " +
                         " on a.folder = b.id_local  " +
@@ -328,8 +354,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                         "ON e.id_local = ahem.image " +
                         "LEFT JOIN AgInternedExifCameraModel aiecm " +
                         "ON ahem.cameraModelRef = aiecm.id_local " +
-                        "where '" + SystemFiles.normalizePath(repertoire) + "' like p.absolutePath || '%'  " +
-                        "and p.absolutePath || b.pathFromRoot like '" + SystemFiles.normalizePath(repertoire) + "' || '%' " +
+                        CLAUSEWHERE +
                         "order by captureTime asc " +
                         "" +
 //                        "limit 10 " +
@@ -340,37 +365,37 @@ public class Database extends SQLiteJDBCDriverConnection {
 
 
     public String pathAbsentPhysique() throws SQLException {
-            String sql = "select " +
-                    "c.absolutePath , " +
-                    "b.pathFromRoot , " +
-                    "a.lc_idx_filename as lc_idx_filename , " +
-                    "c.id_local as path_id_local , " +
-                    "b.id_local as folder_id_local , " +
-                    "a.id_local as file_id_local  , " +
-                    "b.rootFolder " +
-                    "from AgLibraryFile a  " +
-                    "inner join AgLibraryFolder b   " +
-                    " on a.folder = b.id_local  " +
-                    "inner join AgLibraryRootFolder c   " +
-                    " on b.rootFolder = c.id_local  " +
-                    ";";
-            ResultSet rs = select(sql);
-            String txtret = "";
-            int nb = 0;
-            int ko = 0;
-            int koCor = 0;
-            while (rs.next()) {
-                File filepath = new File(rs.getString("absolutePath") + rs.getString("pathFromRoot") + rs.getString("lc_idx_filename"));
-                nb += 1;
-                if (!filepath.exists()) {
-                    txtret += "ko = " + "file_id_local" + "(" + rs.getString("file_id_local") + ")" +  filepath.toString() + "\n";
-                    ko += 1;
-                    koCor += sqlDeleteFile(rs.getString("file_id_local"));
-                }
-
+        String sql = "select " +
+                "c.absolutePath , " +
+                "b.pathFromRoot , " +
+                "a.lc_idx_filename as lc_idx_filename , " +
+                "c.id_local as path_id_local , " +
+                "b.id_local as folder_id_local , " +
+                "a.id_local as file_id_local  , " +
+                "b.rootFolder " +
+                "from AgLibraryFile a  " +
+                "inner join AgLibraryFolder b   " +
+                " on a.folder = b.id_local  " +
+                "inner join AgLibraryRootFolder c   " +
+                " on b.rootFolder = c.id_local  " +
+                ";";
+        ResultSet rs = select(sql);
+        String txtret = "";
+        int nb = 0;
+        int ko = 0;
+        int koCor = 0;
+        while (rs.next()) {
+            File filepath = new File(rs.getString("absolutePath") + rs.getString("pathFromRoot") + rs.getString("lc_idx_filename"));
+            nb += 1;
+            if (!filepath.exists()) {
+                txtret += "ko = " + "file_id_local" + "(" + rs.getString("file_id_local") + ")" + filepath.toString() + "\n";
+                ko += 1;
+                koCor += sqlDeleteFile(rs.getString("file_id_local"));
             }
-            txtret += " nb path logique = " + nb + " : absent physique = " + ko + "\n";
-            txtret += "    --- corrige         = " + koCor + "\n";
+
+        }
+        txtret += " nb path logique = " + nb + " : absent physique = " + ko + "\n";
+        txtret += "    --- corrige         = " + koCor + "\n";
         return txtret;
     }
 
@@ -391,7 +416,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         int ko = 0;
         int koCor = 0;
         while (rs.next()) {
-            File filepath = new File(rs.getString("absolutePath") + rs.getString("pathFromRoot") );
+            File filepath = new File(rs.getString("absolutePath") + rs.getString("pathFromRoot"));
             nb += 1;
             if (!filepath.exists()) {
                 txtret += "ko = " + "folder_id_local" + "(" + rs.getString("folder_id_local") + ")" + filepath.toString() + "\n";
@@ -447,9 +472,9 @@ public class Database extends SQLiteJDBCDriverConnection {
         int ko = 0;
         int koCor = 0;
         while (rs.next()) {
-                txtret += "ko = " + "folder_id_local" + "(" + rs.getString("folder_id_local") + ")" + " pathFromRoot => " + rs.getString("pathFromRoot") + "\n";
-                ko += 1;
-                koCor += sqlDeleteRepertory(rs.getString("folder_id_local"));
+            txtret += "ko = " + "folder_id_local" + "(" + rs.getString("folder_id_local") + ")" + " pathFromRoot => " + rs.getString("pathFromRoot") + "\n";
+            ko += 1;
+            koCor += sqlDeleteRepertory(rs.getString("folder_id_local"));
         }
         txtret += " nb folder without Root = " + ko + "\n";
         txtret += "    --- corrige         = " + koCor + "\n";
@@ -463,6 +488,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                 " ; ";
         return executeUpdate(sql);
     }
+
     private int sqlDeleteFile(String fileIdLocal) throws SQLException {
         String sql = " delete " +
                 "from AgLibraryFile  " +
@@ -470,5 +496,6 @@ public class Database extends SQLiteJDBCDriverConnection {
                 " ; ";
         return executeUpdate(sql);
     }
+
 }
 

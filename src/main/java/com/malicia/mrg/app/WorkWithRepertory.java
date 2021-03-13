@@ -7,7 +7,6 @@ import com.malicia.mrg.param.importjson.RepertoirePhoto;
 import com.malicia.mrg.util.Serialize;
 import com.malicia.mrg.util.SystemFiles;
 
-import com.malicia.mrg.util.WhereIAm;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,11 +20,11 @@ import java.util.ListIterator;
 
 public class WorkWithRepertory {
 
+    private static final Logger LOGGER = LogManager.getLogger(WorkWithRepertory.class);
+
     private WorkWithRepertory() {
         throw new IllegalStateException("Utility class");
     }
-
-    private static final Logger LOGGER = LogManager.getLogger(WorkWithRepertory.class);
 
     public static boolean deleteEmptyRep(String fileLocation) {
         boolean isFinished = true;
@@ -110,6 +109,19 @@ public class WorkWithRepertory {
 
         File f = new File(repertoire + Context.FOLDERDELIM + "photoOrganizeAnalyse.json");
         if (!retour) {
+
+            Context.nbDiscretionnaire++;
+            String nbDiscr = String.format("%1$03X", Context.nbDiscretionnaire);
+
+            //poser les tag sur le repertoire
+            for (EleChamp elech : listOfChamp) {
+                List<String> lst = elech.getCompTagRetour();
+                for (String tagval : lst) {
+                    String tag = Context.TAGORG + "_" + nbDiscr + "_" + tagval;
+                    dbLr.taggerRep(repertoire, tag);
+                }
+            }
+
             Serialize.writeJSON(listOfChamp, f);
             LOGGER.debug("ecriture fichier ->" + f.toString());
         } else {

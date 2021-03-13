@@ -16,9 +16,13 @@ import java.util.List;
 public class Context {
 
     public static final String FOLDERDELIM = "\\";
-    private static final Logger LOGGER = LogManager.getLogger(Context.class);
-
+    public static final int IREP_NEW = 10;
     private static final String JSON = ".json";
+    public static final String TAGORG = "ORG#";
+
+    private static final Logger LOGGER = LogManager.getLogger(Context.class);
+    public static int nbDiscretionnaire = 0;
+
     private ControleRepertoire paramControleRepertoire;
     private final List<RepertoirePhoto> arrayRepertoirePhoto = new ArrayList<>();
     private RepertoireFonctionnel repFonctionnel;

@@ -10,6 +10,7 @@ import com.malicia.mrg.param.importjson.RepertoirePhoto;
 import com.malicia.mrg.param.importjson.TriNew;
 import com.malicia.mrg.util.Output;
 import com.malicia.mrg.util.Serialize;
+import com.malicia.mrg.util.SystemFiles;
 import com.malicia.mrg.util.WhereIAm;
 import com.malicia.mrg.view.JTextAreaAppender;
 import net.lingala.zip4j.ZipFile;
@@ -31,7 +32,7 @@ public class Main {
 
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
     //Work In Progress ??????
-    private static final Boolean IS_IN_WORK = Boolean.FALSE;
+    private static final Boolean IS_IN_WORK = Boolean.TRUE;
 
     private static Context ctx;
     private static Database dbLr;
@@ -43,21 +44,28 @@ public class Main {
             chargeLog4j();
             //*
 
-            isInWork();
-
             // chargement application
             ctx = Context.chargeParam();
             dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat());
             //*
 
+            listerLesRapprochermentAvecLesRepertoirePhoto();
+            isInWork();
+
             //Maintenance database lr
             maintenanceDatabase();
             //*
 
+            dbLr.MiseAzeroDesTagPOEtColorRed();
+            
             //En Fonction De La Strategies De Rangement
             rangerLesRejets();
             topperLesRepertoires();
             regrouperLesNouvellesPhoto();
+            //*
+
+            //lister les possible photo oublier
+            listerLesRapprochermentAvecLesRepertoirePhoto();
             //*
 
             //Nettoyage repertoires Local
@@ -191,15 +199,76 @@ public class Main {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         //Regroupement
-        ResultSet rsele = dbLr.sqlgetListelementnewaclasser(ctx.getParamTriNew().getTempsAdherence(), ctx.getParamTriNew().getRepertoire50NEW());
+        String repertoire50NEW = ctx.getParamTriNew().getRepertoire50NEW();
+        ResultSet rsele = dbLr.sqlgetListelementnewaclasser(ctx.getParamTriNew().getTempsAdherence(), repertoire50NEW);
 
-        GrpPhoto listFileBazar = new GrpPhoto();
-        GrpPhoto listElekidz = new GrpPhoto();
+        if (rsele.getBoolean("isNew")) {
+
+            dbLr.topperARed(repertoire50NEW);
+
+            GrpPhoto listFileBazar = new GrpPhoto();
+            GrpPhoto listElekidz = new GrpPhoto();
+            List<GrpPhoto> listGrpEletmp = new ArrayList();
+            GrpPhoto listEletmp = new GrpPhoto();
+
+
+            List<String> listkidsModel = ctx.getParamTriNew().getListeModelKidz();
+            long maxprev = 0;
+            while (rsele.next()) {
+
+                // Recuperer les info de l'elements
+                String fileIdLocal = rsele.getString("file_id_local");
+                String absolutePath = rsele.getString("absolutePath");
+                String pathFromRoot = rsele.getString("pathFromRoot");
+                String lcIdxFilename = rsele.getString("lc_idx_filename");
+                String cameraModel = rsele.getString("CameraModel");
+                long mint = rsele.getLong("mint");
+                long maxt = rsele.getLong("maxt");
+                long captureTime = rsele.getLong("captureTime");
+
+                ElementFichier eleFile = new ElementFichier(absolutePath, pathFromRoot, lcIdxFilename, fileIdLocal);
+
+                if (listkidsModel.contains(cameraModel)) {
+                    listElekidz.add(eleFile);
+                } else {
+                    if (mint > maxprev) {
+
+                        if (listEletmp.size() > ctx.getParamTriNew().getThresholdNew()) {
+                            listGrpEletmp.add(listEletmp);
+                        } else {
+                            listFileBazar.addAll(listEletmp);
+                        }
+
+                        listEletmp = new GrpPhoto();
+
+                    }
+                    maxprev = maxt;
+                    listEletmp.setFirstDate(captureTime);
+                    listEletmp.add(eleFile);
+                }
+
+            }
+            if (listEletmp.size() > ctx.getParamTriNew().getThresholdNew()) {
+                listGrpEletmp.add(listEletmp);
+            } else {
+                listFileBazar.addAll(listEletmp);
+            }
+
+            deplacementDesGroupes(listFileBazar, listElekidz, listGrpEletmp);
+        }
+
+    }
+
+
+    private static void listerLesRapprochermentAvecLesRepertoirePhoto() throws SQLException, IOException {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+
+        //Regroupement
+        ResultSet rsele = dbLr.sqlgetListelementnewaclasser(ctx.getParamTriNew().getTempsAdherence(), "");
+
         List<GrpPhoto> listGrpEletmp = new ArrayList();
         GrpPhoto listEletmp = new GrpPhoto();
 
-
-        List<String> listkidsModel = ctx.getParamTriNew().getListeModelKidz();
         long maxprev = 0;
         while (rsele.next()) {
 
@@ -208,23 +277,32 @@ public class Main {
             String absolutePath = rsele.getString("absolutePath");
             String pathFromRoot = rsele.getString("pathFromRoot");
             String lcIdxFilename = rsele.getString("lc_idx_filename");
-            String cameraModel = rsele.getString("CameraModel");
             long mint = rsele.getLong("mint");
             long maxt = rsele.getLong("maxt");
             long captureTime = rsele.getLong("captureTime");
+            boolean isNew = rsele.getBoolean("isNew");
 
-            ElementFichier eleFile = new ElementFichier(absolutePath, pathFromRoot, lcIdxFilename, fileIdLocal);
+            // recherche du repPhoto concerner
+            String ch = absolutePath + pathFromRoot;
+            List<RepertoirePhoto> arrayRepertoirePhoto = ctx.getArrayRepertoirePhoto();
+            int numeroRep = -1;
+            int i;
+            for (i = 0; i < arrayRepertoirePhoto.size(); i++) {
+                if (ch.startsWith(SystemFiles.normalizePath(ctx.getRepertoire50Phototheque() + arrayRepertoirePhoto.get(i).getRepertoire()))) {
+                    numeroRep = i;
+                }
+            }
+            if (ch.startsWith(SystemFiles.normalizePath(ctx.getParamTriNew().getRepertoire50NEW()))) {
+                numeroRep = Context.IREP_NEW;
+            }
 
-            if (listkidsModel.contains(cameraModel)) {
-                listElekidz.add(eleFile);
-            } else {
+
+            if (numeroRep > -1) {
+                ElementFichier eleFile = new ElementFichier(absolutePath, pathFromRoot, lcIdxFilename, fileIdLocal, numeroRep);
+
                 if (mint > maxprev) {
 
-                    if (listEletmp.size() > ctx.getParamTriNew().getThresholdNew()) {
-                        listGrpEletmp.add(listEletmp);
-                    } else {
-                        listFileBazar.addAll(listEletmp);
-                    }
+                    listGrpEletmp.add(listEletmp);
 
                     listEletmp = new GrpPhoto();
 
@@ -235,13 +313,45 @@ public class Main {
             }
 
         }
-        if (listEletmp.size() > ctx.getParamTriNew().getThresholdNew()) {
+        if (listEletmp.size() > 0) {
             listGrpEletmp.add(listEletmp);
-        } else {
-            listFileBazar.addAll(listEletmp);
         }
 
-        deplacementDesGroupes(listFileBazar, listElekidz, listGrpEletmp);
+
+        //display des rapprochementd
+
+        for (GrpPhoto listEle : listGrpEletmp) {
+
+            if (listEle.size() > 1 && listEle.getArrayRep(Context.IREP_NEW) > 0 && listEle.size() > listEle.getArrayRep(Context.IREP_NEW)) {
+
+                actionRapprochementNewREpPhoto(listEle);
+
+            }
+
+        }
+
+
+    }
+
+    private static void actionRapprochementNewREpPhoto(GrpPhoto listEle) {
+        Context.nbDiscretionnaire++;
+        String nbDiscr = String.format("%1$03X", Context.nbDiscretionnaire);
+        String tag = Context.TAGORG + "_" + nbDiscr + "_" + "possibleNewGroup";
+        for (ElementFichier eleFile : listEle.lstEleFile) {
+            Database.taggerFichier(eleFile,tag);
+        }
+
+
+        LOGGER.info("---------------------------");
+        int nbele = listEle.lstEleFile.size();
+        LOGGER.info(String.format("%05d", nbele) + " ===========");
+        int i;
+        for (i = 0; i < ctx.getArrayRepertoirePhoto().size(); i++) {
+            if (listEle.getArrayRep(i) > 0) {
+                LOGGER.info(String.format("%05d", listEle.getArrayRep(i)) + " - " + ctx.getArrayRepertoirePhoto().get(i).getRepertoire());
+            }
+        }
+        LOGGER.info(String.format("%05d", listEle.getArrayRep(Context.IREP_NEW)) + " - " + ctx.getParamTriNew().getRepertoire50NEW());
 
     }
 
@@ -297,7 +407,6 @@ public class Main {
                 }
 
             }
-
             File f = new File(ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire() + Context.FOLDERDELIM + new File(repPhoto.getRepertoire()).getName() + ".svg.json");
             Serialize.writeJSON(repPhoto, f);
             LOGGER.debug("ecriture fichier ->" + f.toString());

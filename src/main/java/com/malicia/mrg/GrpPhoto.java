@@ -5,12 +5,17 @@ import com.malicia.mrg.model.ElementFichier;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class GrpPhoto {
     public long firstDate;
     List<ElementFichier> lstEleFile = new ArrayList();
+    private int[] arrayRep = new int[Context.IREP_NEW+1];
 
     public GrpPhoto() {
-        // Do nothing because of X and Y
+    }
+
+    public int getArrayRep(int i) {
+        return arrayRep[i];
     }
 
     public List<ElementFichier> getLstEleFile() {
@@ -30,6 +35,11 @@ public class GrpPhoto {
     }
 
     public void add(ElementFichier eleFile) {
+        int numRep = eleFile.getNumRep();
+        if (numRep > -1) {
+            arrayRep[numRep] += 1;
+        }
+
         lstEleFile.add(eleFile);
     }
 
