@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static com.malicia.mrg.Context.TAGORG;
 import static com.malicia.mrg.util.SystemFiles.normalizePath;
 
 public class Database extends SQLiteJDBCDriverConnection {
@@ -35,21 +36,65 @@ public class Database extends SQLiteJDBCDriverConnection {
         return new Database(catalogLrcat);
     }
 
-    public void taggerRep(String repertoire, String tag) {
-        //todo topper toute les photos du repertoire avec tag particulier (specifique au repertoire)
+    public void taggerFichier(String fileIdLocal, String tag) throws SQLException {
+        String sql;
+        sql = "update Adobe_images " +
+                "set colorLabels = '" + tag + "' " +
+                " where rootFile = " + fileIdLocal + " " +
+                ";";
+        executeUpdate(sql);
     }
 
-    public static void taggerFichier(ElementFichier eleFile, String tag) {
-        //todo tagger fichier
-    }
-
-    public void topperARed(String repertoire) {
-        //todo  topperARed
-    }
-
-    public void MiseAzeroDesTagPOEtColorRed() {
+    public void taggerRep(String repertoire, String tag) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        //todo MiseAzeroDesTagPOEtColorRed
+        String sql;
+        sql = "update Adobe_images " +
+                "set colorLabels = '" + tag + "' " +
+                " where rootFile in ( " +
+                " select a.id_local as file_id_local " +
+                "from AgLibraryFile a  " +
+                "inner join AgLibraryFolder b   " +
+                " on a.folder = b.id_local  " +
+                "inner join AgLibraryRootFolder p   " +
+                " on b.rootFolder = p.id_local  " +
+                "where '" + SystemFiles.normalizePath(repertoire) + "' like p.absolutePath || '%'  " +
+                "and p.absolutePath || b.pathFromRoot like '" + SystemFiles.normalizePath(repertoire) + "' || '%' " +
+                " ) " +
+                ";";
+        executeUpdate(sql);
+    }
+
+    public void topperARed50NEW( String repertoire50NEW ) throws SQLException {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        String sql;
+        sql = "update Adobe_images " +
+                "set colorLabels = 'Red' " +
+                " where rootFile in ( " +
+                " select a.id_local as file_id_local " +
+                "from AgLibraryFile a  " +
+                "inner join AgLibraryFolder b   " +
+                " on a.folder = b.id_local  " +
+                "inner join AgLibraryRootFolder p   " +
+                " on b.rootFolder = p.id_local  " +
+                "where '" + SystemFiles.normalizePath(repertoire50NEW) + "' like p.absolutePath || '%'  " +
+                "and p.absolutePath || b.pathFromRoot like '" + SystemFiles.normalizePath(repertoire50NEW) + "' || '%' " +
+                " ) " +
+                ";";
+        executeUpdate(sql);
+
+    }
+
+    public void MiseAzeroDesTagPOEtColorRed() throws SQLException {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+
+        String sql;
+        sql = "update Adobe_images " +
+                "set colorLabels = '' " +
+                "where colorLabels = 'Red' " +
+                " or colorLabels = 'Rouge' " +
+                " or colorLabels like '" + TAGORG + "%' " +
+                ";";
+        executeUpdate(sql);
     }
 
     public void makeRepertory(String directoryName) throws SQLException {
@@ -497,5 +542,54 @@ public class Database extends SQLiteJDBCDriverConnection {
         return executeUpdate(sql);
     }
 
+    public void sqlcreateKeyword(String keywordmaitre, String keyword) throws SQLException {
+
+        ResultSet rs = this.select("select id_local , genealogy " +
+                "from  AgLibraryKeyword " +
+                "where lc_name = '" + keywordmaitre.toLowerCase() + "' ");
+        String genealogyMaitre = "";
+        String idlocalmaitre = "";
+        while (rs.next()) {
+            genealogyMaitre = rs.getString("genealogy");
+            idlocalmaitre = rs.getString("id_local");
+        }
+
+        long idlocal = sqlGetPrevIdlocalforKeyword();
+        String sql = "INSERT INTO AgLibraryKeyword (id_local, id_global, dateCreated, " +
+                "genealogy, imageCountCache, includeOnExport, includeParents, includeSynonyms, " +
+                "keywordType, lastApplied, lc_name, name, parent) " +
+                "VALUES (" + idlocal + " , '" + UUID.randomUUID().toString() + "', '608509497.846982', " +
+                "'" + genealogyMaitre + "/7" + idlocal + "', '', '1', '1', '1', " +
+                "'', '', '" + keyword.toLowerCase() + "', '" + keyword + "', '" + idlocalmaitre + "');";
+        executeUpdate(sql);
+    }
+
+    public long sqlGetPrevIdlocalforKeyword() throws SQLException {
+        String sql = "select * FROM AgLibraryKeyword " +
+                "ORDER by id_local desc " +
+                "; ";
+        ResultSet rs = select(sql);
+        boolean first = true;
+        long idLocalCalcul = 0;
+        long idLocal = 0;
+        while (rs.next()) {
+            // Recuperer les info de l'elements
+            idLocal = rs.getLong("id_local");
+            if (first) {
+                idLocalCalcul = idLocal;
+                first = false;
+            } else {
+                idLocalCalcul -= 1;
+                if (idLocalCalcul > idLocal) {
+                    return idLocalCalcul;
+                }
+            }
+        }
+        // 0 ou 1 repertoire dans AgLibraryFolder
+        if (idLocalCalcul == idLocal) {
+            idLocalCalcul = (idLocal / 2) + 1;
+        }
+        return idLocalCalcul;
+    }
 }
 

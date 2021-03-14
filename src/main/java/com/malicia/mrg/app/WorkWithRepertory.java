@@ -110,17 +110,16 @@ public class WorkWithRepertory {
         File f = new File(repertoire + Context.FOLDERDELIM + "photoOrganizeAnalyse.json");
         if (!retour) {
 
-            Context.nbDiscretionnaire++;
-            String nbDiscr = String.format("%1$03X", Context.nbDiscretionnaire);
-
-            //poser les tag sur le repertoire
-            for (EleChamp elech : listOfChamp) {
-                List<String> lst = elech.getCompTagRetour();
-                for (String tagval : lst) {
-                    String tag = Context.TAGORG + "_" + nbDiscr + "_" + tagval;
-                    dbLr.taggerRep(repertoire, tag);
-                }
-            }
+//            Context.nbDiscretionnaire++;
+//            String nbDiscr = String.format("%1$03X", Context.nbDiscretionnaire);
+//            //poser les tag sur le repertoire
+//            for (EleChamp elech : listOfChamp) {
+//                List<String> lst = elech.getCompTagRetour();
+//                for (String tagval : lst) {
+//                    String tag = Context.TAGORG + "_" + nbDiscr + "_" + tagval;
+//                    dbLr.taggerRep(repertoire, tag);
+//                }
+//            }
 
             Serialize.writeJSON(listOfChamp, f);
             LOGGER.debug("ecriture fichier ->" + f.toString());

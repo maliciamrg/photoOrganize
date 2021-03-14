@@ -9,13 +9,13 @@ import java.util.List;
 
 public class RepertoirePhoto extends Serialize {
 
+    private boolean rapprochermentNewOk;
     private String repertoire;
     private int uniteDeJour;
     private int nbMaxParUniteDeJour;
     private List<Integer> ratioStarMax;
     private List<String> zoneValeurAdmise;
     private List<String> nomRepertoire;
-
     public RepertoirePhoto() {
         super();
     }
@@ -27,6 +27,11 @@ public class RepertoirePhoto extends Serialize {
         ratioStarMax = new ArrayList<>();
         zoneValeurAdmise = new ArrayList<>();
         nomRepertoire = new ArrayList<>();
+        rapprochermentNewOk = false;
+    }
+
+    public boolean isRapprochermentNewOk() {
+        return rapprochermentNewOk;
     }
 
     public List<String> getNomRepertoire() {

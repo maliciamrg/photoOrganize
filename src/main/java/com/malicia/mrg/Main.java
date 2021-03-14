@@ -32,7 +32,7 @@ public class Main {
 
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
     //Work In Progress ??????
-    private static final Boolean IS_IN_WORK = Boolean.TRUE;
+    private static final Boolean IS_IN_WORK = Boolean.FALSE;
 
     private static Context ctx;
     private static Database dbLr;
@@ -49,24 +49,23 @@ public class Main {
             dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat());
             //*
 
-            listerLesRapprochermentAvecLesRepertoirePhoto();
-            isInWork();
-
             //Maintenance database lr
             maintenanceDatabase();
             //*
 
             dbLr.MiseAzeroDesTagPOEtColorRed();
-            
+
             //En Fonction De La Strategies De Rangement
             rangerLesRejets();
             topperLesRepertoires();
+            dbLr.topperARed50NEW(ctx.getParamTriNew().getRepertoire50NEW());
             regrouperLesNouvellesPhoto();
             //*
 
             //lister les possible photo oublier
             listerLesRapprochermentAvecLesRepertoirePhoto();
             //*
+            isInWork();
 
             //Nettoyage repertoires Local
             purgeDesRepertoireVide50Phototheque();
@@ -202,20 +201,17 @@ public class Main {
         String repertoire50NEW = ctx.getParamTriNew().getRepertoire50NEW();
         ResultSet rsele = dbLr.sqlgetListelementnewaclasser(ctx.getParamTriNew().getTempsAdherence(), repertoire50NEW);
 
-        if (rsele.getBoolean("isNew")) {
-
-            dbLr.topperARed(repertoire50NEW);
-
-            GrpPhoto listFileBazar = new GrpPhoto();
-            GrpPhoto listElekidz = new GrpPhoto();
-            List<GrpPhoto> listGrpEletmp = new ArrayList();
-            GrpPhoto listEletmp = new GrpPhoto();
+        GrpPhoto listFileBazar = new GrpPhoto();
+        GrpPhoto listElekidz = new GrpPhoto();
+        List<GrpPhoto> listGrpEletmp = new ArrayList();
+        GrpPhoto listEletmp = new GrpPhoto();
 
 
-            List<String> listkidsModel = ctx.getParamTriNew().getListeModelKidz();
-            long maxprev = 0;
-            while (rsele.next()) {
+        List<String> listkidsModel = ctx.getParamTriNew().getListeModelKidz();
+        long maxprev = 0;
+        while (rsele.next()) {
 
+            if (rsele.getBoolean("isNew")) {
                 // Recuperer les info de l'elements
                 String fileIdLocal = rsele.getString("file_id_local");
                 String absolutePath = rsele.getString("absolutePath");
@@ -246,16 +242,16 @@ public class Main {
                     listEletmp.setFirstDate(captureTime);
                     listEletmp.add(eleFile);
                 }
-
             }
-            if (listEletmp.size() > ctx.getParamTriNew().getThresholdNew()) {
-                listGrpEletmp.add(listEletmp);
-            } else {
-                listFileBazar.addAll(listEletmp);
-            }
-
-            deplacementDesGroupes(listFileBazar, listElekidz, listGrpEletmp);
         }
+        if (listEletmp.size() > ctx.getParamTriNew().getThresholdNew()) {
+            listGrpEletmp.add(listEletmp);
+        } else {
+            listFileBazar.addAll(listEletmp);
+        }
+
+        deplacementDesGroupes(listFileBazar, listElekidz, listGrpEletmp);
+
 
     }
 
@@ -280,7 +276,6 @@ public class Main {
             long mint = rsele.getLong("mint");
             long maxt = rsele.getLong("maxt");
             long captureTime = rsele.getLong("captureTime");
-            boolean isNew = rsele.getBoolean("isNew");
 
             // recherche du repPhoto concerner
             String ch = absolutePath + pathFromRoot;
@@ -288,8 +283,10 @@ public class Main {
             int numeroRep = -1;
             int i;
             for (i = 0; i < arrayRepertoirePhoto.size(); i++) {
-                if (ch.startsWith(SystemFiles.normalizePath(ctx.getRepertoire50Phototheque() + arrayRepertoirePhoto.get(i).getRepertoire()))) {
-                    numeroRep = i;
+                if (arrayRepertoirePhoto.get(i).isRapprochermentNewOk()) {
+                    if (ch.startsWith(SystemFiles.normalizePath(ctx.getRepertoire50Phototheque() + arrayRepertoirePhoto.get(i).getRepertoire()))) {
+                        numeroRep = i;
+                    }
                 }
             }
             if (ch.startsWith(SystemFiles.normalizePath(ctx.getParamTriNew().getRepertoire50NEW()))) {
@@ -333,12 +330,12 @@ public class Main {
 
     }
 
-    private static void actionRapprochementNewREpPhoto(GrpPhoto listEle) {
+    private static void actionRapprochementNewREpPhoto(GrpPhoto listEle) throws SQLException {
         Context.nbDiscretionnaire++;
         String nbDiscr = String.format("%1$03X", Context.nbDiscretionnaire);
         String tag = Context.TAGORG + "_" + nbDiscr + "_" + "possibleNewGroup";
         for (ElementFichier eleFile : listEle.lstEleFile) {
-            Database.taggerFichier(eleFile,tag);
+            dbLr.taggerFichier(eleFile.getFileIdLocal(), tag);
         }
 
 
@@ -418,7 +415,11 @@ public class Main {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         // zip file with a folder
-        new ZipFile(ctx.getRepertoireDestZip()).addFolder(new File(ctx.getRepertoireRoamingAdobeLightroom()));
+        String repertoireDestZip = ctx.getRepertoireDestZip();
+        File f = new File(repertoireDestZip);
+        if (f.isFile()) {f.delete();}
+        File RepertoireRoamingAdobeLightroom = new File(ctx.getRepertoireRoamingAdobeLightroom());
+        new ZipFile(repertoireDestZip).addFolder(RepertoireRoamingAdobeLightroom);
     }
 
     private static void purgeDesRepertoireVide50Phototheque() {
