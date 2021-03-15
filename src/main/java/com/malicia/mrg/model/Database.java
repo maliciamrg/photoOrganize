@@ -134,6 +134,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                 "set colorLabels = '' " +
                 "where colorLabels = " + Context.RED + " " +
                 " or colorLabels = 'Rouge' " +
+                " or colorLabels like '" + Context.TAGORG + "' " +
                 ";";
         executeUpdate(sql);
     }
