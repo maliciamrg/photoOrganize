@@ -117,7 +117,7 @@ public class WorkWithRepertory {
 //                List<String> lst = elech.getCompTagRetour();
 //                for (String tagval : lst) {
 //                    String tag = Context.TAGORG + "_" + nbDiscr + "_" + tagval;
-//                    dbLr.taggerRep(repertoire, tag);
+//                    dbLr.AddKeywordToRep(repertoire, tag);
 //                }
 //            }
 

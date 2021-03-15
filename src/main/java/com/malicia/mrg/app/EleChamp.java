@@ -83,8 +83,8 @@ class EleChamp {
             case ControleRepertoire.TAG_WHERE:
             case ControleRepertoire.TAG_WHAT:
             case ControleRepertoire.TAG_WHO:
-                setRetourToFalse(dbLr.getValueForTag(nettoyageTag(elechamp)).toString(),"changenomrep_"+elechamp);
-                if (Boolean.TRUE.equals(dbLr.isValueInTag(getoValue(), nettoyageTag(elechamp)))) {
+                setRetourToFalse(dbLr.getValueForKeyword(nettoyageTag(elechamp)).toString(),"changenomrep_"+elechamp);
+                if (Boolean.TRUE.equals(dbLr.isValueInKeyword(getoValue(), nettoyageTag(elechamp)))) {
                     setRetourToTrue();
                 }
                 break;

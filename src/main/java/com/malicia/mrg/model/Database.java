@@ -19,7 +19,6 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.malicia.mrg.Context.TAGORG;
 import static com.malicia.mrg.util.SystemFiles.normalizePath;
 
 public class Database extends SQLiteJDBCDriverConnection {
@@ -36,17 +35,60 @@ public class Database extends SQLiteJDBCDriverConnection {
         return new Database(catalogLrcat);
     }
 
-    public void taggerFichier(String fileIdLocal, String tag) throws SQLException {
-        String sql;
-        sql = "update Adobe_images " +
-                "set colorLabels = '" + tag + "' " +
-                " where rootFile = " + fileIdLocal + " " +
-                ";";
-        executeUpdate(sql);
+    public void AddKeywordToFile(String fileIdLocal, String tag) throws SQLException {
+        //todo
+        String idlocaltag = sqlcreateKeyword(Context.TAGORG, tag);
+        long idlocalImage = sqlGetAdobeImage(fileIdLocal);
+
+        long idlocalKeywordImage = sqlGetAgLibraryKeywordImage(idlocalImage, idlocaltag);
+        if (idlocalKeywordImage == 0) {
+            idlocalKeywordImage = sqlGetPrevIdlocalforKeywordImage();
+
+            String sql;
+            sql = "insert into AgLibraryKeywordImage " +
+                    "( 'id_local', 'image', 'tag') " +
+                    "VALUES " +
+                    "('" + idlocalKeywordImage + "', '" + idlocalImage + "', '" + idlocaltag + "');" +
+                    ";";
+            executeUpdate(sql);
+        }
     }
 
-    public void taggerRep(String repertoire, String tag) throws SQLException {
-        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+    private long sqlGetAdobeImage(String fileIdLocal) throws SQLException {
+
+        ResultSet rsexist = select(
+                " select  e.id_local as result" +
+                        " from Adobe_images e " +
+                        " where " + fileIdLocal + " = e.rootFile " +
+                        ";");
+
+        int idlocalImage = 0;
+        while (rsexist.next()) {
+            idlocalImage = rsexist.getString("result") == null ? 0 : rsexist.getInt("result");
+        }
+        return idlocalImage;
+
+    }
+
+    private long sqlGetAgLibraryKeywordImage(long idlocalImage, String idlocaltag) throws SQLException {
+
+        ResultSet rsexist = select(
+                " select  e.id_local as result" +
+                        " from AgLibraryKeywordImage e " +
+                        " where " + idlocalImage + " = e.image " +
+                        " and " + idlocaltag + " = e.tag " +
+                        ";");
+
+        int idlocalKeywordImage = 0;
+        while (rsexist.next()) {
+            idlocalKeywordImage = rsexist.getString("result") == null ? 0 : rsexist.getInt("result");
+        }
+        return idlocalKeywordImage;
+
+    }
+
+    public void AddKeywordToRep(String repertoire, String tag) throws SQLException {
+        //todo
         String sql;
         sql = "update Adobe_images " +
                 "set colorLabels = '" + tag + "' " +
@@ -64,11 +106,11 @@ public class Database extends SQLiteJDBCDriverConnection {
         executeUpdate(sql);
     }
 
-    public void topperARed50NEW( String repertoire50NEW ) throws SQLException {
+    public void topperARed50NEW(String repertoire50NEW) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         String sql;
         sql = "update Adobe_images " +
-                "set colorLabels = 'Red' " +
+                "set colorLabels = " + Context.RED + " " +
                 " where rootFile in ( " +
                 " select a.id_local as file_id_local " +
                 "from AgLibraryFile a  " +
@@ -84,15 +126,14 @@ public class Database extends SQLiteJDBCDriverConnection {
 
     }
 
-    public void MiseAzeroDesTagPOEtColorRed() throws SQLException {
+    public void MiseAzeroDesColorLabelsRed() throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         String sql;
         sql = "update Adobe_images " +
                 "set colorLabels = '' " +
-                "where colorLabels = 'Red' " +
+                "where colorLabels = " + Context.RED + " " +
                 " or colorLabels = 'Rouge' " +
-                " or colorLabels like '" + TAGORG + "%' " +
                 ";";
         executeUpdate(sql);
     }
@@ -333,12 +374,12 @@ public class Database extends SQLiteJDBCDriverConnection {
         return repDateFormat.format(new Date(captureTime * 1000));
     }
 
-    public Boolean isValueInTag(String getoValue, String tagAction) throws SQLException {
-        List<String> listTag = getValueForTag(tagAction);
+    public Boolean isValueInKeyword(String getoValue, String tagAction) throws SQLException {
+        List<String> listTag = getValueForKeyword(tagAction);
         return listTag.contains(getoValue);
     }
 
-    public List<String> getValueForTag(String getcChamp) throws SQLException {
+    public List<String> getValueForKeyword(String getcChamp) throws SQLException {
         List<String> listLcName = new ArrayList<>();
         ResultSet rs = select("select lc_name " +
                 "from AgLibraryKeyword " +
@@ -542,26 +583,65 @@ public class Database extends SQLiteJDBCDriverConnection {
         return executeUpdate(sql);
     }
 
-    public void sqlcreateKeyword(String keywordmaitre, String keyword) throws SQLException {
+    public String sqlcreateKeyword(String keywordmaitre, String keyword) throws SQLException {
 
-        ResultSet rs = this.select("select id_local , genealogy " +
-                "from  AgLibraryKeyword " +
-                "where lc_name = '" + keywordmaitre.toLowerCase() + "' ");
-        String genealogyMaitre = "";
-        String idlocalmaitre = "";
-        while (rs.next()) {
-            genealogyMaitre = rs.getString("genealogy");
-            idlocalmaitre = rs.getString("id_local");
+        String keyWordIdlocal = getIdforKeyword(keyword).get("KeyWordIdlocal");
+        if (keyWordIdlocal.compareTo("") == 0) {
+
+            Map<String, String> idforKeywordMaitre = getIdforKeyword(keywordmaitre);
+
+            long idlocal = sqlGetPrevIdlocalforKeyword();
+            String sql = "INSERT INTO AgLibraryKeyword (id_local, id_global, dateCreated, " +
+                    "genealogy, imageCountCache, includeOnExport, includeParents, includeSynonyms, " +
+                    "keywordType, lastApplied, lc_name, name, parent) " +
+                    "VALUES (" +
+                    "" + idlocal + " , " +
+                    "'" + UUID.randomUUID().toString() + "', " +
+                    "'608509497.846982', " +
+                    "'" + idforKeywordMaitre.get("genealogy") + "/8" + idlocal + "', " +
+                    "'', " +
+                    "'1', " +
+                    "'1', " +
+                    "'1', " +
+                    "'', " +
+                    "'', " +
+                    "'" + keyword.toLowerCase() + "', " +
+                    "'" + keyword + "', " +
+                    "'" + idforKeywordMaitre.get("KeyWordIdlocal") + "' " +
+                    ")" +
+                    ";";
+            executeUpdate(sql);
+            return idlocal + "";
+        }
+        return keyWordIdlocal;
+    }
+
+    private Map<String, String> getIdforKeyword(String keyword) throws SQLException {
+        Map<String, String> ret = new HashMap<>();
+        String sql;
+        if (keyword.compareTo("") == 0) {
+            sql = "select " +
+                    "id_local , " +
+                    "genealogy " +
+                    "from  AgLibraryKeyword " +
+                    "where lc_name is null ";
+        } else {
+            sql = "select " +
+                    "id_local , " +
+                    "genealogy " +
+                    "from  AgLibraryKeyword " +
+                    "where lc_name = '" + keyword.toLowerCase() + "' ";
         }
 
-        long idlocal = sqlGetPrevIdlocalforKeyword();
-        String sql = "INSERT INTO AgLibraryKeyword (id_local, id_global, dateCreated, " +
-                "genealogy, imageCountCache, includeOnExport, includeParents, includeSynonyms, " +
-                "keywordType, lastApplied, lc_name, name, parent) " +
-                "VALUES (" + idlocal + " , '" + UUID.randomUUID().toString() + "', '608509497.846982', " +
-                "'" + genealogyMaitre + "/7" + idlocal + "', '', '1', '1', '1', " +
-                "'', '', '" + keyword.toLowerCase() + "', '" + keyword + "', '" + idlocalmaitre + "');";
-        executeUpdate(sql);
+        ResultSet rs = this.select(sql);
+
+        ret.put("genealogy", "");
+        ret.put("KeyWordIdlocal", "");
+        while (rs.next()) {
+            ret.replace("genealogy", rs.getString("genealogy"));
+            ret.replace("KeyWordIdlocal", rs.getString("id_local"));
+        }
+        return ret;
     }
 
     public long sqlGetPrevIdlocalforKeyword() throws SQLException {
@@ -590,6 +670,92 @@ public class Database extends SQLiteJDBCDriverConnection {
             idLocalCalcul = (idLocal / 2) + 1;
         }
         return idLocalCalcul;
+    }
+
+    public long sqlGetPrevIdlocalforKeywordImage() throws SQLException {
+        String sql = "select * FROM AgLibraryKeywordImage " +
+                "ORDER by id_local desc " +
+                "; ";
+        ResultSet rs = select(sql);
+        boolean first = true;
+        long idLocalCalcul = 0;
+        long idLocal = 0;
+        while (rs.next()) {
+            // Recuperer les info de l'elements
+            idLocal = rs.getLong("id_local");
+            if (first) {
+                idLocalCalcul = idLocal;
+                first = false;
+            } else {
+                idLocalCalcul -= 1;
+                if (idLocalCalcul > idLocal) {
+                    return idLocalCalcul;
+                }
+            }
+        }
+        // 0 ou 1 repertoire dans AgLibraryFolder
+        if (idLocalCalcul == idLocal) {
+            idLocalCalcul = (idLocal / 2) + 1;
+        }
+        return idLocalCalcul;
+    }
+
+    public void creationContextEtPurgeKeyword() throws SQLException {
+        //todo creation tag mere a tous les tag
+        purgeGroupeKeyword(Context.TAGORG);
+        sqlcreateKeyword("", Context.TAGORG);
+        sqlcreateKeyword(Context.TAGORG, "GO" + Context.TAGORG);
+        sqlcreateKeyword(Context.TAGORG, "LAURELINE" + Context.TAGORG);
+        sqlcreateKeyword(Context.TAGORG, "NELLY" + Context.TAGORG);
+        sqlcreateKeyword(Context.TAGORG, "MIYA" + Context.TAGORG);
+        sqlcreateKeyword(Context.TAGORG, "ROMAIN" + Context.TAGORG);
+        sqlcreateKeyword(Context.TAGORG, "SANDRINE" + Context.TAGORG);
+        sqlcreateKeyword(Context.TAGORG, "TRAVAUX" + Context.TAGORG);
+    }
+
+    private int purgeGroupeKeyword(String tagorg) throws SQLException {
+        String sql = " delete " +
+                "from AgLibraryKeyword  " +
+                " where name like '" + tagorg + "%' " +
+                " and name <> '" + tagorg + "' " +
+                " ; ";
+        return executeUpdate(sql);
+    }
+
+    public String keywordImageWithoutKeyword() throws SQLException {
+        String sql = " select k.id_local " +
+                "from AgLibraryKeywordImage k " +
+                "left join AgLibraryKeyword i " +
+                " on k.tag = i.id_local " +
+                "where lc_name is NULL " +
+                ";";
+        ResultSet rs = select(sql);
+        int ko = 0;
+        while (rs.next()) {
+            ko ++;
+        }
+        int koCor = 0;
+        if (ko > 0 ) {
+            koCor += sqlDeletekeywordImage();
+        }
+        String txtret = "";
+        txtret += " nb keyword orphelin    = " + ko + "\n";
+        txtret += "    --- corrige         = " + koCor + "\n";
+        return txtret;
+    }
+
+    private int sqlDeletekeywordImage() throws SQLException {
+        String sql = " delete " +
+                "from AgLibraryKeywordImage  " +
+                " where id_local in ( " +
+                "select k.id_local as result " +
+                "from AgLibraryKeywordImage k " +
+                "left join AgLibraryKeyword i " +
+                " on k.tag = i.id_local " +
+                "where name is NULL " +
+                ") " +
+                " ; ";
+        return executeUpdate(sql);
     }
 }
 

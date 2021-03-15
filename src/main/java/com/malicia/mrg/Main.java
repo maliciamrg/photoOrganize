@@ -32,7 +32,7 @@ public class Main {
 
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
     //Work In Progress ??????
-    private static final Boolean IS_IN_WORK = Boolean.FALSE;
+    private static final Boolean IS_IN_WORK = Boolean.TRUE;
 
     private static Context ctx;
     private static Database dbLr;
@@ -53,12 +53,17 @@ public class Main {
             maintenanceDatabase();
             //*
 
-            dbLr.MiseAzeroDesTagPOEtColorRed();
+            //effectuer les actions demander via le tag Lightroom
+            makeActionFromKeyword();
+
+            //initialization pour nouveau démarrage
+            dbLr.creationContextEtPurgeKeyword();
+            dbLr.MiseAzeroDesColorLabelsRed();
+            dbLr.topperARed50NEW(ctx.getParamTriNew().getRepertoire50NEW());
 
             //En Fonction De La Strategies De Rangement
             rangerLesRejets();
             topperLesRepertoires();
-            dbLr.topperARed50NEW(ctx.getParamTriNew().getRepertoire50NEW());
             regrouperLesNouvellesPhoto();
             //*
 
@@ -88,6 +93,10 @@ public class Main {
             exceptionLog(e, LOGGER);
         }
 
+    }
+
+    private static void makeActionFromKeyword() {
+        //todo
     }
 
     private static void createLoggingPanel() {
@@ -134,6 +143,7 @@ public class Main {
         splitLOGGERInfo(dbLr.folderWithoutRoot());
         splitLOGGERInfo(dbLr.folderAbsentPhysique());
         splitLOGGERInfo(dbLr.fileWithoutFolder());
+        splitLOGGERInfo(dbLr.keywordImageWithoutKeyword());
     }
 
     private static void splitLOGGERInfo(String txt) {
@@ -335,7 +345,7 @@ public class Main {
         String nbDiscr = String.format("%1$03X", Context.nbDiscretionnaire);
         String tag = Context.TAGORG + "_" + nbDiscr + "_" + "possibleNewGroup";
         for (ElementFichier eleFile : listEle.lstEleFile) {
-            dbLr.taggerFichier(eleFile.getFileIdLocal(), tag);
+            dbLr.AddKeywordToFile(eleFile.getFileIdLocal(), tag);
         }
 
 
