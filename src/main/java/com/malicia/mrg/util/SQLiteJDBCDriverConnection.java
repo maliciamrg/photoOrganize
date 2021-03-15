@@ -2,8 +2,10 @@ package com.malicia.mrg.util;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.sqlite.Function;
 
 import java.sql.*;
+import java.util.regex.Pattern;
 
 /**
  * The type Sq lite jdbc driver connection.
@@ -25,7 +27,7 @@ public class SQLiteJDBCDriverConnection {
      *
      * @param catalogLrcat the catalog lrcat
      */
-    public SQLiteJDBCDriverConnection(String catalogLrcat) {
+    public SQLiteJDBCDriverConnection(String catalogLrcat) throws SQLException {
         connect(catalogLrcat);
     }
 
@@ -34,7 +36,7 @@ public class SQLiteJDBCDriverConnection {
      *
      * @param sqlliteDatabase the sqllite database
      */
-    public void connect(String sqlliteDatabase) {
+    public void connect(String sqlliteDatabase) throws SQLException {
         LOGGER.debug(() -> "connect to database : " + sqlliteDatabase);
         conn = null;
         try {
@@ -47,7 +49,22 @@ public class SQLiteJDBCDriverConnection {
         } catch (SQLException e) {
             LOGGER.fatal(e.getMessage());
         }
+        regexpimplementation();
+    }
 
+    private void regexpimplementation() throws SQLException {
+        Function.create(conn, "REGEXP", new Function() {
+            @Override
+            protected void xFunc() throws SQLException {
+                String expression = value_text(0);
+                String value = value_text(1);
+                if (value == null)
+                    value = "";
+
+                Pattern pattern=Pattern.compile(expression);
+                result(pattern.matcher(value).find() ? 1 : 0);
+            }
+        });
     }
 
     /**

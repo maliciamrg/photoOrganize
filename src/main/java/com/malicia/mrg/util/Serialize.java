@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 public class Serialize {
 
@@ -26,7 +28,8 @@ public class Serialize {
     public static void writeJSON(Object o, String fileName) throws IOException {
 
         String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
-        File f = new File(rootPath + "objJson\\" + fileName);
+//        File f = new File(rootPath + "objJson\\" + fileName);
+        File f = new File(rootPath + fileName);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.writerWithDefaultPrettyPrinter().writeValue(f, o);
@@ -44,7 +47,13 @@ public class Serialize {
         return objret ;
     }
 
-    public static Object readJSON(Class aClass, InputStream stream) throws IOException {
+    public static Object readJSON(Class aClass, InputStream stream) throws IOException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
+        if (stream==null){
+            Constructor con = aClass.getConstructor();
+            Object xyz = con.newInstance();
+            writeJSON(xyz,aClass.getSimpleName()+".json");
+            return xyz;
+        }
         ObjectMapper mapper = new ObjectMapper();
         Object objret = mapper.readValue(stream, aClass);
         ((Serialize)objret).fileName = stream.toString();

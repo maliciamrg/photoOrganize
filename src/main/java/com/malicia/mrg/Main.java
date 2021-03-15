@@ -51,10 +51,12 @@ public class Main {
 
             //Maintenance database lr
             maintenanceDatabase();
+            ctx.getActionVersRepertoire().populate(dbLr.getFolderCollection(Context.COLLECTIONS));
             //*
 
             //effectuer les actions demander via le tag Lightroom
             makeActionFromKeyword();
+            isInWork();
 
             //initialization pour nouveau démarrage
             dbLr.creationContextEtPurgeKeyword();
@@ -70,7 +72,6 @@ public class Main {
             //lister les possible photo oublier
             listerLesRapprochermentAvecLesRepertoirePhoto();
             //*
-            isInWork();
 
             //Nettoyage repertoires Local
             purgeDesRepertoireVide50Phototheque();
@@ -96,7 +97,13 @@ public class Main {
     }
 
     private static void makeActionFromKeyword() {
-        //todo
+//        Context.ACTION01GO;
+//        Context.ACTION02LAURELINE;
+//        Context.ACTION03NELLY;
+//        Context.ACTION04MIYA;
+//        Context.ACTION05ROMAIN;
+//        Context.ACTION06SANDRINE;
+//        Context.ACTION07TRAVAUX;
     }
 
     private static void createLoggingPanel() {

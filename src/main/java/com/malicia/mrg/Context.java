@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -18,19 +19,20 @@ public class Context {
     public static final String FOLDERDELIM = "\\";
     public static final int IREP_NEW = 10;
     public static final String RED = "'Red'";
-    private static final String JSON = ".json";
     public static final String TAGORG = "#ORG#";
-    public static int nbDiscretionnaire = 0;
-
+    public static final String ACTION01GO = "GO" + Context.TAGORG;
+    public static final String COLLECTIONS = "!!Collections";
+    private static final String JSON = ".json";
     private static final Logger LOGGER = LogManager.getLogger(Context.class);
-
-    private ControleRepertoire paramControleRepertoire;
+    public static int nbDiscretionnaire = 0;
+    private final ActionRepertoire actionVersRepertoire;
     private final List<RepertoirePhoto> arrayRepertoirePhoto = new ArrayList<>();
+    private ControleRepertoire paramControleRepertoire;
     private RepertoireFonctionnel repFonctionnel;
     private ElementsRejet paramElementsRejet;
     private TriNew paramTriNew;
 
-    public Context() throws IOException {
+    public Context() throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         paramElementsRejet = (ElementsRejet) ElementsRejet.readJSON(ElementsRejet.class, getResourceAsStream("ElementsRejet.json"));
         arrayRepertoirePhoto.add((RepertoirePhoto) RepertoirePhoto.readJSON(RepertoirePhoto.class, getResourceAsStream("repertoirePhoto-Autoconstruction.json")));
         arrayRepertoirePhoto.add((RepertoirePhoto) RepertoirePhoto.readJSON(RepertoirePhoto.class, getResourceAsStream("repertoirePhoto-Events.json")));
@@ -41,11 +43,18 @@ public class Context {
         repFonctionnel = (RepertoireFonctionnel) RepertoireFonctionnel.readJSON(RepertoireFonctionnel.class, getResourceAsStream("RepertoireFonctionnel.json"));
         paramControleRepertoire = (ControleRepertoire) ControleRepertoire.readJSON(ControleRepertoire.class, getResourceAsStream("ControleRepertoire.json"));
         paramTriNew = (TriNew) TriNew.readJSON(TriNew.class, getResourceAsStream("TriNew.json"));
+
+        actionVersRepertoire = new ActionRepertoire() ;
+
     }
 
-    public static Context chargeParam() throws IOException {
+    public static Context chargeParam() throws IOException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         return new Context();
+    }
+
+    public ActionRepertoire getActionVersRepertoire() {
+        return actionVersRepertoire;
     }
 
     public RepertoireFonctionnel getRepFonctionnel() {

@@ -25,18 +25,17 @@ public class Database extends SQLiteJDBCDriverConnection {
 
     private static final Logger LOGGER = LogManager.getLogger(Database.class);
 
-    private Database(String catalogLrcat) {
+    private Database(String catalogLrcat) throws SQLException {
         super(catalogLrcat);
     }
 
-    public static Database chargeDatabaseLR(String catalogLrcat) {
+    public static Database chargeDatabaseLR(String catalogLrcat) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         return new Database(catalogLrcat);
     }
 
     public void AddKeywordToFile(String fileIdLocal, String tag) throws SQLException {
-        //todo
         String idlocaltag = sqlcreateKeyword(Context.TAGORG, tag);
         long idlocalImage = sqlGetAdobeImage(fileIdLocal);
 
@@ -702,16 +701,16 @@ public class Database extends SQLiteJDBCDriverConnection {
     }
 
     public void creationContextEtPurgeKeyword() throws SQLException {
-        //todo creation tag mere a tous les tag
         purgeGroupeKeyword(Context.TAGORG);
         sqlcreateKeyword("", Context.TAGORG);
-        sqlcreateKeyword(Context.TAGORG, "GO" + Context.TAGORG);
-        sqlcreateKeyword(Context.TAGORG, "LAURELINE" + Context.TAGORG);
-        sqlcreateKeyword(Context.TAGORG, "NELLY" + Context.TAGORG);
-        sqlcreateKeyword(Context.TAGORG, "MIYA" + Context.TAGORG);
-        sqlcreateKeyword(Context.TAGORG, "ROMAIN" + Context.TAGORG);
-        sqlcreateKeyword(Context.TAGORG, "SANDRINE" + Context.TAGORG);
-        sqlcreateKeyword(Context.TAGORG, "TRAVAUX" + Context.TAGORG);
+        sqlcreateKeyword(Context.TAGORG, Context.ACTION01GO );
+
+//        sqlcreateKeyword(Context.TAGORG, Context.ACTION02LAURELINE );
+//        sqlcreateKeyword(Context.TAGORG, Context.ACTION03NELLY);
+//        sqlcreateKeyword(Context.TAGORG, Context.ACTION04MIYA );
+//        sqlcreateKeyword(Context.TAGORG, Context.ACTION05ROMAIN );
+//        sqlcreateKeyword(Context.TAGORG, Context.ACTION06SANDRINE);
+//        sqlcreateKeyword(Context.TAGORG, Context.ACTION07TRAVAUX);
     }
 
     private int purgeGroupeKeyword(String tagorg) throws SQLException {
@@ -757,6 +756,22 @@ public class Database extends SQLiteJDBCDriverConnection {
                 ") " +
                 " ; ";
         return executeUpdate(sql);
+    }
+
+    public Map<String, String> getFolderCollection(String collections) throws SQLException {
+        Map<String, String> ret = new HashMap<>();
+        String sql = " select * " +
+                "from AgLibraryFolder " +
+                "where pathFromRoot REGEXP  '\\/"+collections+"\\/[@&#a-zA-Z 0-9-]*\\/$' " +
+                ";";
+        ResultSet rs = select(sql);
+        while (rs.next()) {
+            String pathFromRoot = rs.getString("pathFromRoot");
+            String[] split = pathFromRoot.split("/");
+            String tag = split[split.length-1];
+            ret.put(tag, pathFromRoot);
+        }
+        return ret;
     }
 }
 
