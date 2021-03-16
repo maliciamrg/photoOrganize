@@ -59,7 +59,7 @@ public class Main {
             isInWork();
 
             //initialization pour nouveau démarrage
-            dbLr.creationContextEtPurgeKeyword();
+            dbLr.creationContextEtPurgeKeyword(ctx.getActionVersRepertoire().listeAction);
             dbLr.MiseAzeroDesColorLabelsRed();
             dbLr.topperARed50NEW(ctx.getParamTriNew().getRepertoire50NEW());
 
@@ -96,14 +96,11 @@ public class Main {
 
     }
 
-    private static void makeActionFromKeyword() {
-//        Context.ACTION01GO;
-//        Context.ACTION02LAURELINE;
-//        Context.ACTION03NELLY;
-//        Context.ACTION04MIYA;
-//        Context.ACTION05ROMAIN;
-//        Context.ACTION06SANDRINE;
-//        Context.ACTION07TRAVAUX;
+    private static void makeActionFromKeyword() throws SQLException, IOException {
+        Map<String, String> listeAction = ctx.getActionVersRepertoire().listeAction;
+        for (String key : listeAction.keySet()) {
+            dbLr.sqlmoveAllFileWithTagtoRep(key + Context.TAGORG,ctx.getRepertoire50Phototheque() + listeAction.get(key));
+        }
     }
 
     private static void createLoggingPanel() {
@@ -277,7 +274,7 @@ public class Main {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         //Regroupement
-        ResultSet rsele = dbLr.sqlgetListelementnewaclasser(ctx.getParamTriNew().getTempsAdherence(), "");
+        ResultSet rsele = dbLr.sqlgetListelementnewaclasser( ctx.getParamTriNew().getTempsAdherence(), "");
 
         List<GrpPhoto> listGrpEletmp = new ArrayList();
         GrpPhoto listEletmp = new GrpPhoto();
@@ -434,7 +431,9 @@ public class Main {
         // zip file with a folder
         String repertoireDestZip = ctx.getRepertoireDestZip();
         File f = new File(repertoireDestZip);
-        if (f.isFile()) {f.delete();}
+        if (f.isFile()) {
+            f.delete();
+        }
         File RepertoireRoamingAdobeLightroom = new File(ctx.getRepertoireRoamingAdobeLightroom());
         new ZipFile(repertoireDestZip).addFolder(RepertoireRoamingAdobeLightroom);
     }

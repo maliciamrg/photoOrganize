@@ -138,6 +138,15 @@ public class Database extends SQLiteJDBCDriverConnection {
         executeUpdate(sql);
     }
 
+    public void creationContextEtPurgeKeyword(Map<String, String> listeAction) throws SQLException {
+        purgeGroupeKeyword(Context.TAGORG);
+        sqlcreateKeyword("", Context.TAGORG);
+        sqlcreateKeyword(Context.TAGORG, Context.ACTION01GO);
+        for (String key : listeAction.keySet()) {
+            sqlcreateKeyword(Context.TAGORG, key + Context.TAGORG );
+        }
+    }
+
     public void makeRepertory(String directoryName) throws SQLException {
 
         Map<String, String> idlocalforRep = getIdlocalforRep(new File(directoryName).getParent());
@@ -192,6 +201,22 @@ public class Database extends SQLiteJDBCDriverConnection {
 
     }
 
+    public void sqlmovefile(String fileIdLocal, String destination) throws IOException, SQLException {
+
+        File fdest = new File(destination);
+
+        Map<String, String> dst = getIdlocalforRep(fdest.getParent());
+
+        String sql;
+        sql = "" +
+                "update AgLibraryFile " +
+                "set folder =  " + dst.get("Folderidlocal") + " " +
+                "where id_local =  " + fileIdLocal + " " +
+                ";";
+        executeUpdate(sql);
+
+
+    }
     private long sqlGetPrevIdlocalforFolder() throws SQLException {
         String sql = "select * FROM AgLibraryFolder " +
                 "ORDER by id_local desc " +
@@ -474,7 +499,7 @@ public class Database extends SQLiteJDBCDriverConnection {
             File filepath = new File(rs.getString("absolutePath") + rs.getString("pathFromRoot") + rs.getString("lc_idx_filename"));
             nb += 1;
             if (!filepath.exists()) {
-                txtret += "ko = " + "file_id_local" + "(" + rs.getString("file_id_local") + ")" + filepath.toString() + "\n";
+                txtret += "ko = " + "file_id_local" + "(" + rs.getString("file_id_local") + ")" + filepath.toString() + " ";
                 ko += 1;
                 koCor += sqlDeleteFile(rs.getString("file_id_local"));
             }
@@ -772,6 +797,97 @@ public class Database extends SQLiteJDBCDriverConnection {
             ret.put(tag, pathFromRoot);
         }
         return ret;
+    }
+
+    public void sqlmoveAllFileWithTagtoRep(String tag, String destPath) throws SQLException, IOException {
+        Map<String, String> ret = new HashMap<>();
+        String sql = "select f.id_local as id_local , " +
+                "p.absolutePath as absolutePath , " +
+                "b.pathFromRoot as pathFromRoot , " +
+                "f.lc_idx_filename as lcIdxFilename " +
+                "from AgLibraryKeyword k , " +
+                "AgLibraryKeywordImage ki , " +
+                "Adobe_images e , " +
+                "AgLibraryFile f , " +
+                "AgLibraryFolder b  , " +
+                "AgLibraryRootFolder p " +
+                "where k.name = '" + tag + "' " +
+                "and k.id_local = ki.tag " +
+                "and ki.image = e.id_local " +
+                "and e.rootFile = f.id_local " +
+                "and f.folder = b.id_local  " +
+                "and b.rootFolder = p.id_local  " +
+                ";";
+        ResultSet rs = select(sql);
+        while (rs.next()) {
+            String fileIdLocal = rs.getString("id_local");
+            String absolutePath = rs.getString("absolutePath");
+            String pathFromRoot = rs.getString("pathFromRoot");
+            String lcIdxFilename = rs.getString("lcIdxFilename");
+
+            String oldPath = normalizePath(absolutePath + pathFromRoot + lcIdxFilename);
+            String newPath = normalizePath(destPath + File.separator + lcIdxFilename);
+            SystemFiles.moveFile(oldPath, newPath);
+            sqlmovefile(fileIdLocal, newPath);
+
+        }
+    }
+
+    public void getFileForGoTag(String tag) throws SQLException, IOException {
+        Map<String, String> ret = new HashMap<>();
+        String sql = " select f.id_local as id_local , p.absolutePath as absolutePath , b.pathFromRoot as pathFromRoot , f.lc_idx_filename as lcIdxFilename " +
+                " from AgLibraryKeyword k , AgLibraryKeywordImage ki , Adobe_images e , AgLibraryFile f , AgLibraryFolder b  , AgLibraryRootFolder p " +
+                " where k.name = '" + tag +"' " +
+                " and k.id_local = ki.tag " +
+                " and ki.image = e.id_local " +
+                " and e.rootFile = f.id_local " +
+                " and f.folder = b.id_local " +
+                " and b.rootFolder = p.id_local " +
+                " ;";
+        ResultSet rs = select(sql);
+        String newPath = "";
+        while (rs.next()) {
+            String fileIdLocal = rs.getString("id_local");
+            String absolutePath = rs.getString("absolutePath");
+            String pathFromRoot = rs.getString("pathFromRoot");
+            String lcIdxFilename = rs.getString("lcIdxFilename");
+        }
+    }
+
+    public String getNewPathForGoTagandFileIdlocal(String tag, String fileIdLocal) throws SQLException, IOException {
+        Map<String, String> ret = new HashMap<>();
+        String sql = "select DISTINCT p2.absolutePath as absolutePath , b2.pathFromRoot as pathFromRoot  " +
+                " from AgLibraryFile f " +
+                " inner join AgLibraryFolder b " +
+                " on f.folder = b.id_local " +
+                " inner join Adobe_images e " +
+                " on e.rootFile = f.id_local " +
+                " inner join AgLibraryKeywordImage ki " +
+                " on e.id_local = ki.image " +
+                " inner join AgLibraryKeyword k " +
+                " on ki.tag = k.id_local " +
+                " inner join AgLibraryKeywordImage ki2 " +
+                " on Ki2.tag = k.id_local " +
+                " inner join Adobe_images e2 " +
+                " on e2.id_local = ki2.image " +
+                " inner join AgLibraryFile f2 " +
+                " on e2.rootFile = f2.id_local " +
+                " inner join AgLibraryFolder b2 " +
+                " on f2.folder = b2.id_local " +
+                " inner join AgLibraryRootFolder p2 " +
+                " on b2.rootFolder = p2.id_local " +
+                "  where f.id_local = " + fileIdLocal + " " +
+                "  and k.name like '"+ tag +"' " +
+                "  and b.pathFromRoot <> b2.pathFromRoot " +
+                ";";
+        ResultSet rs = select(sql);
+        String newPath = "";
+        while (rs.next()) {
+            String absolutePath = rs.getString("absolutePath");
+            String pathFromRoot = rs.getString("pathFromRoot");
+            newPath = normalizePath(absolutePath + pathFromRoot );
+        }
+        return newPath;
     }
 }
 

@@ -83,7 +83,7 @@ class EleChamp {
             case ControleRepertoire.TAG_WHERE:
             case ControleRepertoire.TAG_WHAT:
             case ControleRepertoire.TAG_WHO:
-                setRetourToFalse(dbLr.getValueForKeyword(nettoyageTag(elechamp)).toString(),"changenomrep_"+elechamp);
+                setRetourToFalse(dbLr.getValueForKeyword( nettoyageTag(elechamp)).toString(),"changenomrep_"+elechamp);
                 if (Boolean.TRUE.equals(dbLr.isValueInKeyword(getoValue(), nettoyageTag(elechamp)))) {
                     setRetourToTrue();
                 }
@@ -99,15 +99,15 @@ class EleChamp {
                 }
                 break;
             case ControleRepertoire.NB_SELECTIONNER:
-                nbSelectionner = dbLr.nbPick(repertoire);
+                nbSelectionner = dbLr.nbPick( repertoire);
                 setRetourToTrue();
                 if (nbSelectionner == 0) {
                     setRetourToFalse(String.valueOf(nbSelectionner),"pbrepertoire_zeroelements_selectionner");
                 }
                 break;
             case ControleRepertoire.NB_PHOTOAPURGER:
-                limitemaxfolder = (int) ((Double.valueOf(repPhoto.getNbMaxParUniteDeJour()) * dbLr.nbjourfolder(repertoire)) / Double.valueOf(repPhoto.getUniteDeJour()));
-                nbSelectionner = dbLr.nbPick(repertoire);
+                limitemaxfolder = (int) ((Double.valueOf(repPhoto.getNbMaxParUniteDeJour()) * dbLr.nbjourfolder( repertoire)) / Double.valueOf(repPhoto.getUniteDeJour()));
+                nbSelectionner = dbLr.nbPick( repertoire);
                 nbphotoapurger = nbSelectionner - limitemaxfolder;
                 setRetourToTrue();
                 if (nbphotoapurger > 0) {
@@ -115,7 +115,7 @@ class EleChamp {
                 }
                 break;
             case ControleRepertoire.NB_LIMITEMAXFOLDER:
-                limitemaxfolder = (int) ((Double.valueOf(repPhoto.getNbMaxParUniteDeJour()) * dbLr.nbjourfolder(repertoire)) / Double.valueOf(repPhoto.getUniteDeJour()));
+                limitemaxfolder = (int) ((Double.valueOf(repPhoto.getNbMaxParUniteDeJour()) * dbLr.nbjourfolder( repertoire)) / Double.valueOf(repPhoto.getUniteDeJour()));
                 setRetourToTrue();
                 if (limitemaxfolder == 0) {
                     setRetourToFalse(String.valueOf(limitemaxfolder),"pbrepertoire_limitemaxazero");
@@ -142,8 +142,8 @@ class EleChamp {
 
     private void controleRepertoireNBSTARVALUE(Database dbLr, String repertoire, RepertoirePhoto repPhoto) throws SQLException {
         int nbSelectionner;
-        nbSelectionner = dbLr.nbPick(repertoire);
-        Map<String, Integer> starValue = dbLr.getStarValue(repertoire);
+        nbSelectionner = dbLr.nbPick( repertoire);
+        Map<String, Integer> starValue = dbLr.getStarValue( repertoire);
         List<Integer> ratio = repPhoto.getratioStarMax();
         StringBuilder res = new StringBuilder();
         StringBuilder tag = new StringBuilder();
