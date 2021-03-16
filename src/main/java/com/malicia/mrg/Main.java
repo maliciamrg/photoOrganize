@@ -97,10 +97,18 @@ public class Main {
     }
 
     private static void makeActionFromKeyword() throws SQLException, IOException {
+        //action collection
         Map<String, String> listeAction = ctx.getActionVersRepertoire().listeAction;
         for (String key : listeAction.keySet()) {
             dbLr.sqlmoveAllFileWithTagtoRep(key + Context.TAGORG,ctx.getRepertoire50Phototheque() + listeAction.get(key));
         }
+        //Action GO
+        Map<String, String> fileToGo = dbLr.getFileForGoTag(Context.ACTION01GO);
+        for (String key : fileToGo.keySet()) {
+            String newPath = dbLr.getNewPathForGoTagandFileIdlocal(Context.ACTION01GO, key);
+            dbLr.sqlmovefile(key, newPath);
+        }
+
     }
 
     private static void createLoggingPanel() {

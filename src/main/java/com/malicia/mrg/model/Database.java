@@ -833,7 +833,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         }
     }
 
-    public void getFileForGoTag(String tag) throws SQLException, IOException {
+    public Map<String, String> getFileForGoTag(String tag) throws SQLException, IOException {
         Map<String, String> ret = new HashMap<>();
         String sql = " select f.id_local as id_local , p.absolutePath as absolutePath , b.pathFromRoot as pathFromRoot , f.lc_idx_filename as lcIdxFilename " +
                 " from AgLibraryKeyword k , AgLibraryKeywordImage ki , Adobe_images e , AgLibraryFile f , AgLibraryFolder b  , AgLibraryRootFolder p " +
@@ -845,13 +845,11 @@ public class Database extends SQLiteJDBCDriverConnection {
                 " and b.rootFolder = p.id_local " +
                 " ;";
         ResultSet rs = select(sql);
-        String newPath = "";
         while (rs.next()) {
             String fileIdLocal = rs.getString("id_local");
-            String absolutePath = rs.getString("absolutePath");
-            String pathFromRoot = rs.getString("pathFromRoot");
-            String lcIdxFilename = rs.getString("lcIdxFilename");
+            ret.put(fileIdLocal, "");
         }
+        return ret;
     }
 
     public String getNewPathForGoTagandFileIdlocal(String tag, String fileIdLocal) throws SQLException, IOException {
