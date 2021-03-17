@@ -97,15 +97,28 @@ public class Main {
     }
 
     private static void makeActionFromKeyword() throws SQLException, IOException {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         //action collection
         Map<String, String> listeAction = ctx.getActionVersRepertoire().listeAction;
         for (String key : listeAction.keySet()) {
-            dbLr.sqlmoveAllFileWithTagtoRep(key + Context.TAGORG,ctx.getRepertoire50Phototheque() + listeAction.get(key));
+            Map<String, Map<String, String>> fileToTag = dbLr.sqlmoveAllFileWithTagtoRep(key + Context.TAGORG,ctx.getRepertoire50Phototheque() + listeAction.get(key));
+            LOGGER.info("move " + fileToTag.size() + " - " + key + Context.TAGORG );
+            for (String keyt : fileToTag.keySet()) {
+                String oldPath = fileToTag.get(keyt).get("oldPath");
+                String newPath = fileToTag.get(keyt).get("newPath");
+                SystemFiles.moveFile(oldPath, newPath);
+                dbLr.sqlmovefile(keyt, newPath);
+                LOGGER.debug(key + Context.TAGORG + " : " + oldPath + " -> " + newPath);
+            }
         }
         //Action GO
         Map<String, String> fileToGo = dbLr.getFileForGoTag(Context.ACTION01GO);
+        LOGGER.info("move " + fileToGo.size() + " - " + Context.ACTION01GO );
         for (String key : fileToGo.keySet()) {
             String newPath = dbLr.getNewPathForGoTagandFileIdlocal(Context.ACTION01GO, key);
+            String source = fileToGo.get(key);
+            LOGGER.debug(Context.ACTION01GO + " : " + source + " -> " + newPath );
+            SystemFiles.moveFile(source, newPath);
             dbLr.sqlmovefile(key, newPath);
         }
 

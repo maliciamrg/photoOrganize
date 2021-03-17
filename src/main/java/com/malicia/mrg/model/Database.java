@@ -799,8 +799,9 @@ public class Database extends SQLiteJDBCDriverConnection {
         return ret;
     }
 
-    public void sqlmoveAllFileWithTagtoRep(String tag, String destPath) throws SQLException, IOException {
+    public Map<String, Map<String, String>> sqlmoveAllFileWithTagtoRep(String tag, String destPath) throws SQLException, IOException {
         Map<String, String> ret = new HashMap<>();
+        Map<String, Map<String, String>> ret2 = new HashMap<>();
         String sql = "select f.id_local as id_local , " +
                 "p.absolutePath as absolutePath , " +
                 "b.pathFromRoot as pathFromRoot , " +
@@ -824,13 +825,13 @@ public class Database extends SQLiteJDBCDriverConnection {
             String absolutePath = rs.getString("absolutePath");
             String pathFromRoot = rs.getString("pathFromRoot");
             String lcIdxFilename = rs.getString("lcIdxFilename");
-
             String oldPath = normalizePath(absolutePath + pathFromRoot + lcIdxFilename);
             String newPath = normalizePath(destPath + File.separator + lcIdxFilename);
-            SystemFiles.moveFile(oldPath, newPath);
-            sqlmovefile(fileIdLocal, newPath);
-
+            ret.put("oldPath", oldPath);
+            ret.put("newPath", newPath);
+            ret2.put(fileIdLocal, ret);
         }
+        return ret2;
     }
 
     public Map<String, String> getFileForGoTag(String tag) throws SQLException, IOException {
@@ -847,7 +848,11 @@ public class Database extends SQLiteJDBCDriverConnection {
         ResultSet rs = select(sql);
         while (rs.next()) {
             String fileIdLocal = rs.getString("id_local");
-            ret.put(fileIdLocal, "");
+            String absolutePath = rs.getString("absolutePath");
+            String pathFromRoot = rs.getString("pathFromRoot");
+            String lcIdxFilename = rs.getString("lcIdxFilename");
+            String oldPath = normalizePath(absolutePath + pathFromRoot + lcIdxFilename);
+            ret.put(fileIdLocal, oldPath);
         }
         return ret;
     }
