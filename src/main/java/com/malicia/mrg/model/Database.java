@@ -783,8 +783,8 @@ public class Database extends SQLiteJDBCDriverConnection {
         return executeUpdate(sql);
     }
 
-    public Map<String, String> getFolderCollection(String collections) throws SQLException {
-        Map<String, String> ret = new HashMap<>();
+    public HashMap<String, String> getFolderCollection(String collections) throws SQLException {
+        HashMap<String, String> ret = new HashMap<>();
         String sql = " select * " +
                 "from AgLibraryFolder " +
                 "where pathFromRoot REGEXP  '\\/"+collections+"\\/[@&#a-zA-Z 0-9-]*\\/$' " +

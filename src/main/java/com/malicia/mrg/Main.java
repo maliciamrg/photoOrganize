@@ -59,7 +59,7 @@ public class Main {
             isInWork();
 
             //initialization pour nouveau démarrage
-            dbLr.creationContextEtPurgeKeyword(ctx.getActionVersRepertoire().listeAction);
+            dbLr.creationContextEtPurgeKeyword(ctx.getActionVersRepertoire().getListeAction());
             dbLr.MiseAzeroDesColorLabelsRed();
             dbLr.topperARed50NEW(ctx.getParamTriNew().getRepertoire50NEW());
 
@@ -99,10 +99,10 @@ public class Main {
     private static void makeActionFromKeyword() throws SQLException, IOException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         //action collection
-        Map<String, String> listeAction = ctx.getActionVersRepertoire().listeAction;
+        Map<String, String> listeAction = ctx.getActionVersRepertoire().getListeAction();
         for (String key : listeAction.keySet()) {
             Map<String, Map<String, String>> fileToTag = dbLr.sqlmoveAllFileWithTagtoRep(key + Context.TAGORG,ctx.getRepertoire50Phototheque() + listeAction.get(key));
-            LOGGER.info("move " + fileToTag.size() + " - " + key + Context.TAGORG );
+            LOGGER.info("move " + String.format("%05d",fileToTag.size()) + " - " + key + Context.TAGORG );
             for (String keyt : fileToTag.keySet()) {
                 String oldPath = fileToTag.get(keyt).get("oldPath");
                 String newPath = fileToTag.get(keyt).get("newPath");
@@ -113,7 +113,7 @@ public class Main {
         }
         //Action GO
         Map<String, String> fileToGo = dbLr.getFileForGoTag(Context.ACTION01GO);
-        LOGGER.info("move " + fileToGo.size() + " - " + Context.ACTION01GO );
+        LOGGER.info("move " + String.format("%05d",fileToGo.size()) + " - " + Context.ACTION01GO );
         for (String key : fileToGo.keySet()) {
             String newPath = dbLr.getNewPathForGoTagandFileIdlocal(Context.ACTION01GO, key);
             String source = fileToGo.get(key);
