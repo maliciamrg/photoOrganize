@@ -29,10 +29,12 @@ public class Database extends SQLiteJDBCDriverConnection {
         super(catalogLrcat);
     }
 
-    public static Database chargeDatabaseLR(String catalogLrcat) throws SQLException {
+    public static Database chargeDatabaseLR(String catalogLrcat, Boolean IS_DRY_RUN) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
-        return new Database(catalogLrcat);
+        Database database = new Database(catalogLrcat);
+        database.setIsDryRun(IS_DRY_RUN);
+        return database;
     }
 
     public void AddKeywordToFile(String fileIdLocal, String tag) throws SQLException {

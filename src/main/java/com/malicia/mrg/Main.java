@@ -22,9 +22,12 @@ import org.apache.logging.log4j.Logger;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.List;
 
@@ -33,9 +36,11 @@ public class Main {
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
     //Work In Progress ??????
     private static final Boolean IS_IN_WORK = Boolean.TRUE;
+    private static final Boolean IS_DRY_RUN = Boolean.TRUE;
 
     private static Context ctx;
     private static Database dbLr;
+    private static JFrame frame;
 
     public static void main(String[] args) {
         try {
@@ -46,7 +51,8 @@ public class Main {
 
             // chargement application
             ctx = Context.chargeParam();
-            dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat());
+            dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat(), IS_DRY_RUN);
+            SystemFiles.setIsDryRun(IS_DRY_RUN);
             //*
 
             //Maintenance database lr
@@ -54,9 +60,11 @@ public class Main {
             ctx.getActionVersRepertoire().populate(dbLr.getFolderCollection(Context.COLLECTIONS));
             //*
 
+            sauvegardeStudioPhoto2Reseaux();
+            isInWork();
+
             //effectuer les actions demander via le tag Lightroom
             makeActionFromKeyword();
-            isInWork();
 
             //initialization pour nouveau démarrage
             dbLr.creationContextEtPurgeKeyword(ctx.getActionVersRepertoire().getListeAction());
@@ -94,6 +102,15 @@ public class Main {
             exceptionLog(e, LOGGER);
         }
 
+        endall();
+
+    }
+
+    private static void endall() {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        if (frame != null) {
+            frame.dispose();
+        }
     }
 
     private static void makeActionFromKeyword() throws SQLException, IOException {
@@ -101,8 +118,8 @@ public class Main {
         //action collection
         Map<String, String> listeAction = ctx.getActionVersRepertoire().getListeAction();
         for (String key : listeAction.keySet()) {
-            Map<String, Map<String, String>> fileToTag = dbLr.sqlmoveAllFileWithTagtoRep(key + Context.TAGORG,ctx.getRepertoire50Phototheque() + listeAction.get(key));
-            LOGGER.info("move " + String.format("%05d",fileToTag.size()) + " - " + key + Context.TAGORG );
+            Map<String, Map<String, String>> fileToTag = dbLr.sqlmoveAllFileWithTagtoRep(key + Context.TAGORG, ctx.getRepertoire50Phototheque() + listeAction.get(key));
+            LOGGER.info("move " + String.format("%05d", fileToTag.size()) + " - " + key + Context.TAGORG);
             for (String keyt : fileToTag.keySet()) {
                 String oldPath = fileToTag.get(keyt).get("oldPath");
                 String newPath = fileToTag.get(keyt).get("newPath");
@@ -113,11 +130,11 @@ public class Main {
         }
         //Action GO
         Map<String, String> fileToGo = dbLr.getFileForGoTag(Context.ACTION01GO);
-        LOGGER.info("move " + String.format("%05d",fileToGo.size()) + " - " + Context.ACTION01GO );
+        LOGGER.info("move " + String.format("%05d", fileToGo.size()) + " - " + Context.ACTION01GO);
         for (String key : fileToGo.keySet()) {
             String newPath = dbLr.getNewPathForGoTagandFileIdlocal(Context.ACTION01GO, key);
             String source = fileToGo.get(key);
-            LOGGER.debug(Context.ACTION01GO + " : " + source + " -> " + newPath );
+            LOGGER.debug(Context.ACTION01GO + " : " + source + " -> " + newPath);
             SystemFiles.moveFile(source, newPath);
             dbLr.sqlmovefile(key, newPath);
         }
@@ -145,7 +162,7 @@ public class Main {
 
         // now add the scrollpane to the jframe's content pane, specifically
         // placing it in the center of the jframe's borderlayout
-        JFrame frame = new JFrame("PhotoOrganize");
+        frame = new JFrame("PhotoOrganize");
         frame.getContentPane().add(jConsoleScroll, BorderLayout.CENTER);
 
         // make it easy to close the application
@@ -214,19 +231,49 @@ public class Main {
     private static void sauvegardeStudioPhoto2Reseaux() throws Exception {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
-        RSync rsync = new RSync()
-                .sources(ctx.getRepFonctionnel().getRepertoiresyncsource())
-                .destination(ctx.getRepFonctionnel().getRepertoiresyncdest())
-                .recursive(true)
-                .exclude(ctx.getRepFonctionnel().getRsyncexclude())
-//                .dryRun(true)
-                .humanReadable(true)
-                .archive(true)
-                .delete(true)
-                .verbose(true);
-        StreamingProcessOutput output = new StreamingProcessOutput(new Output());
-        output.monitor(rsync.builder());
+        File syncMouchard = new File(ctx.getRepFonctionnel().getRepertoiresyncdest() + ctx.getRepFonctionnel().getSyncdestmouchard());
+        Calendar cal = Calendar.getInstance();
+        long lastModified = syncMouchard.lastModified();
+        cal.setTime(new Date(lastModified));
+        cal.add(Calendar.DATE, Integer.parseInt(ctx.getRepFonctionnel().getSyncAmountDaysBetween()));
 
+        Calendar calt = Calendar.getInstance();
+        calt.setTime(new Date());
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        LOGGER.info("Dernier Modification du fichier : " + sdf.format(lastModified));
+
+        if (calt.compareTo(cal) > 0) {
+
+            LOGGER.info("Dernier Modification du fichier : " + sdf.format(lastModified));
+
+            RSync rsync = new RSync()
+                    .sources(ctx.getRepFonctionnel().getRepertoiresyncsource())
+                    .destination(ctx.getRepFonctionnel().getRepertoiresyncdest())
+                    .recursive(true)
+                    .exclude(ctx.getRepFonctionnel().getRsyncexclude())
+                    .dryRun(IS_DRY_RUN)
+                    .humanReadable(true)
+                    .archive(true)
+                    .delete(true)
+                    .verbose(true);
+
+            StreamingProcessOutput output = new StreamingProcessOutput(new Output());
+            output.monitor(rsync.builder());
+
+            String txt = Arrays.toString(ctx.getRepFonctionnel().getRepertoiresyncsource()) + "\n" +
+                    " to " + ctx.getRepFonctionnel().getRepertoiresyncdest() + "\n" +
+                    " -> " + rsync.getInfo() + "\n" +
+                    " ---------------------------------------  \n";
+            LOGGER.debug(txt);
+
+            if (!IS_DRY_RUN) {
+                if (!syncMouchard.exists()) {
+                    syncMouchard.createNewFile();
+                }
+                Files.write(syncMouchard.toPath(), txt.getBytes(), StandardOpenOption.APPEND);
+            }
+        }
     }
 
     private static void regrouperLesNouvellesPhoto() throws SQLException, IOException {
@@ -295,7 +342,7 @@ public class Main {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         //Regroupement
-        ResultSet rsele = dbLr.sqlgetListelementnewaclasser( ctx.getParamTriNew().getTempsAdherence(), "");
+        ResultSet rsele = dbLr.sqlgetListelementnewaclasser(ctx.getParamTriNew().getTempsAdherence(), "");
 
         List<GrpPhoto> listGrpEletmp = new ArrayList();
         GrpPhoto listEletmp = new GrpPhoto();

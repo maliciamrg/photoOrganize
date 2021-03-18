@@ -17,6 +17,17 @@ public class RepertoireFonctionnel extends Serialize {
     private String[] repertoiresyncsource;
     private String repertoiresyncdest;
 
+    public String getSyncAmountDaysBetween() {
+        return syncAmountDaysBetween;
+    }
+
+    private String syncAmountDaysBetween;
+    public String getSyncdestmouchard() {
+        return syncdestmouchard;
+    }
+
+    private String syncdestmouchard;
+
     public RepertoireFonctionnel() {
         // Do nothing because of X and Y
     }

@@ -18,23 +18,11 @@ import java.sql.SQLException;
 public class SystemFiles {
 
     private static final Logger LOGGER = LogManager.getLogger(SystemFiles.class);
+    private static Boolean IS_DRY_RUN = Boolean.FALSE;
 
     private SystemFiles() {
         throw new IllegalStateException("Utility class");
     }
-
-    /**
-     * Delete dir boolean.
-     *
-     * @param dir the dir
-     * @return the boolean
-     * @throws IOException the io exception
-     */
-    public static void deleteDir(File dir) throws IOException {
-        Files.delete(dir.toPath());
-        LOGGER.log(Level.DEBUG, "delete_dir: {0} ", dir);
-    }
-
 
     /**
      * Normalize path string.
@@ -47,6 +35,20 @@ public class SystemFiles {
     }
 
     /**
+     * Delete dir boolean.
+     *
+     * @param dir the dir
+     * @return the boolean
+     * @throws IOException the io exception
+     */
+    public static void deleteDir(File dir) throws IOException {
+        if (!IS_DRY_RUN) {
+            Files.delete(dir.toPath());
+        }
+        LOGGER.log(Level.DEBUG, "delete_dir: {0} ", dir);
+    }
+
+    /**
      * Mkdir.
      *
      * @param directoryName the directory name
@@ -55,7 +57,9 @@ public class SystemFiles {
     public static void mkdir(String directoryName) {
         File fdirectoryName = new File(directoryName);
         if (!fdirectoryName.exists()) {
-            fdirectoryName.mkdir();
+            if (!IS_DRY_RUN) {
+                fdirectoryName.mkdir();
+            }
         }
     }
 
@@ -71,18 +75,22 @@ public class SystemFiles {
         File fsource = new File(source);
         File fdest = new File(destination);
         if (fsource.compareTo(fdest) != 0) {
-            if ((!fsource.exists() || !fsource.isFile())&&!fdest.exists() ) {
-                    throw new IllegalStateException("non existance : " + fsource.toString());
+            if ((!fsource.exists() || !fsource.isFile()) && !fdest.exists()) {
+                throw new IllegalStateException("non existance : " + fsource.toString());
             }
             if (fdest.exists() && fsource.exists()) {
-                    throw new IllegalStateException("existance     : " + fdest.toString());
+                throw new IllegalStateException("existance     : " + fdest.toString());
             }
             if (fsource.exists() && fsource.isFile() && !fdest.exists()) {
                 LOGGER.debug(() -> "move_file p=" + fsource.toString() + " -> " + fdest.toString());
-                Path success = Files.move(fsource.toPath(), fdest.toPath());
-                if (!Files.exists(success)) {
-                    // File was not successfully renamed
-                    throw new java.io.IOException("file was not successfully renamed");
+                if (Boolean.FALSE.equals(IS_DRY_RUN)) {
+                    if (!IS_DRY_RUN) {
+                        Path success = Files.move(fsource.toPath(), fdest.toPath());
+                        if (!Files.exists(success)) {
+                            // File was not successfully renamed
+                            throw new java.io.IOException("file was not successfully renamed");
+                        }
+                    }
                 }
             }
         }
@@ -107,8 +115,14 @@ public class SystemFiles {
                 throw new IllegalStateException("existance     : " + fdest.toString());
             }
             LOGGER.debug(() -> "move_file p=" + fsource.toString() + " -> " + fdest.toString());
-            Files.move(fsource.toPath(), fdest.toPath());
+            if (!IS_DRY_RUN) {
+                Files.move(fsource.toPath(), fdest.toPath());
+            }
         }
+    }
+
+    public static void setIsDryRun(Boolean isDryRun) {
+        IS_DRY_RUN = isDryRun;
     }
 
 }

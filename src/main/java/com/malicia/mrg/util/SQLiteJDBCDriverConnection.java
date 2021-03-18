@@ -1,5 +1,6 @@
 package com.malicia.mrg.util;
 
+import com.malicia.mrg.Main;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.sqlite.Function;
@@ -16,7 +17,7 @@ public class SQLiteJDBCDriverConnection {
 
 
     private static final Logger LOGGER = LogManager.getLogger(SQLiteJDBCDriverConnection.class);
-
+    private Boolean IS_DRY_RUN = Boolean.FALSE;
     /**
      * The constant conn.
      */
@@ -29,6 +30,10 @@ public class SQLiteJDBCDriverConnection {
      */
     public SQLiteJDBCDriverConnection(String catalogLrcat) throws SQLException {
         connect(catalogLrcat);
+    }
+
+    public void setIsDryRun(Boolean isDryRun) {
+        IS_DRY_RUN = isDryRun;
     }
 
     /**
@@ -61,7 +66,7 @@ public class SQLiteJDBCDriverConnection {
                 if (value == null)
                     value = "";
 
-                Pattern pattern=Pattern.compile(expression);
+                Pattern pattern = Pattern.compile(expression);
                 result(pattern.matcher(value).find() ? 1 : 0);
             }
         });
@@ -138,7 +143,10 @@ public class SQLiteJDBCDriverConnection {
 
         stmt = conn.createStatement();
         LOGGER.debug(sql);
-        int ret = stmt.executeUpdate(sql);
+        int ret = 0;
+        if (Boolean.FALSE.equals(IS_DRY_RUN)) {
+            ret = stmt.executeUpdate(sql);
+        }
 //        LOGGER.debug(stmt.toString());
         LOGGER.debug("ret=>" + ret);
         return ret;
