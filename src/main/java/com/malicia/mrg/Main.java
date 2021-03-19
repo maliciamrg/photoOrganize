@@ -46,14 +46,14 @@ public class Main {
     private static final Boolean IS_TAG_DEL_________ = GO;
     private static final Boolean IS_TAG_CR__________ = GO;
     private static final Boolean IS_RETAG_RED_______ = GO;
-    private static final Boolean IS_WRK_REJET_______ = ITS_A_NO_GO;
-    private static final Boolean IS_WRK_REP_PHOTO___ = ITS_A_NO_GO;
+    private static final Boolean IS_WRK_REJET_______ = GO;
+    private static final Boolean IS_WRK_REP_PHOTO___ = GO;
     private static final Boolean IS_RGP_NEW_________ = GO;
     private static final Boolean IS_LST_RAPP_NEW_REP = GO;
     private static final Boolean IS_TAG_RAPP_NEW_REP = GO;
     private static final Boolean IS_PURGE_FOLDER____ = GO;
-    private static final Boolean IS_SVG_LRCONFIG____ = ITS_A_NO_GO;
-    private static final Boolean IS_RSYNC_BIB_______ = ITS_A_NO_GO;
+    private static final Boolean IS_SVG_LRCONFIG____ = GO;
+    private static final Boolean IS_RSYNC_BIB_______ = GO;
 
     private static Context ctx;
     private static Database dbLr;
@@ -408,21 +408,7 @@ public class Main {
     private static void sauvegardeStudioPhoto2Reseaux() throws Exception {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
-        File syncMouchard = new File(ctx.getRepFonctionnel().getRepertoiresyncdest() + ctx.getRepFonctionnel().getSyncdestmouchard());
-        Calendar cal = Calendar.getInstance();
-        long lastModified = syncMouchard.lastModified();
-        cal.setTime(new Date(lastModified));
-        cal.add(Calendar.DATE, Integer.parseInt(ctx.getRepFonctionnel().getSyncAmountDaysBetween()));
-
-        Calendar calt = Calendar.getInstance();
-        calt.setTime(new Date());
-
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        LOGGER.info("Dernier Modification du fichier : " + sdf.format(lastModified));
-
-        if (calt.compareTo(cal) > 0) {
-
-            LOGGER.info("Dernier Modification du fichier : " + sdf.format(lastModified));
+        if (isItTimeToSave()) {
 
             RSync rsync = new RSync()
                     .sources(ctx.getRepFonctionnel().getRepertoiresyncsource())
@@ -438,19 +424,42 @@ public class Main {
             StreamingProcessOutput output = new StreamingProcessOutput(new Output());
             output.monitor(rsync.builder());
 
-            String txt = Arrays.toString(ctx.getRepFonctionnel().getRepertoiresyncsource()) + "\n" +
-                    " to " + ctx.getRepFonctionnel().getRepertoiresyncdest() + "\n" +
-                    " -> " + rsync.getInfo() + "\n" +
-                    " ---------------------------------------  \n";
-            LOGGER.debug(txt);
-
-            if (!IS_DRY_RUN) {
-                if (!syncMouchard.exists()) {
-                    syncMouchard.createNewFile();
-                }
-                Files.write(syncMouchard.toPath(), txt.getBytes(), StandardOpenOption.APPEND);
-            }
+            writeMouchard(rsync);
         }
+    }
+
+    private static void writeMouchard(RSync rsync) throws IOException {
+        File syncMouchard = new File(ctx.getRepFonctionnel().getRepertoiresyncdest() + ctx.getRepFonctionnel().getSyncdestmouchard());
+
+        String txt = Arrays.toString(ctx.getRepFonctionnel().getRepertoiresyncsource()) + "\n" +
+                " to " + ctx.getRepFonctionnel().getRepertoiresyncdest() + "\n" +
+                " -> " + rsync.getInfo() + "\n" +
+                " ---------------------------------------  \n";
+        LOGGER.debug(txt);
+
+        if (!IS_DRY_RUN) {
+            if (!syncMouchard.exists()) {
+                syncMouchard.createNewFile();
+            }
+            Files.write(syncMouchard.toPath(), txt.getBytes(), StandardOpenOption.APPEND);
+        }
+    }
+
+    private static boolean isItTimeToSave() {
+        File syncMouchard = new File(ctx.getRepFonctionnel().getRepertoiresyncdest() + ctx.getRepFonctionnel().getSyncdestmouchard());
+        Calendar cal = Calendar.getInstance();
+        long lastModified = syncMouchard.lastModified();
+        cal.setTime(new Date(lastModified));
+        cal.add(Calendar.DATE, Integer.parseInt(ctx.getRepFonctionnel().getSyncAmountDaysBetween()));
+
+        Calendar calt = Calendar.getInstance();
+        calt.setTime(new Date());
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        LOGGER.info("Dernier Modification du fichier mouchard: " + sdf.format(lastModified));
+
+        boolean isItTimeToSave = calt.compareTo(cal) > 0;
+        return isItTimeToSave;
     }
 
     private static void regrouperLesNouvellesPhoto() throws SQLException, IOException {
@@ -682,14 +691,16 @@ public class Main {
     private static void sauvegardeLightroomConfigSauve() throws ZipException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
-        // zip file with a folder
-        String repertoireDestZip = ctx.getRepertoireDestZip();
-        File f = new File(repertoireDestZip);
-        if (f.isFile()) {
-            f.delete();
+        if (isItTimeToSave()) {
+            // zip file with a folder
+            String repertoireDestZip = ctx.getRepertoireDestZip();
+            File f = new File(repertoireDestZip);
+            if (f.isFile()) {
+                f.delete();
+            }
+            File RepertoireRoamingAdobeLightroom = new File(ctx.getRepertoireRoamingAdobeLightroom());
+            new ZipFile(repertoireDestZip).addFolder(RepertoireRoamingAdobeLightroom);
         }
-        File RepertoireRoamingAdobeLightroom = new File(ctx.getRepertoireRoamingAdobeLightroom());
-        new ZipFile(repertoireDestZip).addFolder(RepertoireRoamingAdobeLightroom);
     }
 
     private static void purgeDesRepertoireVide50Phototheque() {
