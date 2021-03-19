@@ -71,7 +71,7 @@ public class Main {
             // chargement application
             dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat(), IS_DRY_RUN);
             SystemFiles.setIsDryRun(IS_DRY_RUN);
-            ctx.getActionVersRepertoire().populate(dbLr.getFolderCollection(Context.COLLECTIONS));
+            ctx.getActionVersRepertoire().populate(dbLr.getFolderCollection(Context.COLLECTIONS , Context.TAGORG));
             //*
 
             displayBooleen();
@@ -178,13 +178,13 @@ public class Main {
 
         for (String tag : listeAction.keySet()) {
 
-            Map<String, Map<String, String>> filetoPurge = dbLr.getFileForGoTag(tag + Context.TAGORG);
+            Map<String, Map<String, String>> filetoPurge = dbLr.getFileForGoTag(tag);
             int nb = 0;
-            LOGGER.info("purge link tag "  + " - " + String.format("%05d", filetoPurge.size()) + " - " + tag + Context.TAGORG );
+            LOGGER.info("purge link tag "  + " - " + String.format("%05d", filetoPurge.size()) + " - " + tag );
             for (String key : filetoPurge.keySet()) {
                 nb += dbLr.removeKeywordImages(filetoPurge.get(key).get("kiIdLocal"));
             }
-            LOGGER.info("        - fait " + " - " + String.format("%05d", nb) + " - " + tag + Context.TAGORG );
+            LOGGER.info("        - fait " + " - " + String.format("%05d", nb) + " - " + tag );
 
         }
 
@@ -205,8 +205,8 @@ public class Main {
         idKey= dbLr.sqlcreateKeyword(Context.TAGORG, Context.ACTION01GO);
         LOGGER.info("Keyword " + Context.ACTION01GO + " idlocal = " + idKey);
         for (String key : ctx.getActionVersRepertoire().getListeAction().keySet()) {
-            idKey = dbLr.sqlcreateKeyword(Context.TAGORG, key + Context.TAGORG);
-            LOGGER.info("Keyword " + key + Context.TAGORG + " idlocal = " + idKey);
+            idKey = dbLr.sqlcreateKeyword(Context.TAGORG, key );
+            LOGGER.info("Keyword " + key + " idlocal = " + idKey);
         }
     }
 
@@ -289,35 +289,39 @@ public class Main {
 
     private static void makeActionFromKeyword() throws SQLException, IOException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        //action collection
-        Map<String, String> listeAction = ctx.getActionVersRepertoire().getListeAction();
-        for (String key : listeAction.keySet()) {
-            Map<String, Map<String, String>> fileToTag = dbLr.sqlmoveAllFileWithTagtoRep(key + Context.TAGORG, ctx.getRepertoire50Phototheque() + listeAction.get(key));
-            LOGGER.info("move " + String.format("%05d", fileToTag.size()) + " - " + key + Context.TAGORG);
-            for (String keyt : fileToTag.keySet()) {
-                String oldPath = fileToTag.get(keyt).get("oldPath");
-                String newPath = fileToTag.get(keyt).get("newPath");
-                LOGGER.debug(key + Context.TAGORG + " : " + oldPath + " -> " + newPath);
-                SystemFiles.moveFile(oldPath, newPath);
-                dbLr.sqlmovefile(keyt, newPath);
-                dbLr.removeKeywordImages(fileToTag.get(keyt).get("kiIdLocal"));
-            }
-        }
+
         //Action GO
         Map<String, Map<String, String>> fileToGo = dbLr.getFileForGoTag(Context.ACTION01GO);
-        LOGGER.info("move " + String.format("%05d", fileToGo.size()) + " - " + Context.ACTION01GO);
+        LOGGER.info("nb de fichier tagger : " + Context.ACTION01GO + " => " + String.format("%05d", fileToGo.size()) + "" );
+        int nb = 0;
         for (String key : fileToGo.keySet()) {
             Map<String, String> ForGoTag = dbLr.getNewPathForGoTagandFileIdlocal(Context.TAGORG, key);
             if (ForGoTag.size() > 0) {
+                nb ++;
                 String source = fileToGo.get(key).get("oldPath");
                 String newPath = ForGoTag.get("newPath");
-                LOGGER.debug(Context.ACTION01GO + " : " + source + " -> " + newPath);
+                LOGGER.debug("---move " + Context.ACTION01GO + " : " + source + " -> " + newPath);
                 SystemFiles.moveFile(source, newPath);
                 dbLr.sqlmovefile(key, newPath);
                 dbLr.removeKeywordImages(ForGoTag.get("kiIdLocal"));
             }
         }
+        LOGGER.info("move " + String.format("%05d", nb) + " - " + Context.ACTION01GO);
 
+        //action collection
+        Map<String, String> listeAction = ctx.getActionVersRepertoire().getListeAction();
+        for (String key : listeAction.keySet()) {
+            Map<String, Map<String, String>> fileToTag = dbLr.sqlmoveAllFileWithTagtoRep(key , ctx.getRepertoire50Phototheque() + listeAction.get(key));
+            LOGGER.info("move " + String.format("%05d", fileToTag.size()) + " - " + key );
+            for (String keyt : fileToTag.keySet()) {
+                String oldPath = fileToTag.get(keyt).get("oldPath");
+                String newPath = fileToTag.get(keyt).get("newPath");
+                LOGGER.debug("---move " + key + " : " + oldPath + " -> " + newPath);
+                SystemFiles.moveFile(oldPath, newPath);
+                dbLr.sqlmovefile(keyt, newPath);
+                dbLr.removeKeywordImages(fileToTag.get(keyt).get("kiIdLocal"));
+            }
+        }
     }
 
     private static void createLoggingPanel() {
@@ -360,6 +364,7 @@ public class Main {
     private static void maintenanceDatabase() throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         splitLOGGERInfo(dbLr.pathAbsentPhysique());
+        splitLOGGERInfo(dbLr.AdobeImagesWithoutLibraryFile());
         splitLOGGERInfo(dbLr.folderWithoutRoot());
         splitLOGGERInfo(dbLr.folderAbsentPhysique());
         splitLOGGERInfo(dbLr.fileWithoutFolder());

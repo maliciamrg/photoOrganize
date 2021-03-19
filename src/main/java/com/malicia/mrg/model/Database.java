@@ -136,6 +136,14 @@ public class Database extends SQLiteJDBCDriverConnection {
         executeUpdate(sql);
     }
 
+    public int sqlDeleteAdobe_images(String images_id_local) throws SQLException {
+        String sql;
+        sql = "delete from Adobe_images " +
+                "where id_local = '" + images_id_local + "' " +
+                ";";
+        int ret = executeUpdate(sql);
+        return ret;
+    }
     public void creationContextEtPurgeKeyword(Map<String, String> listeAction) throws SQLException {
 
     }
@@ -560,6 +568,26 @@ public class Database extends SQLiteJDBCDriverConnection {
         return txtret;
     }
 
+    public String AdobeImagesWithoutLibraryFile() throws SQLException {
+        String sql = "SELECT e.id_local  from Adobe_images e " +
+                "left join AgLibraryFile f " +
+                "on f.id_local = e.rootFile " +
+                "where lc_idx_filename is NULL" +
+                ";";
+        ResultSet rs = select(sql);
+        String txtret = "";
+        int ko = 0;
+        int koCor = 0;
+        while (rs.next()) {
+            txtret += "ko = " + "rootFile" + "(" + rs.getString("id_local") + ")" + "\n";
+            ko += 1;
+            koCor += sqlDeleteAdobe_images(rs.getString("id_local"));
+        }
+        txtret += " nb Images Without File = " + ko + "\n";
+        txtret += "    --- corrige         = " + koCor + "\n";
+        return txtret;
+    }
+
     public String folderWithoutRoot() throws SQLException {
         String sql = "select c.absolutePath , " +
                 "b.pathFromRoot , " +
@@ -764,7 +792,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         return executeUpdate(sql);
     }
 
-    public HashMap<String, String> getFolderCollection(String collections) throws SQLException {
+    public HashMap<String, String> getFolderCollection(String collections, String tagorg) throws SQLException {
         HashMap<String, String> ret = new HashMap<>();
         String sql = " select * " +
                 "from AgLibraryFolder " +
@@ -774,14 +802,13 @@ public class Database extends SQLiteJDBCDriverConnection {
         while (rs.next()) {
             String pathFromRoot = rs.getString("pathFromRoot");
             String[] split = pathFromRoot.split("/");
-            String tag = split[split.length-1];
+            String tag = split[split.length-1] + tagorg;
             ret.put(tag, pathFromRoot);
         }
         return ret;
     }
 
     public Map<String, Map<String, String>> sqlmoveAllFileWithTagtoRep(String tag, String destPath) throws SQLException, IOException {
-        Map<String, String> ret = new HashMap<>();
         Map<String, Map<String, String>> ret2 = new HashMap<>();
         String sql = "select f.id_local as id_local , " +
                 "p.absolutePath as absolutePath , " +
@@ -803,6 +830,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                 ";";
         ResultSet rs = select(sql);
         while (rs.next()) {
+            Map<String, String> ret = new HashMap<>();
             String fileIdLocal = rs.getString("id_local");
             String absolutePath = rs.getString("absolutePath");
             String pathFromRoot = rs.getString("pathFromRoot");
@@ -819,7 +847,6 @@ public class Database extends SQLiteJDBCDriverConnection {
     }
 
     public Map<String, Map<String, String>> getFileForGoTag(String tag) throws SQLException, IOException {
-        Map<String, String> ret = new HashMap<>();
         Map<String, Map<String, String>> ret2 = new HashMap<>();
         String sql = " select f.id_local as id_local , p.absolutePath as absolutePath , b.pathFromRoot as pathFromRoot , f.lc_idx_filename as lcIdxFilename , " +
                 " ki.id_local as ki_id_local " +
@@ -833,6 +860,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                 " ;";
         ResultSet rs = select(sql);
         while (rs.next()) {
+            Map<String, String> ret = new HashMap<>();
             String fileIdLocal = rs.getString("id_local");
             String absolutePath = rs.getString("absolutePath");
             String pathFromRoot = rs.getString("pathFromRoot");
