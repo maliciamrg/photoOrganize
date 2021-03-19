@@ -83,13 +83,11 @@ public class SystemFiles {
             }
             if (fsource.exists() && fsource.isFile() && !fdest.exists()) {
                 LOGGER.debug(() -> "move_file p=" + fsource.toString() + " -> " + fdest.toString());
-                if (Boolean.FALSE.equals(IS_DRY_RUN)) {
-                    if (!IS_DRY_RUN) {
-                        Path success = Files.move(fsource.toPath(), fdest.toPath());
-                        if (!Files.exists(success)) {
-                            // File was not successfully renamed
-                            throw new java.io.IOException("file was not successfully renamed");
-                        }
+                if (!IS_DRY_RUN) {
+                    Path success = Files.move(fsource.toPath(), fdest.toPath());
+                    if (!Files.exists(success)) {
+                        // File was not successfully renamed
+                        throw new java.io.IOException("file was not successfully renamed");
                     }
                 }
             }

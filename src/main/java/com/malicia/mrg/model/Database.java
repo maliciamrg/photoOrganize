@@ -127,26 +127,19 @@ public class Database extends SQLiteJDBCDriverConnection {
 
     }
 
-    public void MiseAzeroDesColorLabelsRed() throws SQLException {
+    public void MiseAzeroDesColorLabels(String colortag) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         String sql;
         sql = "update Adobe_images " +
                 "set colorLabels = '' " +
-                "where colorLabels = " + Context.RED + " " +
-                " or colorLabels = 'Rouge' " +
-                " or colorLabels like '" + Context.TAGORG + "' " +
+                "where colorLabels = " + colortag + " " +
                 ";";
         executeUpdate(sql);
     }
 
     public void creationContextEtPurgeKeyword(Map<String, String> listeAction) throws SQLException {
-        purgeGroupeKeyword(Context.TAGORG);
-        sqlcreateKeyword("", Context.TAGORG);
-        sqlcreateKeyword(Context.TAGORG, Context.ACTION01GO);
-        for (String key : listeAction.keySet()) {
-            sqlcreateKeyword(Context.TAGORG, key + Context.TAGORG );
-        }
+
     }
 
     public void makeRepertory(String directoryName) throws SQLException {
@@ -727,20 +720,8 @@ public class Database extends SQLiteJDBCDriverConnection {
         return idLocalCalcul;
     }
 
-    public void creationContextEtPurgeKeyword() throws SQLException {
-        purgeGroupeKeyword(Context.TAGORG);
-        sqlcreateKeyword("", Context.TAGORG);
-        sqlcreateKeyword(Context.TAGORG, Context.ACTION01GO );
 
-//        sqlcreateKeyword(Context.TAGORG, Context.ACTION02LAURELINE );
-//        sqlcreateKeyword(Context.TAGORG, Context.ACTION03NELLY);
-//        sqlcreateKeyword(Context.TAGORG, Context.ACTION04MIYA );
-//        sqlcreateKeyword(Context.TAGORG, Context.ACTION05ROMAIN );
-//        sqlcreateKeyword(Context.TAGORG, Context.ACTION06SANDRINE);
-//        sqlcreateKeyword(Context.TAGORG, Context.ACTION07TRAVAUX);
-    }
-
-    private int purgeGroupeKeyword(String tagorg) throws SQLException {
+    public int purgeGroupeKeyword(String tagorg) throws SQLException {
         String sql = " delete " +
                 "from AgLibraryKeyword  " +
                 " where name like '" + tagorg + "%' " +
@@ -807,7 +788,8 @@ public class Database extends SQLiteJDBCDriverConnection {
         String sql = "select f.id_local as id_local , " +
                 "p.absolutePath as absolutePath , " +
                 "b.pathFromRoot as pathFromRoot , " +
-                "f.lc_idx_filename as lcIdxFilename " +
+                "f.lc_idx_filename as lcIdxFilename , " +
+                "ki.id_local as ki_id_local " +
                 "from AgLibraryKeyword k , " +
                 "AgLibraryKeywordImage ki , " +
                 "Adobe_images e , " +
@@ -827,10 +809,12 @@ public class Database extends SQLiteJDBCDriverConnection {
             String absolutePath = rs.getString("absolutePath");
             String pathFromRoot = rs.getString("pathFromRoot");
             String lcIdxFilename = rs.getString("lcIdxFilename");
+            String kiIdLocal = rs.getString("ki_id_local");
             String oldPath = normalizePath(absolutePath + pathFromRoot + lcIdxFilename);
             String newPath = normalizePath(destPath + File.separator + lcIdxFilename);
             ret.put("oldPath", oldPath);
             ret.put("newPath", newPath);
+            ret.put("kiIdLocal", kiIdLocal);
             ret2.put(fileIdLocal, ret);
         }
         return ret2;
@@ -853,15 +837,16 @@ public class Database extends SQLiteJDBCDriverConnection {
             String absolutePath = rs.getString("absolutePath");
             String pathFromRoot = rs.getString("pathFromRoot");
             String lcIdxFilename = rs.getString("lcIdxFilename");
-            String oldPath = normalizePath(absolutePath + pathFromRoot + lcIdxFilename);
+            String oldPath = normalizePath(absolutePath + pathFromRoot + File.separator + lcIdxFilename);
             ret.put(fileIdLocal, oldPath);
         }
         return ret;
     }
 
-    public String getNewPathForGoTagandFileIdlocal(String tag, String fileIdLocal) throws SQLException, IOException {
+    public Map<String, String> getNewPathForGoTagandFileIdlocal(String generiquetag, String fileIdLocal) throws SQLException, IOException {
         Map<String, String> ret = new HashMap<>();
-        String sql = "select DISTINCT p2.absolutePath as absolutePath , b2.pathFromRoot as pathFromRoot  " +
+        String sql = "select DISTINCT p2.absolutePath as absolutePath , b2.pathFromRoot as pathFromRoot , f.lc_idx_filename as lcIdxFilename , " +
+                " ki.id_local as ki_id_local " +
                 " from AgLibraryFile f " +
                 " inner join AgLibraryFolder b " +
                 " on f.folder = b.id_local " +
@@ -882,7 +867,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                 " inner join AgLibraryRootFolder p2 " +
                 " on b2.rootFolder = p2.id_local " +
                 "  where f.id_local = " + fileIdLocal + " " +
-                "  and k.name like '"+ tag +"' " +
+                "  and k.name like '"+ generiquetag +"%' " +
                 "  and b.pathFromRoot <> b2.pathFromRoot " +
                 ";";
         ResultSet rs = select(sql);
@@ -890,9 +875,21 @@ public class Database extends SQLiteJDBCDriverConnection {
         while (rs.next()) {
             String absolutePath = rs.getString("absolutePath");
             String pathFromRoot = rs.getString("pathFromRoot");
-            newPath = normalizePath(absolutePath + pathFromRoot );
+            String lcIdxFilename = rs.getString("lcIdxFilename");
+            String kiIdLocal = rs.getString("ki_id_local");
+            newPath = normalizePath(absolutePath + pathFromRoot + File.separator + lcIdxFilename);
+            ret.put("newPath",newPath);
+            ret.put("kiIdLocal",kiIdLocal);
         }
-        return newPath;
+        return ret;
+    }
+
+    public int removeKeywordImages(String kiIdLocal) throws SQLException {
+        String sql = " delete " +
+                "from AgLibraryKeywordImage  " +
+                " where id_local = " + kiIdLocal + " " +
+                " ; ";
+        return executeUpdate(sql);
     }
 }
 
