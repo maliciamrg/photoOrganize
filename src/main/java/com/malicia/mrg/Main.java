@@ -365,6 +365,7 @@ public class Main {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         splitLOGGERInfo(dbLr.pathAbsentPhysique());
         splitLOGGERInfo(dbLr.AdobeImagesWithoutLibraryFile());
+        splitLOGGERInfo(dbLr.KeywordImageWithoutImages());
         splitLOGGERInfo(dbLr.folderWithoutRoot());
         splitLOGGERInfo(dbLr.folderAbsentPhysique());
         splitLOGGERInfo(dbLr.fileWithoutFolder());

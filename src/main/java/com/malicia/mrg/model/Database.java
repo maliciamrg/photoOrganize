@@ -588,6 +588,27 @@ public class Database extends SQLiteJDBCDriverConnection {
         return txtret;
     }
 
+    public String KeywordImageWithoutImages() throws SQLException {
+        String sql = "SELECT ki.id_local as id_local " +
+                "from AgLibraryKeywordImage ki " +
+                "left join Adobe_images i " +
+                "on ki.image = i.id_local " +
+                "where i.rootFile is NULL " +
+                ";";
+        ResultSet rs = select(sql);
+        String txtret = "";
+        int ko = 0;
+        int koCor = 0;
+        while (rs.next()) {
+            txtret += "ko = " + "KeywordImage" + "(" + rs.getString("id_local") + ")" + "\n";
+            ko += 1;
+            koCor += removeKeywordImages(rs.getString("id_local"));
+        }
+        txtret += " nb KeyImg Without Img  = " + ko + "\n";
+        txtret += "    --- corrige         = " + koCor + "\n";
+        return txtret;
+    }
+
     public String folderWithoutRoot() throws SQLException {
         String sql = "select c.absolutePath , " +
                 "b.pathFromRoot , " +
