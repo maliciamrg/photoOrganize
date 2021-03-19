@@ -2,6 +2,11 @@ package com.malicia.mrg.model;
 
 public class ElementFichier {
     private final String absolutePath;
+
+    public String getPathFromRoot() {
+        return pathFromRoot;
+    }
+
     private final String pathFromRoot;
     private final String lcIdxFilename;
     private final String fileIdLocal;

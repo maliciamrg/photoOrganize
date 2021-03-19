@@ -111,7 +111,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         String sql;
         sql = "update Adobe_images " +
-                "set colorLabels = " + Context.RED + " " +
+                "set colorLabels = '" + Context.RED + "' " +
                 " where rootFile in ( " +
                 " select a.id_local as file_id_local " +
                 "from AgLibraryFile a  " +
@@ -128,12 +128,10 @@ public class Database extends SQLiteJDBCDriverConnection {
     }
 
     public void MiseAzeroDesColorLabels(String colortag) throws SQLException {
-        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-
         String sql;
         sql = "update Adobe_images " +
                 "set colorLabels = '' " +
-                "where colorLabels = " + colortag + " " +
+                "where colorLabels = '" + colortag + "' " +
                 ";";
         executeUpdate(sql);
     }
@@ -820,9 +818,11 @@ public class Database extends SQLiteJDBCDriverConnection {
         return ret2;
     }
 
-    public Map<String, String> getFileForGoTag(String tag) throws SQLException, IOException {
+    public Map<String, Map<String, String>> getFileForGoTag(String tag) throws SQLException, IOException {
         Map<String, String> ret = new HashMap<>();
-        String sql = " select f.id_local as id_local , p.absolutePath as absolutePath , b.pathFromRoot as pathFromRoot , f.lc_idx_filename as lcIdxFilename " +
+        Map<String, Map<String, String>> ret2 = new HashMap<>();
+        String sql = " select f.id_local as id_local , p.absolutePath as absolutePath , b.pathFromRoot as pathFromRoot , f.lc_idx_filename as lcIdxFilename , " +
+                " ki.id_local as ki_id_local " +
                 " from AgLibraryKeyword k , AgLibraryKeywordImage ki , Adobe_images e , AgLibraryFile f , AgLibraryFolder b  , AgLibraryRootFolder p " +
                 " where k.name = '" + tag +"' " +
                 " and k.id_local = ki.tag " +
@@ -837,10 +837,13 @@ public class Database extends SQLiteJDBCDriverConnection {
             String absolutePath = rs.getString("absolutePath");
             String pathFromRoot = rs.getString("pathFromRoot");
             String lcIdxFilename = rs.getString("lcIdxFilename");
+            String kiIdLocal = rs.getString("ki_id_local");
             String oldPath = normalizePath(absolutePath + pathFromRoot + File.separator + lcIdxFilename);
-            ret.put(fileIdLocal, oldPath);
+            ret.put("oldPath", oldPath);
+            ret.put("kiIdLocal", kiIdLocal);
+            ret2.put(fileIdLocal, ret);
         }
-        return ret;
+        return ret2;
     }
 
     public Map<String, String> getNewPathForGoTagandFileIdlocal(String generiquetag, String fileIdLocal) throws SQLException, IOException {

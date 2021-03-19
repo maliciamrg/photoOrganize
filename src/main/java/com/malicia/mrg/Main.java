@@ -29,27 +29,31 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
 
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
 
-    private static final Boolean IS_DRY_RUN = Boolean.TRUE;
+    private static final Boolean IS_DRY_RUN = Boolean.FALSE;
 
-    private static final Boolean IS_MAINT_LR = Boolean.FALSE;
-    private static final Boolean IS_TAG_CR = Boolean.FALSE;
-    private static final Boolean IS_TAG_DEL = Boolean.FALSE;
-    private static final Boolean IS_RETAG_RED = Boolean.FALSE;
-    private static final Boolean IS_ACTION_FROM_KEY = Boolean.FALSE;
-    private static final Boolean IS_PURGE_FOLDER = Boolean.FALSE;
-    private static final Boolean IS_RGP_NEW = Boolean.FALSE;
-    private static final Boolean IS_LST_RAPP_NEW_REP = Boolean.FALSE;
-    private static final Boolean IS_SVG_LRCONFIG = Boolean.FALSE;
-    private static final Boolean IS_RSYNC_BIB = Boolean.FALSE;
-    private static final Boolean IS_WRK_REJET = Boolean.FALSE;
-    private static final Boolean IS_WRK_REP_PHOTO = Boolean.FALSE;
-    private static final Boolean IS_TAG_RAPP_NEW_REP = Boolean.FALSE;
+    private static Boolean GO = Boolean.TRUE;
+    private static Boolean ITS_A_NO_GO = Boolean.FALSE;
 
+    private static final Boolean IS_MAINT_LR________ = GO;
+    private static final Boolean IS_ACTION_FROM_KEY_ = GO;
+    private static final Boolean IS_PURGE_ACTION____ = GO;
+    private static final Boolean IS_TAG_DEL_________ = GO;
+    private static final Boolean IS_TAG_CR__________ = GO;
+    private static final Boolean IS_RETAG_RED_______ = GO;
+    private static final Boolean IS_WRK_REJET_______ = ITS_A_NO_GO;
+    private static final Boolean IS_WRK_REP_PHOTO___ = ITS_A_NO_GO;
+    private static final Boolean IS_RGP_NEW_________ = GO;
+    private static final Boolean IS_LST_RAPP_NEW_REP = GO;
+    private static final Boolean IS_TAG_RAPP_NEW_REP = GO;
+    private static final Boolean IS_PURGE_FOLDER____ = GO;
+    private static final Boolean IS_SVG_LRCONFIG____ = ITS_A_NO_GO;
+    private static final Boolean IS_RSYNC_BIB_______ = ITS_A_NO_GO;
 
     private static Context ctx;
     private static Database dbLr;
@@ -72,49 +76,54 @@ public class Main {
 
             displayBooleen();
 
-            if (IS_MAINT_LR) {
+            if (IS_MAINT_LR________) {
                 //Maintenance database lr
                 maintenanceDatabase();
                 //*
             }
 
-            if (IS_ACTION_FROM_KEY) {
+            if (IS_ACTION_FROM_KEY_) {
                 //effectuer les actions demander via le tag Lightroom
                 makeActionFromKeyword();
                 //*
             }
+            if (IS_PURGE_ACTION____) {
+                //purger les action demander via les keywords
+                removeLinkWithActionFromKeyword();
+                //*
+            }
 
             //initialization pour nouveau démarrage
-            if (IS_TAG_DEL) {
+            if (IS_TAG_DEL_________) {
                 purgeKeywordProjet();
-                if (IS_TAG_CR) {
+                if (IS_TAG_CR__________) {
                     creationDesKeywordProjet();
                 }
             }
-            if (IS_RETAG_RED) {
+            if (IS_RETAG_RED_______) {
                 reTAGlesColorTagARED();
             }
             //*
 
             //En Fonction De La Strategies De Rangement
-            if (IS_WRK_REJET) {
+            if (IS_WRK_REJET_______) {
                 //En Fonction De La Strategies De Rangement
                 rangerLesRejets();
                 //*
             }
-            if (IS_WRK_REP_PHOTO) {
+            if (IS_WRK_REP_PHOTO___) {
                 //En Fonction De La Strategies De Rangement
                 topperLesRepertoires();
                 //*
             }
-            if (IS_RGP_NEW) {
+            if (IS_RGP_NEW_________) {
                 //regrouper le new
                 regrouperLesNouvellesPhoto();
                 //*
                 if (IS_LST_RAPP_NEW_REP) {
                     //lister les possible photo oublier
                     List<GrpPhoto> grpPhotosRapprocher = listerLesRapprochermentAvecLesRepertoirePhoto();
-                    if (IS_TAG_RAPP_NEW_REP && IS_TAG_CR) {
+                    if (IS_TAG_RAPP_NEW_REP && IS_TAG_CR__________) {
                         miseEnPlaceDesTagDeRapprochement(grpPhotosRapprocher);
                     }
                     //*
@@ -123,13 +132,13 @@ public class Main {
             }
             //*
 
-            if (IS_MAINT_LR) {
+            if (IS_MAINT_LR________) {
                 //Maintenance database lr
                 maintenanceDatabase();
                 //*
             }
 
-            if (IS_PURGE_FOLDER) {
+            if (IS_PURGE_FOLDER____) {
                 //Nettoyage repertoires Local
                 purgeDesRepertoireVide50Phototheque();
                 //*
@@ -138,38 +147,66 @@ public class Main {
                 //*
             }
 
-            if (IS_SVG_LRCONFIG) {
+            if (IS_SVG_LRCONFIG____) {
                 //Sauvegarde Lightroom sur Local
                 sauvegardeLightroomConfigSauve();
                 //*
             }
 
-            if (IS_RSYNC_BIB) {
+            if (IS_RSYNC_BIB_______) {
                 //sauvegarde Vers Réseaux Pour Cloud
                 sauvegardeStudioPhoto2Reseaux();
                 //*
             }
+
+            endall();
 
         } catch (Exception e) {
             e.printStackTrace();
             exceptionLog(e, LOGGER);
         }
 
-        endall();
+    }
+
+    private static void removeLinkWithActionFromKeyword() throws IOException, SQLException {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+
+        //action collection
+        Map<String, String> listeAction = ctx.getActionVersRepertoire().getListeAction();
+        //action GO
+        listeAction.put(Context.ACTION01GO,"");
+
+        for (String tag : listeAction.keySet()) {
+
+            Map<String, Map<String, String>> filetoPurge = dbLr.getFileForGoTag(tag + Context.TAGORG);
+            int nb = 0;
+            LOGGER.info("purge link tag "  + " - " + String.format("%05d", filetoPurge.size()) + " - " + tag + Context.TAGORG );
+            for (String key : filetoPurge.keySet()) {
+                nb += dbLr.removeKeywordImages(filetoPurge.get(key).get("kiIdLocal"));
+            }
+            LOGGER.info("        - fait " + " - " + String.format("%05d", nb) + " - " + tag + Context.TAGORG );
+
+        }
 
     }
 
     private static void purgeKeywordProjet() throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        dbLr.purgeGroupeKeyword(Context.TAGORG);
+        int nbPurge = dbLr.purgeGroupeKeyword(Context.TAGORG);
+        LOGGER.info("purge " + String.format("%05d", nbPurge) + " - keywords ");
     }
 
     private static void creationDesKeywordProjet() throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        dbLr.sqlcreateKeyword("", Context.TAGORG);
-        dbLr.sqlcreateKeyword(Context.TAGORG, Context.ACTION01GO);
+        String idKey = "";
+
+        idKey = dbLr.sqlcreateKeyword("", Context.TAGORG);
+        LOGGER.info("Keyword " + Context.TAGORG + " idlocal = " + idKey);
+        idKey= dbLr.sqlcreateKeyword(Context.TAGORG, Context.ACTION01GO);
+        LOGGER.info("Keyword " + Context.ACTION01GO + " idlocal = " + idKey);
         for (String key : ctx.getActionVersRepertoire().getListeAction().keySet()) {
-            dbLr.sqlcreateKeyword(Context.TAGORG, key + Context.TAGORG);
+            idKey = dbLr.sqlcreateKeyword(Context.TAGORG, key + Context.TAGORG);
+            LOGGER.info("Keyword " + key + Context.TAGORG + " idlocal = " + idKey);
         }
     }
 
@@ -181,61 +218,71 @@ public class Main {
     }
 
     private static void displayBooleen() {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
-        String txt = "";
+        String txt = "\n";
+        if (IS_DRY_RUN) {
+            txt += "" + "\n";
+            txt += "   --DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN--   " + "\n";
+            txt += "" + "\n";
+
+        }
         txt += "   -------------------------------ACTION PREVU--------------------------------------   " + "\n";
         txt += "   -                                                                               -   " + "\n";
-        if (IS_MAINT_LR) {
+        if (IS_MAINT_LR________) {
             txt += "   -  " + "maintenanceDatabase()" + "\n";
         }
-        if (IS_ACTION_FROM_KEY) {
+        if (IS_ACTION_FROM_KEY_) {
             txt += "   -  " + "makeActionFromKeyword()" + "\n";
+            txt += "   -  " + "removeLinkWithActionFromKeyword()" + "\n";
         }
-        if (IS_TAG_DEL) {
+        if (IS_TAG_DEL_________) {
             txt += "   -  " + "purgeKeywordProjet()" + "\n";
-            if (IS_TAG_CR) {
-                txt += "   -  " + "creationDesKeywordProjet()" + "\n";
+            if (IS_TAG_CR__________) {
+                txt += "   -  - " + "creationDesKeywordProjet()" + "\n";
             }
         }
-        if (IS_RETAG_RED) {
+        if (IS_RETAG_RED_______) {
             txt += "   -  " + "reTAGlesColorTagARED()" + "\n";
         }
-        if (IS_WRK_REJET) {
+        if (IS_WRK_REJET_______) {
             txt += "   -  " + "rangerLesRejets()" + "\n";
         }
-        if (IS_WRK_REP_PHOTO) {
+        if (IS_WRK_REP_PHOTO___) {
             txt += "   -  " + "topperLesRepertoires()" + "\n";
         }
-        if (IS_RGP_NEW) {
+        if (IS_RGP_NEW_________) {
             txt += "   -  " + "regrouperLesNouvellesPhoto()" + "\n";
             if (IS_LST_RAPP_NEW_REP) {
-                txt += "   -  " + "listerLesRapprochermentAvecLesRepertoirePhoto()" + "\n";
-                if (IS_TAG_RAPP_NEW_REP && IS_TAG_CR) {
-                    txt += "   -  " + "miseEnPlaceDesTagDeRapprochement()" + "\n";
+                txt += "   -  - " + "listerLesRapprochermentAvecLesRepertoirePhoto()" + "\n";
+                if (IS_TAG_RAPP_NEW_REP && IS_TAG_CR__________) {
+                    txt += "   -  - - " + "miseEnPlaceDesTagDeRapprochement()" + "\n";
                 }
             }
         }
-        if (IS_MAINT_LR) {
+        if (IS_MAINT_LR________) {
             txt += "   -  " + "maintenanceDatabase()" + "\n";
         }
-        if (IS_PURGE_FOLDER) {
+        if (IS_PURGE_FOLDER____) {
             txt += "   -  " + "purgeDesRepertoireVide50Phototheque()" + "\n";
             txt += "   -  " + "purgeDesRepertoireVide00NEW()" + "\n";
         }
-        if (IS_SVG_LRCONFIG) {
+        if (IS_SVG_LRCONFIG____) {
             txt += "   -  " + "sauvegardeLightroomConfigSauve()" + "\n";
         }
-        if (IS_RSYNC_BIB) {
+        if (IS_RSYNC_BIB_______) {
             txt += "   -  " + "sauvegardeStudioPhoto2Reseaux()" + "\n";
         }
         txt += "   -                                                                               -   " + "\n";
         txt += "   ---------------------------------------------------------------------------------   " + "\n";
+        LOGGER.info(txt);
 
     }
 
-    private static void endall() {
+    private static void endall() throws InterruptedException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         if (frame != null) {
+            TimeUnit.SECONDS.sleep(10);
             frame.dispose();
         }
     }
@@ -257,12 +304,12 @@ public class Main {
             }
         }
         //Action GO
-        Map<String, String> fileToGo = dbLr.getFileForGoTag(Context.ACTION01GO);
+        Map<String, Map<String, String>> fileToGo = dbLr.getFileForGoTag(Context.ACTION01GO);
         LOGGER.info("move " + String.format("%05d", fileToGo.size()) + " - " + Context.ACTION01GO);
         for (String key : fileToGo.keySet()) {
             Map<String, String> ForGoTag = dbLr.getNewPathForGoTagandFileIdlocal(Context.TAGORG, key);
             if (ForGoTag.size() > 0) {
-                String source = fileToGo.get(key);
+                String source = fileToGo.get(key).get("oldPath");
                 String newPath = ForGoTag.get("newPath");
                 LOGGER.debug(Context.ACTION01GO + " : " + source + " -> " + newPath);
                 SystemFiles.moveFile(source, newPath);
@@ -548,9 +595,21 @@ public class Main {
                 Context.nbDiscretionnaire++;
                 String nbDiscr = String.format("%1$03X", Context.nbDiscretionnaire);
                 String tag = Context.TAGORG + "_" + nbDiscr + "_" + "possibleNewGroup";
+                LOGGER.info("tag : " + tag  +  " ==> " );
                 for (ElementFichier eleFile : listEle.lstEleFile) {
                     dbLr.AddKeywordToFile(eleFile.getFileIdLocal(), tag);
+                    LOGGER.debug(" --- " + eleFile.getPathFromRoot() + File.separator  +  eleFile.getLcIdxFilename());
                 }
+                //display info
+                int i;
+                for (i = 0; i < ctx.getArrayRepertoirePhoto().size(); i++) {
+                    if (listEle.getArrayRep(i) > 0) {
+                        LOGGER.info("    " + String.format("%05d", listEle.getArrayRep(i)) + " - " + ctx.getArrayRepertoirePhoto().get(i).getRepertoire());
+                    }
+                }
+                LOGGER.info("    " + String.format("%05d", listEle.getArrayRep(Context.IREP_NEW)) + " - " + ctx.getParamTriNew().getRepertoire50NEW());
+
+
             }
         }
     }

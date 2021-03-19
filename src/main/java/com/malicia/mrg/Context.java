@@ -18,7 +18,7 @@ public class Context {
 
     public static final String FOLDERDELIM = "\\";
     public static final int IREP_NEW = 10;
-    public static final String RED = "'Red'";
+    public static final String RED = "Red";
     public static final String TAGORG = "#ORG#";
     public static final String ACTION01GO = "GO" + Context.TAGORG;
     public static final String COLLECTIONS = "!!Collections";
