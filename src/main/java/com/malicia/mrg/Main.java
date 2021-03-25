@@ -37,9 +37,7 @@ public class Main {
 
     private static final Boolean IS_DRY_RUN = Boolean.FALSE;
 
-    private static Boolean GO = Boolean.TRUE;
-    private static Boolean ITS_A_NO_GO = Boolean.FALSE;
-
+    private static final Boolean GO = Boolean.TRUE;
     private static final Boolean IS_MAINT_LR________ = GO;
     private static final Boolean IS_ACTION_FROM_KEY_ = GO;
     private static final Boolean IS_PURGE_ACTION____ = GO;
@@ -54,7 +52,7 @@ public class Main {
     private static final Boolean IS_PURGE_FOLDER____ = GO;
     private static final Boolean IS_SVG_LRCONFIG____ = GO;
     private static final Boolean IS_RSYNC_BIB_______ = GO;
-
+    private static final Boolean ITS_A_NO_GO = Boolean.FALSE;
     private static Context ctx;
     private static Database dbLr;
     private static JFrame frame;
@@ -68,10 +66,13 @@ public class Main {
 
             // chargement application
             ctx = Context.chargeParam();
-            // chargement application
             dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat(), IS_DRY_RUN);
             SystemFiles.setIsDryRun(IS_DRY_RUN);
-            ctx.getActionVersRepertoire().populate(dbLr.getFolderCollection(Context.COLLECTIONS , Context.TAGORG));
+            ctx.getActionVersRepertoire().populate(dbLr.getFolderCollection(Context.COLLECTIONS, Context.TAGORG));
+            //*
+
+            // chargement parameter
+            chargementParametre(ctx,args);
             //*
 
             displayBooleen();
@@ -168,23 +169,37 @@ public class Main {
 
     }
 
+    private static void chargementParametre(Context ctx, String[] args) {
+        for (int i=0; i<args.length;i++) {
+            String[] decomp = args[i].split(":");
+
+            switch(decomp[0])
+            {
+                case "thresholdNew":
+                    ctx.getParamTriNew().setThresholdNew(Long.parseLong(decomp[1]));
+                    break;
+            }
+            LOGGER.info("Parameter : " + i + " = " + args[i] );
+        }
+    }
+
     private static void removeLinkWithActionFromKeyword() throws IOException, SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         //action collection
         Map<String, String> listeAction = ctx.getActionVersRepertoire().getListeAction();
         //action GO
-        listeAction.put(Context.ACTION01GO,"");
+        listeAction.put(Context.ACTION01GO, "");
 
         for (String tag : listeAction.keySet()) {
 
             Map<String, Map<String, String>> filetoPurge = dbLr.getFileForGoTag(tag);
             int nb = 0;
-            LOGGER.info("purge link tag "  + " - " + String.format("%05d", filetoPurge.size()) + " - " + tag );
+            LOGGER.info("purge link tag " + " - " + String.format("%05d", filetoPurge.size()) + " - " + tag);
             for (String key : filetoPurge.keySet()) {
                 nb += dbLr.removeKeywordImages(filetoPurge.get(key).get("kiIdLocal"));
             }
-            LOGGER.info("        - fait " + " - " + String.format("%05d", nb) + " - " + tag );
+            LOGGER.info("        - fait " + " - " + String.format("%05d", nb) + " - " + tag);
 
         }
 
@@ -202,10 +217,10 @@ public class Main {
 
         idKey = dbLr.sqlcreateKeyword("", Context.TAGORG);
         LOGGER.info("Keyword " + Context.TAGORG + " idlocal = " + idKey);
-        idKey= dbLr.sqlcreateKeyword(Context.TAGORG, Context.ACTION01GO);
+        idKey = dbLr.sqlcreateKeyword(Context.TAGORG, Context.ACTION01GO);
         LOGGER.info("Keyword " + Context.ACTION01GO + " idlocal = " + idKey);
         for (String key : ctx.getActionVersRepertoire().getListeAction().keySet()) {
-            idKey = dbLr.sqlcreateKeyword(Context.TAGORG, key );
+            idKey = dbLr.sqlcreateKeyword(Context.TAGORG, key);
             LOGGER.info("Keyword " + key + " idlocal = " + idKey);
         }
     }
@@ -292,12 +307,12 @@ public class Main {
 
         //Action GO
         Map<String, Map<String, String>> fileToGo = dbLr.getFileForGoTag(Context.ACTION01GO);
-        LOGGER.info("nb de fichier tagger : " + Context.ACTION01GO + " => " + String.format("%05d", fileToGo.size()) + "" );
+        LOGGER.info("nb de fichier tagger : " + Context.ACTION01GO + " => " + String.format("%05d", fileToGo.size()) + "");
         int nb = 0;
         for (String key : fileToGo.keySet()) {
             Map<String, String> ForGoTag = dbLr.getNewPathForGoTagandFileIdlocal(Context.TAGORG, key);
             if (ForGoTag.size() > 0) {
-                nb ++;
+                nb++;
                 String source = fileToGo.get(key).get("oldPath");
                 String newPath = ForGoTag.get("newPath");
                 LOGGER.debug("---move " + Context.ACTION01GO + " : " + source + " -> " + newPath);
@@ -311,8 +326,8 @@ public class Main {
         //action collection
         Map<String, String> listeAction = ctx.getActionVersRepertoire().getListeAction();
         for (String key : listeAction.keySet()) {
-            Map<String, Map<String, String>> fileToTag = dbLr.sqlmoveAllFileWithTagtoRep(key , ctx.getRepertoire50Phototheque() + listeAction.get(key));
-            LOGGER.info("move " + String.format("%05d", fileToTag.size()) + " - " + key );
+            Map<String, Map<String, String>> fileToTag = dbLr.sqlmoveAllFileWithTagtoRep(key, ctx.getRepertoire50Phototheque() + listeAction.get(key));
+            LOGGER.info("move " + String.format("%05d", fileToTag.size()) + " - " + key);
             for (String keyt : fileToTag.keySet()) {
                 String oldPath = fileToTag.get(keyt).get("oldPath");
                 String newPath = fileToTag.get(keyt).get("newPath");
@@ -610,10 +625,10 @@ public class Main {
                 Context.nbDiscretionnaire++;
                 String nbDiscr = String.format("%1$03X", Context.nbDiscretionnaire);
                 String tag = Context.TAGORG + "_" + nbDiscr + "_" + "possibleNewGroup";
-                LOGGER.info("tag : " + tag  +  " ==> " );
+                LOGGER.info("tag : " + tag + " ==> ");
                 for (ElementFichier eleFile : listEle.lstEleFile) {
                     dbLr.AddKeywordToFile(eleFile.getFileIdLocal(), tag);
-                    LOGGER.debug(" --- " + eleFile.getPathFromRoot() + File.separator  +  eleFile.getLcIdxFilename());
+                    LOGGER.debug(" --- " + eleFile.getPathFromRoot() + File.separator + eleFile.getLcIdxFilename());
                 }
                 //display info
                 int i;
