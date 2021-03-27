@@ -59,6 +59,11 @@
             <artifactId>launch4j-maven-plugin</artifactId>
             <version>1.7.25</version>
         </dependency>
+        <dependency>
+            <groupId>github.maliciamrg</groupId>
+            <artifactId>utilitaire</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
