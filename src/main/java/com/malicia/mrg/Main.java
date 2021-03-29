@@ -162,6 +162,8 @@ public class Main {
 
             endall();
 
+            if(Boolean.TRUE){throw new IllegalStateException("Stop Run");}
+
         } catch (Exception e) {
             e.printStackTrace();
             exceptionLog(e, LOGGER);
@@ -471,9 +473,12 @@ public class Main {
         calt.setTime(new Date());
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        LOGGER.info("Today                                   : " + sdf.format(calt.getTimeInMillis()));
         LOGGER.info("Dernier Modification du fichier mouchard: " + sdf.format(lastModified));
+        LOGGER.info("Prochain TmeToSave                      : " + sdf.format(cal.getTimeInMillis()));
 
         boolean isItTimeToSave = calt.compareTo(cal) > 0;
+        LOGGER.info("isItTimeToSave                          : " + isItTimeToSave);
         return isItTimeToSave;
     }
 
@@ -691,6 +696,8 @@ public class Main {
             while (repertoireIterator.hasNext()) {
                 String repertoire = repertoireIterator.next();
 
+                FindZipAndExtractToRejet(repertoire);
+
                 if (!WorkWithRepertory.isRepertoireOk(dbLr, repertoire, repPhoto, ctx.getParamControleRepertoire())) {
                     LOGGER.debug(repertoire + "=>" + "ko");
                 }
@@ -701,6 +708,21 @@ public class Main {
             LOGGER.debug("ecriture fichier ->" + f.toString());
 
         }
+    }
+
+    private static void FindZipAndExtractToRejet(String repertoire) throws IOException {
+
+        List<File> arrayFichierZip = WorkWithFiles.getFilesFromRepertoryWithFilter( repertoire, "zip");
+
+        ListIterator<File> arrayFichierRejetIterator = arrayFichierZip.listIterator();
+        while (arrayFichierRejetIterator.hasNext()) {
+            File fichier = arrayFichierRejetIterator.next();
+
+            LOGGER.info("unzip :" + fichier);
+            WorkWithFiles.extractZipFile(fichier);
+
+        }
+
     }
 
     private static void sauvegardeLightroomConfigSauve() throws ZipException {

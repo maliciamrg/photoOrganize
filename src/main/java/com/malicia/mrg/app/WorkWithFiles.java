@@ -23,23 +23,31 @@ public class WorkWithFiles {
         throw new IllegalStateException("Utility class");
     }
 
-    public static List<File> getFilesFromRepertoryWithFilter(String repertory, List<String> arrayFiltreDeNomDeSubdirectory, String extFileFilter) {
+    public static List<File> getFilesFromRepertoryWithFilter(String repertory, List<String> arrayFiltreDeNomDeSubdirectory, String extFileAExclure) {
         List<File> ret = new ArrayList<>();
         File[] files = new File(repertory).listFiles();
-        showFiles(files, ret, arrayFiltreDeNomDeSubdirectory, extFileFilter, true);
+        showFiles(files, ret, arrayFiltreDeNomDeSubdirectory, extFileAExclure, "",true);
         return ret;
     }
 
-    private static void showFiles(File[] files, List<File> fileRetour, List<String> arrayFiltreRep, String extFileFilter, boolean onlyRepIn) {
+    public static List<File> getFilesFromRepertoryWithFilter(String repertory, String extFileAInclure) {
+        List<File> ret = new ArrayList<>();
+        File[] files = new File(repertory).listFiles();
+        showFiles(files, ret, new ArrayList<>(), "",extFileAInclure, false);
+        return ret;
+    }
+
+    private static void showFiles(File[] files, List<File> fileRetour, List<String> arrayFiltreRep, String extFileAExclure, String extFileAInclure, boolean onlyRepIn) {
         for (File file : files) {
             if (file.isDirectory()) {
                 boolean onlyRepOut = true;
                 if (stringContainsItemFromList(file.toString(), arrayFiltreRep.toArray(new String[0]))) {
                     onlyRepOut = false;
                 }
-                showFiles(file.listFiles(), fileRetour, arrayFiltreRep, extFileFilter, onlyRepOut); // Calls same method again.
+                showFiles(file.listFiles(), fileRetour, arrayFiltreRep, extFileAExclure, extFileAInclure,onlyRepOut); // Calls same method again.
             } else {
-                if ((!onlyRepIn) && (FilenameUtils.getExtension(file.getName()).toLowerCase().compareTo(extFileFilter)) != 0) {
+                if (((!onlyRepIn) && (FilenameUtils.getExtension(file.getName()).toLowerCase().compareTo(extFileAExclure)) != 0) &&
+                    ((!onlyRepIn) && (extFileAInclure.compareTo("") ==0 || FilenameUtils.getExtension(file.getName()).toLowerCase().compareTo(extFileAInclure)== 0)) ) {
                     fileRetour.add(file);
                 }
             }
@@ -84,4 +92,5 @@ public class WorkWithFiles {
         UnzipUtility uZip = new UnzipUtility();
         uZip.unzip(fichier.toString(), fichier.getParent());
     }
+
 }
