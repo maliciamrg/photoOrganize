@@ -64,6 +64,10 @@ public class Main {
             chargeLog4j();
             //*
 
+            LOGGER.info(InfoVersion.showVersionInfo());
+
+            if(Boolean.TRUE){throw new IllegalStateException("Stop Run");}
+
             // chargement application
             ctx = Context.chargeParam();
             dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat(), IS_DRY_RUN);
@@ -161,8 +165,6 @@ public class Main {
             }
 
             endall();
-
-            if(Boolean.TRUE){throw new IllegalStateException("Stop Run");}
 
         } catch (Exception e) {
             e.printStackTrace();

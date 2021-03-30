@@ -10,6 +10,7 @@ import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
 import java.util.ArrayList;
 
 import static javax.swing.SwingUtilities.invokeLater;
@@ -70,23 +71,7 @@ public class JTextAreaAppender extends AbstractAppender
                 {
                     try
                     {
-                        if (textArea != null)
-                        {
-                            if (textArea.getText().length() == 0)
-                            {
-                                textArea.setText(message);
-                            } else
-                            {
-                                textArea.append("\n" + message);
-                                if (maxLines > 0 & textArea.getLineCount() > maxLines + 1)
-                                {
-                                    int endIdx = textArea.getDocument().getText(0, textArea.getDocument().getLength()).indexOf("\n");
-                                    textArea.getDocument().remove(0, endIdx + 1);
-                                }
-                            }
-                            String content = textArea.getText();
-                            textArea.setText(content.substring(0, content.length() - 1));
-                        }
+                        jtextArea(message, textArea);
                     } catch (Throwable throwable)
                     {
                         throwable.printStackTrace();
@@ -96,6 +81,26 @@ public class JTextAreaAppender extends AbstractAppender
         } catch (IllegalStateException exception)
         {
             exception.printStackTrace();
+        }
+    }
+
+    private void jtextArea(String message, JTextArea textArea) throws BadLocationException {
+        if (textArea != null)
+        {
+            if (textArea.getText().length() == 0)
+            {
+                textArea.setText(message);
+            } else
+            {
+                textArea.append("\n" + message);
+                if (maxLines > 0 && textArea.getLineCount() > maxLines + 1)
+                {
+                    int endIdx = textArea.getDocument().getText(0, textArea.getDocument().getLength()).indexOf("\n");
+                    textArea.getDocument().remove(0, endIdx + 1);
+                }
+            }
+            String content = textArea.getText();
+            textArea.setText(content.substring(0, content.length() - 1));
         }
     }
 }

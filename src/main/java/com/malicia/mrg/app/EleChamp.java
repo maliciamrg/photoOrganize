@@ -25,14 +25,14 @@ class EleChamp {
         this.cChamp = "";
         this.oValue = "";
         this.infoRetourControle = "";
-        this.compTagRetour = new ArrayList<String>();
+        this.compTagRetour = new ArrayList<>();
     }
 
     public EleChamp(String codeChamp, String oldValue) {
         this.cChamp = codeChamp;
         this.oValue = oldValue;
         this.infoRetourControle = "";
-        this.compTagRetour = new ArrayList<String>();
+        this.compTagRetour = new ArrayList<>();
     }
 
     public List<String> getCompTagRetour() {
@@ -180,7 +180,7 @@ class EleChamp {
 
     private void setRetourToTrue() {
         this.infoRetourControle = ControleRepertoire.CARAC_EMPTY;
-        this.compTagRetour = new ArrayList<String>();
+        this.compTagRetour = new ArrayList<>();
         retourControle = true;
     }
 
