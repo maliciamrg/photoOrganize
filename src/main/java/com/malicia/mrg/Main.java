@@ -52,7 +52,6 @@ public class Main {
     private static final Boolean IS_PURGE_FOLDER____ = GO;
     private static final Boolean IS_SVG_LRCONFIG____ = GO;
     private static final Boolean IS_RSYNC_BIB_______ = GO;
-    private static final Boolean ITS_A_NO_GO = Boolean.FALSE;
     private static Context ctx;
     private static Database dbLr;
     private static JFrame frame;
@@ -65,8 +64,6 @@ public class Main {
             //*
 
             LOGGER.info(InfoVersion.showVersionInfo());
-
-            if(Boolean.TRUE){throw new IllegalStateException("Stop Run");}
 
             // chargement application
             ctx = Context.chargeParam();
@@ -81,54 +78,54 @@ public class Main {
 
             displayBooleen();
 
-            if (IS_MAINT_LR________) {
+            if (Boolean.TRUE.equals(IS_MAINT_LR________)) {
                 //Maintenance database lr
                 maintenanceDatabase();
                 //*
             }
 
-            if (IS_ACTION_FROM_KEY_) {
+            if (Boolean.TRUE.equals(IS_ACTION_FROM_KEY_)) {
                 //effectuer les actions demander via le tag Lightroom
                 makeActionFromKeyword();
                 //*
             }
-            if (IS_PURGE_ACTION____) {
+            if (Boolean.TRUE.equals(IS_PURGE_ACTION____)) {
                 //purger les action demander via les keywords
                 removeLinkWithActionFromKeyword();
                 //*
             }
 
             //initialization pour nouveau démarrage
-            if (IS_TAG_DEL_________) {
+            if (Boolean.TRUE.equals(IS_TAG_DEL_________)) {
                 purgeKeywordProjet();
-                if (IS_TAG_CR__________) {
+                if (Boolean.TRUE.equals(IS_TAG_CR__________)) {
                     creationDesKeywordProjet();
                 }
             }
-            if (IS_RETAG_RED_______) {
+            if (Boolean.TRUE.equals(IS_RETAG_RED_______)) {
                 reTAGlesColorTagARED();
             }
             //*
 
             //En Fonction De La Strategies De Rangement
-            if (IS_WRK_REJET_______) {
+            if (Boolean.TRUE.equals(IS_WRK_REJET_______)) {
                 //En Fonction De La Strategies De Rangement
                 rangerLesRejets();
                 //*
             }
-            if (IS_WRK_REP_PHOTO___) {
+            if (Boolean.TRUE.equals(IS_WRK_REP_PHOTO___)) {
                 //En Fonction De La Strategies De Rangement
                 topperLesRepertoires();
                 //*
             }
-            if (IS_RGP_NEW_________) {
+            if (Boolean.TRUE.equals(IS_RGP_NEW_________)) {
                 //regrouper le new
                 regrouperLesNouvellesPhoto();
                 //*
-                if (IS_LST_RAPP_NEW_REP) {
+                if (Boolean.TRUE.equals(IS_LST_RAPP_NEW_REP)) {
                     //lister les possible photo oublier
                     List<GrpPhoto> grpPhotosRapprocher = listerLesRapprochermentAvecLesRepertoirePhoto();
-                    if (IS_TAG_RAPP_NEW_REP && IS_TAG_CR__________) {
+                    if (Boolean.TRUE.equals(IS_TAG_RAPP_NEW_REP) && Boolean.TRUE.equals(IS_TAG_CR__________)) {
                         miseEnPlaceDesTagDeRapprochement(grpPhotosRapprocher);
                     }
                     //*
@@ -137,13 +134,13 @@ public class Main {
             }
             //*
 
-            if (IS_MAINT_LR________) {
+            if (Boolean.TRUE.equals(IS_MAINT_LR________)) {
                 //Maintenance database lr
                 maintenanceDatabase();
                 //*
             }
 
-            if (IS_PURGE_FOLDER____) {
+            if (Boolean.TRUE.equals(IS_PURGE_FOLDER____)) {
                 //Nettoyage repertoires Local
                 purgeDesRepertoireVide50Phototheque();
                 //*
@@ -152,19 +149,21 @@ public class Main {
                 //*
             }
 
-            if (IS_SVG_LRCONFIG____) {
+            if (Boolean.TRUE.equals(IS_SVG_LRCONFIG____)) {
                 //Sauvegarde Lightroom sur Local
                 sauvegardeLightroomConfigSauve();
                 //*
             }
 
-            if (IS_RSYNC_BIB_______) {
+            if (Boolean.TRUE.equals(IS_RSYNC_BIB_______)) {
                 //sauvegarde Vers Réseaux Pour Cloud
                 sauvegardeStudioPhoto2Reseaux();
                 //*
             }
 
             endall();
+
+            if(Boolean.TRUE){throw new IllegalStateException("Stop Run");}
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -240,7 +239,7 @@ public class Main {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         String txt = "\n";
-        if (IS_DRY_RUN) {
+        if (Boolean.TRUE.equals(IS_DRY_RUN)) {
             txt += "" + "\n";
             txt += "   --DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN--   " + "\n";
             txt += "" + "\n";
@@ -248,48 +247,48 @@ public class Main {
         }
         txt += "   -------------------------------ACTION PREVU--------------------------------------   " + "\n";
         txt += "   -                                                                               -   " + "\n";
-        if (IS_MAINT_LR________) {
+        if (Boolean.TRUE.equals(IS_MAINT_LR________)) {
             txt += "   -  " + "maintenanceDatabase()" + "\n";
         }
-        if (IS_ACTION_FROM_KEY_) {
+        if (Boolean.TRUE.equals(IS_ACTION_FROM_KEY_)) {
             txt += "   -  " + "makeActionFromKeyword()" + "\n";
             txt += "   -  " + "removeLinkWithActionFromKeyword()" + "\n";
         }
-        if (IS_TAG_DEL_________) {
+        if (Boolean.TRUE.equals(IS_TAG_DEL_________)) {
             txt += "   -  " + "purgeKeywordProjet()" + "\n";
-            if (IS_TAG_CR__________) {
+            if (Boolean.TRUE.equals(IS_TAG_CR__________)) {
                 txt += "   -  - " + "creationDesKeywordProjet()" + "\n";
             }
         }
-        if (IS_RETAG_RED_______) {
+        if (Boolean.TRUE.equals(IS_RETAG_RED_______)) {
             txt += "   -  " + "reTAGlesColorTagARED()" + "\n";
         }
-        if (IS_WRK_REJET_______) {
+        if (Boolean.TRUE.equals(IS_WRK_REJET_______)) {
             txt += "   -  " + "rangerLesRejets()" + "\n";
         }
-        if (IS_WRK_REP_PHOTO___) {
+        if (Boolean.TRUE.equals(IS_WRK_REP_PHOTO___)) {
             txt += "   -  " + "topperLesRepertoires()" + "\n";
         }
-        if (IS_RGP_NEW_________) {
+        if (Boolean.TRUE.equals(IS_RGP_NEW_________)) {
             txt += "   -  " + "regrouperLesNouvellesPhoto()" + "\n";
-            if (IS_LST_RAPP_NEW_REP) {
+            if (Boolean.TRUE.equals(IS_LST_RAPP_NEW_REP)) {
                 txt += "   -  - " + "listerLesRapprochermentAvecLesRepertoirePhoto()" + "\n";
-                if (IS_TAG_RAPP_NEW_REP && IS_TAG_CR__________) {
+                if (Boolean.TRUE.equals(IS_TAG_RAPP_NEW_REP) && Boolean.TRUE.equals(IS_TAG_CR__________)) {
                     txt += "   -  - - " + "miseEnPlaceDesTagDeRapprochement()" + "\n";
                 }
             }
         }
-        if (IS_MAINT_LR________) {
+        if (Boolean.TRUE.equals(IS_MAINT_LR________)) {
             txt += "   -  " + "maintenanceDatabase()" + "\n";
         }
-        if (IS_PURGE_FOLDER____) {
+        if (Boolean.TRUE.equals(IS_PURGE_FOLDER____)) {
             txt += "   -  " + "purgeDesRepertoireVide50Phototheque()" + "\n";
             txt += "   -  " + "purgeDesRepertoireVide00NEW()" + "\n";
         }
-        if (IS_SVG_LRCONFIG____) {
+        if (Boolean.TRUE.equals(IS_SVG_LRCONFIG____)) {
             txt += "   -  " + "sauvegardeLightroomConfigSauve()" + "\n";
         }
-        if (IS_RSYNC_BIB_______) {
+        if (Boolean.TRUE.equals(IS_RSYNC_BIB_______)) {
             txt += "   -  " + "sauvegardeStudioPhoto2Reseaux()" + "\n";
         }
         txt += "   -                                                                               -   " + "\n";

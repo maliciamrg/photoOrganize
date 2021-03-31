@@ -45,8 +45,8 @@ public class WorkWithFiles {
                 }
                 showFiles(file.listFiles(), fileRetour, arrayFiltreRep, extFileAExclure, extFileAInclure,onlyRepOut); // Calls same method again.
             } else {
-                if (((!onlyRepIn) && (FilenameUtils.getExtension(file.getName()).toLowerCase().compareTo(extFileAExclure)) != 0) &&
-                    ((!onlyRepIn) && (extFileAInclure.compareTo("") ==0 || FilenameUtils.getExtension(file.getName()).toLowerCase().compareTo(extFileAInclure)== 0)) ) {
+                if ((!onlyRepIn && (FilenameUtils.getExtension(file.getName()).toLowerCase().compareTo(extFileAExclure)) != 0) &&
+                    (!onlyRepIn && (extFileAInclure.compareTo("") ==0 || FilenameUtils.getExtension(file.getName()).toLowerCase().compareTo(extFileAInclure)== 0)) ) {
                     fileRetour.add(file);
                 }
             }
