@@ -45,6 +45,7 @@ public class Main {
     private static final Boolean IS_TAG_CR__________ = GO;
     private static final Boolean IS_RETAG_RED_______ = GO;
     private static final Boolean IS_WRK_REJET_______ = GO;
+    private static final Boolean IS_UNZIP_REP_PHOTO_ = GO;
     private static final Boolean IS_WRK_REP_PHOTO___ = GO;
     private static final Boolean IS_RGP_NEW_________ = GO;
     private static final Boolean IS_LST_RAPP_NEW_REP = GO;
@@ -73,7 +74,7 @@ public class Main {
             //*
 
             // chargement parameter
-            chargementParametre(ctx,args);
+            chargementParametre(ctx, args);
             //*
 
             displayBooleen();
@@ -97,15 +98,28 @@ public class Main {
 
             //initialization pour nouveau démarrage
             if (Boolean.TRUE.equals(IS_TAG_DEL_________)) {
-                purgeKeywordProjet();
+                List<String> lstIdKey = new ArrayList<>();
                 if (Boolean.TRUE.equals(IS_TAG_CR__________)) {
-                    creationDesKeywordProjet();
+                    lstIdKey = creationDesKeywordProjet();
+                }
+                purgeKeywordProjet(lstIdKey);
+                if (Boolean.TRUE.equals(IS_MAINT_LR________)) {
+                    //Maintenance database lr
+                    maintenanceDatabase();
+                    //*
                 }
             }
+
             if (Boolean.TRUE.equals(IS_RETAG_RED_______)) {
                 reTAGlesColorTagARED();
             }
             //*
+
+            if (Boolean.TRUE.equals(IS_WRK_REP_PHOTO___)) {
+                if (Boolean.TRUE.equals(IS_UNZIP_REP_PHOTO_)) {
+                    UnzipAndExtractAllZip();
+                }
+            }
 
             //En Fonction De La Strategies De Rangement
             if (Boolean.TRUE.equals(IS_WRK_REJET_______)) {
@@ -163,7 +177,9 @@ public class Main {
 
             endall();
 
-            if(Boolean.TRUE){throw new IllegalStateException("Stop Run");}
+            if (Boolean.TRUE) {
+                throw new IllegalStateException("Stop Run");
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -173,16 +189,15 @@ public class Main {
     }
 
     private static void chargementParametre(Context ctx, String[] args) {
-        for (int i=0; i<args.length;i++) {
+        for (int i = 0; i < args.length; i++) {
             String[] decomp = args[i].split(":");
 
-            switch(decomp[0])
-            {
+            switch (decomp[0]) {
                 case "thresholdNew":
                     ctx.getParamTriNew().setThresholdNew(Long.parseLong(decomp[1]));
                     break;
             }
-            LOGGER.info("Parameter : " + i + " = " + args[i] );
+            LOGGER.info("Parameter : " + i + " = " + args[i]);
         }
     }
 
@@ -198,34 +213,41 @@ public class Main {
 
             Map<String, Map<String, String>> filetoPurge = dbLr.getFileForGoTag(tag);
             int nb = 0;
-            LOGGER.info("purge link tag " + " - " + String.format("%05d", filetoPurge.size()) + " - " + tag);
+            LOGGER_info("purge link tag " + " - " + String.format("%05d", filetoPurge.size()) + " - " + tag, filetoPurge.size());
             for (String key : filetoPurge.keySet()) {
                 nb += dbLr.removeKeywordImages(filetoPurge.get(key).get("kiIdLocal"));
             }
-            LOGGER.info("        - fait " + " - " + String.format("%05d", nb) + " - " + tag);
+            LOGGER_info("        - fait " + " - " + String.format("%05d", nb) + " - " + tag, nb);
 
         }
 
     }
 
-    private static void purgeKeywordProjet() throws SQLException {
+    private static void purgeKeywordProjet(List<String> lstIdKey) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        int nbPurge = dbLr.purgeGroupeKeyword(Context.TAGORG);
-        LOGGER.info("purge " + String.format("%05d", nbPurge) + " - keywords ");
+        int nbPurge = dbLr.purgeGroupeKeyword(Context.TAGORG,lstIdKey);
+        LOGGER_info("purge " + String.format("%05d", nbPurge) + " - keywords ", nbPurge);
     }
 
-    private static void creationDesKeywordProjet() throws SQLException {
+    private static List<String> creationDesKeywordProjet() throws SQLException {
+        List<String> lstIdKey = new ArrayList<>();
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         String idKey = "";
 
-        idKey = dbLr.sqlcreateKeyword("", Context.TAGORG);
-        LOGGER.info("Keyword " + Context.TAGORG + " idlocal = " + idKey);
-        idKey = dbLr.sqlcreateKeyword(Context.TAGORG, Context.ACTION01GO);
-        LOGGER.info("Keyword " + Context.ACTION01GO + " idlocal = " + idKey);
+        lstIdKey.add(dbLr.sqlcreateKeyword("", Context.TAGORG));
+        LOGGER.info(getStringLn("Keyword " + Context.TAGORG) + " idlocal = " + lstIdKey.get(lstIdKey.size()-1));
+        lstIdKey.add(dbLr.sqlcreateKeyword(Context.TAGORG, Context.ACTION01GO));
+        LOGGER.info(getStringLn("Keyword " + Context.ACTION01GO) + " idlocal = " + lstIdKey.get(lstIdKey.size()-1));
         for (String key : ctx.getActionVersRepertoire().getListeAction().keySet()) {
-            idKey = dbLr.sqlcreateKeyword(Context.TAGORG, key);
-            LOGGER.info("Keyword " + key + " idlocal = " + idKey);
+            lstIdKey.add(dbLr.sqlcreateKeyword(Context.TAGORG, key));
+            LOGGER.info(getStringLn("Keyword " + key) + " idlocal = " + lstIdKey.get(lstIdKey.size()-1));
         }
+
+        return lstIdKey;
+    }
+
+    private static String getStringLn(String s) {
+        return String.format("%-60s", s);
     }
 
     private static void reTAGlesColorTagARED() throws SQLException {
@@ -263,6 +285,11 @@ public class Main {
         if (Boolean.TRUE.equals(IS_RETAG_RED_______)) {
             txt += "   -  " + "reTAGlesColorTagARED()" + "\n";
         }
+        if (Boolean.TRUE.equals(IS_WRK_REP_PHOTO___)) {
+            if (Boolean.TRUE.equals(IS_UNZIP_REP_PHOTO_)) {
+                txt += "   -  - " + "UnzipAndExtractAllZip()" + "\n";
+            }
+        }
         if (Boolean.TRUE.equals(IS_WRK_REJET_______)) {
             txt += "   -  " + "rangerLesRejets()" + "\n";
         }
@@ -274,7 +301,7 @@ public class Main {
             if (Boolean.TRUE.equals(IS_LST_RAPP_NEW_REP)) {
                 txt += "   -  - " + "listerLesRapprochermentAvecLesRepertoirePhoto()" + "\n";
                 if (Boolean.TRUE.equals(IS_TAG_RAPP_NEW_REP) && Boolean.TRUE.equals(IS_TAG_CR__________)) {
-                    txt += "   -  - - " + "miseEnPlaceDesTagDeRapprochement()" + "\n";
+                    txt += "   -  -  - " + "miseEnPlaceDesTagDeRapprochement()" + "\n";
                 }
             }
         }
@@ -300,7 +327,7 @@ public class Main {
     private static void endall() throws InterruptedException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         if (frame != null) {
-            TimeUnit.SECONDS.sleep(10);
+            TimeUnit.SECONDS.sleep(20);
             frame.dispose();
         }
     }
@@ -310,7 +337,7 @@ public class Main {
 
         //Action GO
         Map<String, Map<String, String>> fileToGo = dbLr.getFileForGoTag(Context.ACTION01GO);
-        LOGGER.info("nb de fichier tagger : " + Context.ACTION01GO + " => " + String.format("%05d", fileToGo.size()) + "");
+        LOGGER_info("nb de fichier tagger : " + Context.ACTION01GO + " => " + String.format("%05d", fileToGo.size()) + "", fileToGo.size());
         int nb = 0;
         for (String key : fileToGo.keySet()) {
             Map<String, String> ForGoTag = dbLr.getNewPathForGoTagandFileIdlocal(Context.TAGORG, key);
@@ -324,13 +351,13 @@ public class Main {
                 dbLr.removeKeywordImages(ForGoTag.get("kiIdLocal"));
             }
         }
-        LOGGER.info("move " + String.format("%05d", nb) + " - " + Context.ACTION01GO);
+        LOGGER_info("move " + String.format("%05d", nb) + " - " + Context.ACTION01GO, nb);
 
         //action collection
         Map<String, String> listeAction = ctx.getActionVersRepertoire().getListeAction();
         for (String key : listeAction.keySet()) {
             Map<String, Map<String, String>> fileToTag = dbLr.sqlmoveAllFileWithTagtoRep(key, ctx.getRepertoire50Phototheque() + listeAction.get(key));
-            LOGGER.info("move " + String.format("%05d", fileToTag.size()) + " - " + key);
+            LOGGER_info("move " + String.format("%05d", fileToTag.size()) + " - " + key, fileToTag.size());
             for (String keyt : fileToTag.keySet()) {
                 String oldPath = fileToTag.get(keyt).get("oldPath");
                 String newPath = fileToTag.get(keyt).get("newPath");
@@ -342,6 +369,14 @@ public class Main {
         }
     }
 
+    private static void LOGGER_info(String texte, int size) {
+        if (size > 0) {
+            LOGGER.info(texte);
+        } else {
+            LOGGER.debug(texte);
+        }
+    }
+
     private static void createLoggingPanel() {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
@@ -350,7 +385,7 @@ public class Main {
         jLoggingConsole.setLineWrap(true);
         jLoggingConsole.setWrapStyleWord(true);
         jLoggingConsole.setEditable(false);
-        jLoggingConsole.setFont(new Font("Courier", Font.PLAIN, 12));
+        jLoggingConsole.setFont(new Font("monospaced", Font.PLAIN, 12));
 
         // Make scrollable console pane
         JScrollPane jConsoleScroll = new JScrollPane(jLoggingConsole);
@@ -370,7 +405,7 @@ public class Main {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // set the frame size (you'll usually want to call frame.pack())
-        frame.setSize(new Dimension(1024, 600));
+        frame.setSize(new Dimension(1240, 600));
 
         // center the frame
         frame.setLocationRelativeTo(null);
@@ -555,6 +590,7 @@ public class Main {
         GrpPhoto listEletmp = new GrpPhoto();
 
         long maxprev = 0;
+        long captureTimeprev=0;
         while (rsele.next()) {
 
             // Recuperer les info de l'elements
@@ -586,14 +622,24 @@ public class Main {
             if (numeroRep > -1) {
                 ElementFichier eleFile = new ElementFichier(absolutePath, pathFromRoot, lcIdxFilename, fileIdLocal, numeroRep);
 
-                if (mint > maxprev) {
+                eleFile.setcaptureTime(captureTime);
+                eleFile.setmint(mint);
+                eleFile.setmaxt(maxt);
 
-                    listGrpEletmp.add(listEletmp);
+                if (captureTime < captureTimeprev) {
+                    throw new IllegalStateException("captureTime not in order = " + captureTime+ " < " + captureTimeprev);
+                }
+
+                if (mint > maxprev) {
+                    if (listEletmp.size() > 1 && listEletmp.getArrayRep(Context.IREP_NEW) > 0 && listEletmp.size() > listEletmp.getArrayRep(Context.IREP_NEW)) {
+                        listGrpEletmp.add(listEletmp);
+                    }
 
                     listEletmp = new GrpPhoto();
 
                 }
                 maxprev = maxt;
+                captureTimeprev = captureTime;
                 listEletmp.setFirstDate(captureTime);
                 listEletmp.add(eleFile);
             }
@@ -613,6 +659,11 @@ public class Main {
                 int i;
                 for (i = 0; i < ctx.getArrayRepertoirePhoto().size(); i++) {
                     if (listEle.getArrayRep(i) > 0) {
+
+                        int ii;
+                        for (ii = 0; ii < listEle.getLstEleFile().size(); ii++) {
+                            LOGGER.debug(listEle.getLstEleFile().get(ii).toString());
+                        }
                         LOGGER.info(String.format("%05d", listEle.getArrayRep(i)) + " - " + ctx.getArrayRepertoirePhoto().get(i).getRepertoire());
                     }
                 }
@@ -630,7 +681,7 @@ public class Main {
             if (listEle.size() > 1 && listEle.getArrayRep(Context.IREP_NEW) > 0 && listEle.size() > listEle.getArrayRep(Context.IREP_NEW)) {
                 Context.nbDiscretionnaire++;
                 String nbDiscr = String.format("%1$03X", Context.nbDiscretionnaire);
-                String tag = Context.TAGORG + "_" + nbDiscr + "_" + "possibleNewGroup";
+                String tag = Context.TAGORG + "_" + nbDiscr + "_" + Context.POSSIBLE_NEW_GROUP;
                 LOGGER.info("tag : " + tag + " ==> ");
                 for (ElementFichier eleFile : listEle.lstEleFile) {
                     dbLr.AddKeywordToFile(eleFile.getFileIdLocal(), tag);
@@ -682,6 +733,28 @@ public class Main {
         }
     }
 
+    private static void UnzipAndExtractAllZip() throws IOException, SQLException {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+
+        List<RepertoirePhoto> arrayRepertoirePhoto = ctx.getArrayRepertoirePhoto();
+
+        ListIterator<RepertoirePhoto> repertoirePhotoIterator = arrayRepertoirePhoto.listIterator();
+        while (repertoirePhotoIterator.hasNext()) {
+            RepertoirePhoto repPhoto = repertoirePhotoIterator.next();
+            LOGGER.info("UnzipAndExtractAllZip = > " + ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire());
+            List<String> listRep = WorkWithRepertory.listRepertoireEligible(ctx.getRepertoire50Phototheque(), repPhoto);
+
+            ListIterator<String> repertoireIterator = listRep.listIterator();
+            while (repertoireIterator.hasNext()) {
+                String repertoire = repertoireIterator.next();
+
+                FindZipAndExtractToRejet(repertoire);
+
+            }
+
+        }
+    }
+
     private static void topperLesRepertoires() throws IOException, SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
@@ -697,8 +770,6 @@ public class Main {
             while (repertoireIterator.hasNext()) {
                 String repertoire = repertoireIterator.next();
 
-                FindZipAndExtractToRejet(repertoire);
-
                 if (!WorkWithRepertory.isRepertoireOk(dbLr, repertoire, repPhoto, ctx.getParamControleRepertoire())) {
                     LOGGER.debug(repertoire + "=>" + "ko");
                 }
@@ -713,7 +784,7 @@ public class Main {
 
     private static void FindZipAndExtractToRejet(String repertoire) throws IOException {
 
-        List<File> arrayFichierZip = WorkWithFiles.getFilesFromRepertoryWithFilter( repertoire, "zip");
+        List<File> arrayFichierZip = WorkWithFiles.getFilesFromRepertoryWithFilter(repertoire, "zip");
 
         ListIterator<File> arrayFichierRejetIterator = arrayFichierZip.listIterator();
         while (arrayFichierRejetIterator.hasNext()) {

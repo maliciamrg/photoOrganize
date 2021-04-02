@@ -18,12 +18,15 @@ public class Context {
 
     public static final String FOLDERDELIM = "\\";
     public static final int IREP_NEW = 10;
+
     public static final String RED = "Red";
     public static final String TAGORG = "#ORG#";
     public static final String ACTION01GO = "GO" + Context.TAGORG;
     public static final String COLLECTIONS = "!!Collections";
     private static final String JSON = ".json";
     private static final Logger LOGGER = LogManager.getLogger(Context.class);
+    public static final String POSSIBLE_NEW_GROUP = "possibleRegroupement";
+
     public static int nbDiscretionnaire = 0;
     private final ActionRepertoire actionVersRepertoire;
     private final List<RepertoirePhoto> arrayRepertoirePhoto = new ArrayList<>();

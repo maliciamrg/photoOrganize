@@ -455,19 +455,19 @@ public class Database extends SQLiteJDBCDriverConnection {
                         "strftime('%s', e.captureTime) as captureTime , " +
                         " ( '" + SystemFiles.normalizePath(repertoire50NEW) + "' like p.absolutePath || '%'  " +
                         "and p.absolutePath || b.pathFromRoot like '" + SystemFiles.normalizePath(repertoire50NEW) + "' || '%' ) as isNew " +
-                        "from AgLibraryFile a  " +
+                        "from Adobe_images e  " +
+                        "inner join AgLibraryFile a  " +
+                        " on a.id_local = e.rootFile    " +
                         "inner join AgLibraryFolder b   " +
                         " on a.folder = b.id_local  " +
                         "inner join AgLibraryRootFolder p   " +
                         " on b.rootFolder = p.id_local  " +
-                        "inner join Adobe_images e  " +
-                        " on a.id_local = e.rootFile    " +
                         "LEFT JOIN AgHarvestedExifMetadata ahem " +
                         "ON e.id_local = ahem.image " +
                         "LEFT JOIN AgInternedExifCameraModel aiecm " +
                         "ON ahem.cameraModelRef = aiecm.id_local " +
                         CLAUSEWHERE +
-                        "order by captureTime asc " +
+                        "order by julianday(e.captureTime) asc " +
                         "" +
 //                        "limit 10 " +
                         ";");
@@ -768,11 +768,23 @@ public class Database extends SQLiteJDBCDriverConnection {
     }
 
 
-    public int purgeGroupeKeyword(String tagorg) throws SQLException {
+    public int purgeGroupeKeyword(String tagorg, List<String> lstIdKey) throws SQLException {
+        String sepa = " , ";
+        String array = "";
+        for(int i = 0; i < lstIdKey.size(); i++) {
+            array += lstIdKey.get(i) + sepa;
+        }
+        if (lstIdKey.size()>0) {
+            array = array.substring(0,array.length() - sepa.length());
+        }
+
         String sql = " delete " +
                 "from AgLibraryKeyword  " +
                 " where name like '" + tagorg + "%' " +
                 " and name <> '" + tagorg + "' " +
+                " and id_local not in ( " +
+                " " + array + " " +
+                " ) " +
                 " ; ";
         return executeUpdate(sql);
     }

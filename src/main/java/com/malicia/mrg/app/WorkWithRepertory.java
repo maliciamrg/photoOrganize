@@ -31,7 +31,7 @@ public class WorkWithRepertory {
         File folder = new File(fileLocation);
         File[] listFiles = folder.listFiles();
         if (listFiles.length == 0) {
-            LOGGER.debug("Folder Name :: " + folder.getAbsolutePath() + " is deleted.");
+            LOGGER.info("Folder Name :: " + folder.getAbsolutePath() + " is deleted.");
             folder.delete();
             isFinished = false;
         } else {
