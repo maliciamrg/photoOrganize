@@ -148,18 +148,18 @@ public class Main {
             }
             //*
 
-            if (Boolean.TRUE.equals(IS_MAINT_LR________)) {
-                //Maintenance database lr
-                maintenanceDatabase();
-                //*
-            }
-
             if (Boolean.TRUE.equals(IS_PURGE_FOLDER____)) {
                 //Nettoyage repertoires Local
                 purgeDesRepertoireVide50Phototheque();
                 //*
                 //Nettoyage repertoires réseaux
                 purgeDesRepertoireVide00NEW();
+                //*
+            }
+
+            if (Boolean.TRUE.equals(IS_MAINT_LR________)) {
+                //Maintenance database lr
+                maintenanceDatabase();
                 //*
             }
 
@@ -277,9 +277,12 @@ public class Main {
             txt += "   -  " + "removeLinkWithActionFromKeyword()" + "\n";
         }
         if (Boolean.TRUE.equals(IS_TAG_DEL_________)) {
-            txt += "   -  " + "purgeKeywordProjet()" + "\n";
             if (Boolean.TRUE.equals(IS_TAG_CR__________)) {
                 txt += "   -  - " + "creationDesKeywordProjet()" + "\n";
+            }
+            txt += "   -  " + "purgeKeywordProjet()" + "\n";
+            if (Boolean.TRUE.equals(IS_MAINT_LR________)) {
+                txt += "   -  " + "maintenanceDatabase()" + "\n";
             }
         }
         if (Boolean.TRUE.equals(IS_RETAG_RED_______)) {
@@ -305,12 +308,12 @@ public class Main {
                 }
             }
         }
-        if (Boolean.TRUE.equals(IS_MAINT_LR________)) {
-            txt += "   -  " + "maintenanceDatabase()" + "\n";
-        }
         if (Boolean.TRUE.equals(IS_PURGE_FOLDER____)) {
             txt += "   -  " + "purgeDesRepertoireVide50Phototheque()" + "\n";
             txt += "   -  " + "purgeDesRepertoireVide00NEW()" + "\n";
+        }
+        if (Boolean.TRUE.equals(IS_MAINT_LR________)) {
+            txt += "   -  " + "maintenanceDatabase()" + "\n";
         }
         if (Boolean.TRUE.equals(IS_SVG_LRCONFIG____)) {
             txt += "   -  " + "sauvegardeLightroomConfigSauve()" + "\n";
@@ -590,7 +593,7 @@ public class Main {
         GrpPhoto listEletmp = new GrpPhoto();
 
         long maxprev = 0;
-        long captureTimeprev=0;
+        long captureTimeprev= Long.MIN_VALUE;
         while (rsele.next()) {
 
             // Recuperer les info de l'elements
@@ -601,6 +604,9 @@ public class Main {
             long mint = rsele.getLong("mint");
             long maxt = rsele.getLong("maxt");
             long captureTime = rsele.getLong("captureTime");
+            if (rsele.wasNull()) {
+                captureTime = Long.MIN_VALUE; // set it to empty string as you desire.
+            }
 
             // recherche du repPhoto concerner
             String ch = absolutePath + pathFromRoot;
