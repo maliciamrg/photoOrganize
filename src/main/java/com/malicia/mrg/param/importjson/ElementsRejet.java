@@ -10,6 +10,7 @@ public class ElementsRejet extends Serialize {
 
     private List<String> arrayNomSubdirectoryRejet = new ArrayList<>();
     private List<String> arrayNomFileRejet = new ArrayList<>();
+    private List<String> arrayNomFileRejetSup = new ArrayList<>();
     private String extFileRejet;
 
     public ElementsRejet() {
@@ -40,4 +41,11 @@ public class ElementsRejet extends Serialize {
         this.arrayNomSubdirectoryRejet = arrayNomSubdirectoryRejet;
     }
 
+    public List<String> getArrayNomFileRejetSup() {
+        return arrayNomFileRejetSup;
+    }
+
+    public void setArrayNomFileRejetSup(List<String> arrayNomFileRejetSup) {
+        this.arrayNomFileRejetSup = arrayNomFileRejetSup;
+    }
 }

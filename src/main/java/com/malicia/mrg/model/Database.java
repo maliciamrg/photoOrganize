@@ -38,7 +38,7 @@ public class Database extends SQLiteJDBCDriverConnection {
     }
 
     public void AddKeywordToFile(String fileIdLocal, String tag) throws SQLException {
-        String idlocaltag = sqlcreateKeyword(Context.TAGORG, tag);
+        String idlocaltag = sqlcreateKeyword(Context.TAGORG, tag).get("keyWordIdlocal");
         long idlocalImage = sqlGetAdobeImage(fileIdLocal);
 
         long idlocalKeywordImage = sqlGetAgLibraryKeywordImage(idlocalImage, idlocaltag);
@@ -107,24 +107,30 @@ public class Database extends SQLiteJDBCDriverConnection {
         executeUpdate(sql);
     }
 
-    public void topperARed50NEW(String repertoire50NEW) throws SQLException {
+    public int topperARed50NEW(String repertoire50NEW) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         String sql;
         sql = "update Adobe_images " +
                 "set colorLabels = '" + Context.RED + "' " +
-                " where rootFile in ( " +
-                " select a.id_local as file_id_local " +
+                " where colorLabels <> '" + Context.RED + "' " +
+                " and rootFile in ( " +
+                getStringAllIdLocalFromNew(repertoire50NEW)  +
+                " ) " +
+                ";";
+        return executeUpdate(sql);
+
+    }
+
+    private String getStringAllIdLocalFromNew(String repertoire50NEW) {
+        return " select a.id_local as file_id_local " +
                 "from AgLibraryFile a  " +
                 "inner join AgLibraryFolder b   " +
                 " on a.folder = b.id_local  " +
                 "inner join AgLibraryRootFolder p   " +
                 " on b.rootFolder = p.id_local  " +
                 "where '" + SystemFiles.normalizePath(repertoire50NEW) + "' like p.absolutePath || '%'  " +
-                "and p.absolutePath || b.pathFromRoot like '" + SystemFiles.normalizePath(repertoire50NEW) + "' || '%' " +
-                " ) " +
-                ";";
-        executeUpdate(sql);
-
+                "and p.absolutePath || b.pathFromRoot like '" + SystemFiles.normalizePath(repertoire50NEW) + "' || '%' "
+                ;
     }
 
     public void MiseAzeroDesColorLabels(String colortag) throws SQLException {
@@ -135,6 +141,19 @@ public class Database extends SQLiteJDBCDriverConnection {
                 ";";
         executeUpdate(sql);
     }
+
+    public int deTopperARedOld50NEW(String repertoire50NEW) throws SQLException {
+        String sql;
+        sql = "update Adobe_images " +
+                "set colorLabels = '' " +
+                " where colorLabels = '" + Context.RED + "' " +
+                " and rootFile not in ( " +
+                getStringAllIdLocalFromNew(repertoire50NEW)  +
+                " ) "+
+                ";";
+        return executeUpdate(sql);
+    }
+
 
     public int sqlDeleteAdobe_images(String images_id_local) throws SQLException {
         String sql;
@@ -285,9 +304,11 @@ public class Database extends SQLiteJDBCDriverConnection {
                         ";");
 
         Map<String, Long> ret = new HashMap<>();
+        ret.put("idlocal", 0l);
+        ret.put("rootFolder", 0l);
         while (rsexist.next()) {
-            ret.put("idlocal", rsexist.getLong("result"));
-            ret.put("rootFolder", rsexist.getLong("rootFolder"));
+            ret.replace("idlocal", rsexist.getLong("result"));
+            ret.replace("rootFolder", rsexist.getLong("rootFolder"));
         }
         return ret;
     }
@@ -650,8 +671,8 @@ public class Database extends SQLiteJDBCDriverConnection {
         return executeUpdate(sql);
     }
 
-    public String sqlcreateKeyword(String keywordmaitre, String keyword) throws SQLException {
-
+    public  Map<String, String> sqlcreateKeyword(String keywordmaitre, String keyword) throws SQLException {
+        Map<String, String> ret = new HashMap<String, String>();
         String keyWordIdlocal = getIdforKeyword(keyword).get("KeyWordIdlocal");
         if (keyWordIdlocal.compareTo("") == 0) {
 
@@ -678,9 +699,13 @@ public class Database extends SQLiteJDBCDriverConnection {
                     ")" +
                     ";";
             executeUpdate(sql);
-            return idlocal + "";
+            ret.put("keyWordIdlocal",String.valueOf(idlocal));
+            ret.put("NewkeyWordIdlocal",String.valueOf(Boolean.TRUE));
+            return ret;
         }
-        return keyWordIdlocal;
+        ret.put("keyWordIdlocal",keyWordIdlocal);
+        ret.put("NewkeyWordIdlocal",String.valueOf(Boolean.FALSE));
+        return ret;
     }
 
     private Map<String, String> getIdforKeyword(String keyword) throws SQLException {

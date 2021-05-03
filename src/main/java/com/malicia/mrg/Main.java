@@ -234,13 +234,28 @@ public class Main {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         String idKey = "";
 
-        lstIdKey.add(dbLr.sqlcreateKeyword("", Context.TAGORG));
-        LOGGER.info(getStringLn("Keyword " + Context.TAGORG) + " idlocal = " + lstIdKey.get(lstIdKey.size()-1));
-        lstIdKey.add(dbLr.sqlcreateKeyword(Context.TAGORG, Context.ACTION01GO));
-        LOGGER.info(getStringLn("Keyword " + Context.ACTION01GO) + " idlocal = " + lstIdKey.get(lstIdKey.size()-1));
+        Map<String, String> dbLr_sqlcreateKeyword = new HashMap<>();
+
+        dbLr_sqlcreateKeyword = dbLr.sqlcreateKeyword("", Context.TAGORG);
+        lstIdKey.add(dbLr_sqlcreateKeyword.get("keyWordIdlocal"));
+        if (Boolean.valueOf(dbLr_sqlcreateKeyword.get("NewkeyWordIdlocal"))){
+            LOGGER.info(getStringLn("Keyword " + Context.TAGORG) + " idlocal = " + lstIdKey.get(lstIdKey.size()-1));
+        }
+
+        dbLr_sqlcreateKeyword = dbLr.sqlcreateKeyword(Context.TAGORG, Context.ACTION01GO);
+        lstIdKey.add(dbLr_sqlcreateKeyword.get("keyWordIdlocal"));
+        if (Boolean.valueOf(dbLr_sqlcreateKeyword.get("NewkeyWordIdlocal"))) {
+            LOGGER.info(getStringLn("Keyword " + Context.ACTION01GO) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
+        }
+
         for (String key : ctx.getActionVersRepertoire().getListeAction().keySet()) {
-            lstIdKey.add(dbLr.sqlcreateKeyword(Context.TAGORG, key));
-            LOGGER.info(getStringLn("Keyword " + key) + " idlocal = " + lstIdKey.get(lstIdKey.size()-1));
+
+            dbLr_sqlcreateKeyword = dbLr.sqlcreateKeyword(Context.TAGORG, key);
+            lstIdKey.add(dbLr_sqlcreateKeyword.get("keyWordIdlocal"));
+            if (Boolean.valueOf(dbLr_sqlcreateKeyword.get("NewkeyWordIdlocal"))) {
+                LOGGER.info(getStringLn("Keyword " + key) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
+            }
+
         }
 
         return lstIdKey;
@@ -252,9 +267,11 @@ public class Main {
 
     private static void reTAGlesColorTagARED() throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        dbLr.MiseAzeroDesColorLabels(Context.RED);
+        int unNbMisARED = dbLr.deTopperARedOld50NEW(ctx.getParamTriNew().getRepertoire50NEW());
+        LOGGER_info("UnTag a RED " + String.format("%05d", unNbMisARED) + " - images ", unNbMisARED);
         dbLr.MiseAzeroDesColorLabels("rouge");
-        dbLr.topperARed50NEW(ctx.getParamTriNew().getRepertoire50NEW());
+        int nbMisARED = dbLr.topperARed50NEW(ctx.getParamTriNew().getRepertoire50NEW());
+        LOGGER_info("Tag a RED " + String.format("%05d", nbMisARED) + " - images ", nbMisARED);
     }
 
     private static void displayBooleen() {
@@ -419,19 +436,28 @@ public class Main {
 
     private static void maintenanceDatabase() throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        splitLOGGERInfo(dbLr.pathAbsentPhysique());
-        splitLOGGERInfo(dbLr.AdobeImagesWithoutLibraryFile());
-        splitLOGGERInfo(dbLr.KeywordImageWithoutImages());
-        splitLOGGERInfo(dbLr.folderWithoutRoot());
-        splitLOGGERInfo(dbLr.folderAbsentPhysique());
-        splitLOGGERInfo(dbLr.fileWithoutFolder());
-        splitLOGGERInfo(dbLr.keywordImageWithoutKeyword());
+        splitLOGGERInfo(IsMoreZeroComm(dbLr.pathAbsentPhysique()));
+        splitLOGGERInfo(IsMoreZeroComm(dbLr.AdobeImagesWithoutLibraryFile()));
+        splitLOGGERInfo(IsMoreZeroComm(dbLr.KeywordImageWithoutImages()));
+        splitLOGGERInfo(IsMoreZeroComm(dbLr.folderWithoutRoot()));
+        splitLOGGERInfo(IsMoreZeroComm(dbLr.folderAbsentPhysique()));
+        splitLOGGERInfo(IsMoreZeroComm(dbLr.fileWithoutFolder()));
+        splitLOGGERInfo(IsMoreZeroComm(dbLr.keywordImageWithoutKeyword()));
+    }
+
+    private static String IsMoreZeroComm(String commentaireAAnalyser) {
+        if (commentaireAAnalyser.contains("--- corrige         = 0")){
+            return "";
+        }
+        return commentaireAAnalyser;
     }
 
     private static void splitLOGGERInfo(String txt) {
-        String[] atxt = txt.split("\n");
-        for (String s : atxt) {
-            LOGGER.info(s);
+        if (txt.length()>0) {
+            String[] atxt = txt.split("\n");
+            for (String s : atxt) {
+                LOGGER.info(s);
+            }
         }
     }
 
@@ -845,7 +871,9 @@ public class Main {
         List<File> arrayFichierRejet = WorkWithFiles.getFilesFromRepertoryWithFilter(ctx.getRepertoire50Phototheque(), ctx.getArrayNomSubdirectoryRejet(), ctx.getParamElementsRejet().getExtFileRejet());
 
         Map<String, Integer> countExt = new HashMap<>();
-        LOGGER.info("arrayFichierRejet     => " + arrayFichierRejet.size());
+        Map<String, Integer> countExtDo = new HashMap<>();
+        Map<String, Integer> countExtDel = new HashMap<>();
+        LOGGER.debug("arrayFichierRejet     => " +  String.format("%05d", arrayFichierRejet.size()));
 
         ListIterator<File> arrayFichierRejetIterator = arrayFichierRejet.listIterator();
         while (arrayFichierRejetIterator.hasNext()) {
@@ -856,6 +884,8 @@ public class Main {
                 countExt.replace(fileExt, countExt.get(fileExt), countExt.get(fileExt) + 1);
             } else {
                 countExt.put(fileExt, 1);
+                countExtDo.put(fileExt, 0);
+                countExtDel.put(fileExt, 0);
             }
 
             if (fileExt.toLowerCase().compareTo("zip") == 0) {
@@ -867,8 +897,21 @@ public class Main {
                 String oldName = fichier.toString();
                 String newName = oldName + "." + ctx.getParamElementsRejet().getExtFileRejet();
                 File fsource = new File(oldName);
-                if (!fsource.exists() || !fsource.isFile()) {
+                File fdest = new File(newName);
+                if (fsource.exists() && fsource.isFile() && !fdest.exists()) {
+                    countExtDo.replace(fileExt, countExtDo.get(fileExt), countExtDo.get(fileExt) + 1);
                     WorkWithFiles.renameFile(oldName, newName, dbLr);
+                }
+            } else {
+                if (ctx.getParamElementsRejet().getArrayNomFileRejetSup().contains(fileExt.toLowerCase())) {
+                    //todo
+//                    String newName = oldName + "." + ctx.getParamElementsRejet().getExtFileRejet();
+//                    File fsource = new File(oldName);
+//                    File fdest = new File(newName);
+//                    if (fsource.exists() && fsource.isFile() && !fdest.exists()) {
+//                        countExtDo.replace(fileExt, countExtDo.get(fileExt), countExtDo.get(fileExt) + 1);
+//                        WorkWithFiles.renameFile(oldName, newName, dbLr);
+//                    }
                 }
             }
         }
@@ -876,7 +919,7 @@ public class Main {
         Iterator it = countExt.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
-            LOGGER.info("arrayFichierRejet." + pair.getKey() + " => " + pair.getValue());
+            LOGGER.info("arrayFichierRejet." + pair.getKey() + " => " +  String.format("%05d", pair.getValue()) + " => " +  String.format("%05d", countExtDo.get(pair.getKey())));
         }
 
 
