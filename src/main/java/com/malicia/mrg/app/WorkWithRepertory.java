@@ -1,10 +1,8 @@
 package com.malicia.mrg.app;
 
-import com.malicia.mrg.Context;
 import com.malicia.mrg.model.Database;
 import com.malicia.mrg.param.importjson.ControleRepertoire;
 import com.malicia.mrg.param.importjson.RepertoirePhoto;
-import com.malicia.mrg.util.Serialize;
 import com.malicia.mrg.util.SystemFiles;
 
 import org.apache.logging.log4j.LogManager;
@@ -60,7 +58,7 @@ public class WorkWithRepertory {
         return ret;
     }
 
-    public static boolean isRepertoireOk(Database dbLr, String repertoire, RepertoirePhoto repPhoto, ControleRepertoire paramControleRepertoire) throws SQLException, IOException {
+    public static List<EleChamp> calculateLesEleChampsDuRepertoire(Database dbLr, String repertoire, RepertoirePhoto repPhoto, ControleRepertoire paramControleRepertoire) throws SQLException, IOException {
         LOGGER.debug("isRepertoireOk : " + repertoire);
 
         String oldNameRepertoire = new File(repertoire).getName();
@@ -87,7 +85,6 @@ public class WorkWithRepertory {
             i++;
         }
 
-
         //controle contenu du repertoire
         ListIterator<String> listControleRepertoireIterator = paramControleRepertoire.getlistControleRepertoire().listIterator();
         while (listControleRepertoireIterator.hasNext()) {
@@ -98,33 +95,17 @@ public class WorkWithRepertory {
             listOfChamp.add(eChamp);
         }
 
+        return listOfChamp;
 
+    }
+
+    public static boolean CalculateResutlatAnalyseReprertoire(List<EleChamp> listOfChamp) throws IOException {
         //Resutlat analyse reprertoire
         boolean retour = true;
         ListIterator<EleChamp> champIte = listOfChamp.listIterator();
         while (champIte.hasNext()) {
             EleChamp elechamp = champIte.next();
             retour = retour && elechamp.isRetourControle();
-        }
-
-        File f = new File(repertoire + Context.FOLDERDELIM + "photoOrganizeAnalyse.json");
-        if (!retour) {
-
-//            Context.nbDiscretionnaire++;
-//            String nbDiscr = String.format("%1$03X", Context.nbDiscretionnaire);
-//            //poser les tag sur le repertoire
-//            for (EleChamp elech : listOfChamp) {
-//                List<String> lst = elech.getCompTagRetour();
-//                for (String tagval : lst) {
-//                    String tag = Context.TAGORG + "_" + nbDiscr + "_" + tagval;
-//                    dbLr.AddKeywordToRep(repertoire, tag);
-//                }
-//            }
-
-            Serialize.writeJSON(listOfChamp, f);
-            LOGGER.debug("ecriture fichier ->" + f.toString());
-        } else {
-            f.delete();
         }
 
         return retour;

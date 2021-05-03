@@ -1,3 +1,5 @@
 /.idea/
 /photoOrganize.iml
 /logs/
+/out/artifacts/photoOrganize_jar/
+/target/

@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-class EleChamp {
+public class EleChamp {
 
     private static final Logger LOGGER = LogManager.getLogger(EleChamp.class);
 

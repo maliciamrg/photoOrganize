@@ -2,6 +2,7 @@ package com.malicia.mrg;
 
 import com.github.fracpete.processoutput4j.output.StreamingProcessOutput;
 import com.github.fracpete.rsync4j.RSync;
+import com.malicia.mrg.app.EleChamp;
 import com.malicia.mrg.app.WorkWithFiles;
 import com.malicia.mrg.app.WorkWithRepertory;
 import com.malicia.mrg.model.Database;
@@ -129,7 +130,7 @@ public class Main {
             }
             if (Boolean.TRUE.equals(IS_WRK_REP_PHOTO___)) {
                 //En Fonction De La Strategies De Rangement
-                topperLesRepertoires();
+                analyseFonctionellesDesRepertoires();
                 //*
             }
             if (Boolean.TRUE.equals(IS_RGP_NEW_________)) {
@@ -316,7 +317,7 @@ public class Main {
             txt += "   -  " + "rangerLesRejets()" + "\n";
         }
         if (Boolean.TRUE.equals(IS_WRK_REP_PHOTO___)) {
-            txt += "   -  " + "topperLesRepertoires()" + "\n";
+            txt += "   -  " + "analyseFonctionellesDesRepertoires()" + "\n";
         }
         if (Boolean.TRUE.equals(IS_RGP_NEW_________)) {
             txt += "   -  " + "regrouperLesNouvellesPhoto()" + "\n";
@@ -793,7 +794,7 @@ public class Main {
         }
     }
 
-    private static void topperLesRepertoires() throws IOException, SQLException {
+    private static void analyseFonctionellesDesRepertoires() throws IOException, SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         List<RepertoirePhoto> arrayRepertoirePhoto = ctx.getArrayRepertoirePhoto();
@@ -801,18 +802,28 @@ public class Main {
         ListIterator<RepertoirePhoto> repertoirePhotoIterator = arrayRepertoirePhoto.listIterator();
         while (repertoirePhotoIterator.hasNext()) {
             RepertoirePhoto repPhoto = repertoirePhotoIterator.next();
-            LOGGER.info("topperLesRepertoires = > " + ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire());
+
+
+
+            LOGGER.debug("repertoire = > " + ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire());
             List<String> listRep = WorkWithRepertory.listRepertoireEligible(ctx.getRepertoire50Phototheque(), repPhoto);
 
             ListIterator<String> repertoireIterator = listRep.listIterator();
             while (repertoireIterator.hasNext()) {
                 String repertoire = repertoireIterator.next();
 
-                if (!WorkWithRepertory.isRepertoireOk(dbLr, repertoire, repPhoto, ctx.getParamControleRepertoire())) {
-                    LOGGER.debug(repertoire + "=>" + "ko");
+                List<EleChamp> listOfChamp = WorkWithRepertory.calculateLesEleChampsDuRepertoire(dbLr, repertoire, repPhoto, ctx.getParamControleRepertoire());
+                
+                File f = new File(repertoire + Context.FOLDERDELIM + "photoOrganizeAnalyse.json");
+                if (!WorkWithRepertory.CalculateResutlatAnalyseReprertoire(listOfChamp)) {
+                    Serialize.writeJSON(listOfChamp, f);
+                    LOGGER.debug(repertoire + "=>" + "ko" + " => " + " ecriture fichier ->" + f.toString());
+                } else {
+                    f.delete();
                 }
-
+                
             }
+            
             File f = new File(ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire() + Context.FOLDERDELIM + new File(repPhoto.getRepertoire()).getName() + ".svg.json");
             Serialize.writeJSON(repPhoto, f);
             LOGGER.debug("ecriture fichier ->" + f.toString());
@@ -914,7 +925,6 @@ public class Main {
                     for (i = 0; i < arrayRepertoirePhoto.size(); i++) {
                         RepertoirePhoto repertoirePhoto = arrayRepertoirePhoto.get(i);
                         if (repertoirePhoto.getRepertoire().toLowerCase(Locale.ROOT).contains("rejet")) {
-                            //todo
                             String oldName = fichier.toString();
                             File fsource = new File(oldName);
 
