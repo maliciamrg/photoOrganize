@@ -163,16 +163,18 @@ public class Main {
                 //*
             }
 
-            if (Boolean.TRUE.equals(IS_SVG_LRCONFIG____)) {
-                //Sauvegarde Lightroom sur Local
-                sauvegardeLightroomConfigSauve();
-                //*
-            }
+            if (isItTimeToSave()) {
+                if (Boolean.TRUE.equals(IS_SVG_LRCONFIG____)) {
+                    //Sauvegarde Lightroom sur Local
+                    sauvegardeLightroomConfigSauve();
+                    //*
+                }
 
-            if (Boolean.TRUE.equals(IS_RSYNC_BIB_______)) {
-                //sauvegarde Vers Réseaux Pour Cloud
-                sauvegardeStudioPhoto2Reseaux();
-                //*
+                if (Boolean.TRUE.equals(IS_RSYNC_BIB_______)) {
+                    //sauvegarde Vers Réseaux Pour Cloud
+                    sauvegardeStudioPhoto2Reseaux();
+                    //*
+                }
             }
 
             endall();
@@ -225,7 +227,7 @@ public class Main {
 
     private static void purgeKeywordProjet(List<String> lstIdKey) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        int nbPurge = dbLr.purgeGroupeKeyword(Context.TAGORG,lstIdKey);
+        int nbPurge = dbLr.purgeGroupeKeyword(Context.TAGORG, lstIdKey);
         LOGGER_info("purge " + String.format("%05d", nbPurge) + " - keywords ", nbPurge);
     }
 
@@ -238,8 +240,8 @@ public class Main {
 
         dbLr_sqlcreateKeyword = dbLr.sqlcreateKeyword("", Context.TAGORG);
         lstIdKey.add(dbLr_sqlcreateKeyword.get("keyWordIdlocal"));
-        if (Boolean.valueOf(dbLr_sqlcreateKeyword.get("NewkeyWordIdlocal"))){
-            LOGGER.info(getStringLn("Keyword " + Context.TAGORG) + " idlocal = " + lstIdKey.get(lstIdKey.size()-1));
+        if (Boolean.valueOf(dbLr_sqlcreateKeyword.get("NewkeyWordIdlocal"))) {
+            LOGGER.info(getStringLn("Keyword " + Context.TAGORG) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
         }
 
         dbLr_sqlcreateKeyword = dbLr.sqlcreateKeyword(Context.TAGORG, Context.ACTION01GO);
@@ -326,8 +328,9 @@ public class Main {
             }
         }
         if (Boolean.TRUE.equals(IS_PURGE_FOLDER____)) {
-            txt += "   -  " + "purgeDesRepertoireVide50Phototheque()" + "\n";
-            txt += "   -  " + "purgeDesRepertoireVide00NEW()" + "\n";
+            txt += "   -  " + "isItTimeToSave()" + "\n";
+            txt += "   -  - " + "purgeDesRepertoireVide50Phototheque()" + "\n";
+            txt += "   -  - " + "purgeDesRepertoireVide00NEW()" + "\n";
         }
         if (Boolean.TRUE.equals(IS_MAINT_LR________)) {
             txt += "   -  " + "maintenanceDatabase()" + "\n";
@@ -446,14 +449,14 @@ public class Main {
     }
 
     private static String IsMoreZeroComm(String commentaireAAnalyser) {
-        if (commentaireAAnalyser.contains("--- corrige         = 0")){
+        if (commentaireAAnalyser.contains("--- corrige         = 0")) {
             return "";
         }
         return commentaireAAnalyser;
     }
 
     private static void splitLOGGERInfo(String txt) {
-        if (txt.length()>0) {
+        if (txt.length() > 0) {
             String[] atxt = txt.split("\n");
             for (String s : atxt) {
                 LOGGER.info(s);
@@ -490,24 +493,21 @@ public class Main {
     private static void sauvegardeStudioPhoto2Reseaux() throws Exception {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
-        if (isItTimeToSave()) {
+        RSync rsync = new RSync()
+                .sources(ctx.getRepFonctionnel().getRepertoiresyncsource())
+                .destination(ctx.getRepFonctionnel().getRepertoiresyncdest())
+                .recursive(true)
+                .exclude(ctx.getRepFonctionnel().getRsyncexclude())
+                .dryRun(IS_DRY_RUN)
+                .humanReadable(true)
+                .archive(true)
+                .delete(true)
+                .verbose(true);
 
-            RSync rsync = new RSync()
-                    .sources(ctx.getRepFonctionnel().getRepertoiresyncsource())
-                    .destination(ctx.getRepFonctionnel().getRepertoiresyncdest())
-                    .recursive(true)
-                    .exclude(ctx.getRepFonctionnel().getRsyncexclude())
-                    .dryRun(IS_DRY_RUN)
-                    .humanReadable(true)
-                    .archive(true)
-                    .delete(true)
-                    .verbose(true);
+        StreamingProcessOutput output = new StreamingProcessOutput(new Output());
+        output.monitor(rsync.builder());
 
-            StreamingProcessOutput output = new StreamingProcessOutput(new Output());
-            output.monitor(rsync.builder());
-
-            writeMouchard(rsync);
-        }
+        writeMouchard(rsync);
     }
 
     private static void writeMouchard(RSync rsync) throws IOException {
@@ -528,6 +528,7 @@ public class Main {
     }
 
     private static boolean isItTimeToSave() {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         File syncMouchard = new File(ctx.getRepFonctionnel().getRepertoiresyncdest() + ctx.getRepFonctionnel().getSyncdestmouchard());
         Calendar cal = Calendar.getInstance();
         long lastModified = syncMouchard.lastModified();
@@ -619,7 +620,7 @@ public class Main {
         GrpPhoto listEletmp = new GrpPhoto();
 
         long maxprev = 0;
-        long captureTimeprev= Long.MIN_VALUE;
+        long captureTimeprev = Long.MIN_VALUE;
         while (rsele.next()) {
 
             // Recuperer les info de l'elements
@@ -659,7 +660,7 @@ public class Main {
                 eleFile.setmaxt(maxt);
 
                 if (captureTime < captureTimeprev) {
-                    throw new IllegalStateException("captureTime not in order = " + captureTime+ " < " + captureTimeprev);
+                    throw new IllegalStateException("captureTime not in order = " + captureTime + " < " + captureTimeprev);
                 }
 
                 if (mint > maxprev) {
@@ -735,33 +736,38 @@ public class Main {
 
     private static void deplacementDesGroupes(GrpPhoto listFileBazar, GrpPhoto listElekidz, List<GrpPhoto> listGrpEletmp) throws IOException, SQLException {
         //deplacement des group d'elements New Trier
-        int nbtot = 0;
-        LOGGER.info("listGrpEletmp       => " + String.format("%05d", listGrpEletmp.size()));
-        for (GrpPhoto listEle : listGrpEletmp) {
-            nbtot += listEle.lstEleFile.size();
-            SimpleDateFormat repDateFormat = new SimpleDateFormat(TriNew.FORMATDATE_YYYY_MM_DD);
-            String nomRep = repDateFormat.format(new Date(listEle.getFirstDate() * 1000)) + "_(" + String.format("%05d", listEle.lstEleFile.size()) + ")";
-            for (ElementFichier eleGrp : listEle.lstEleFile) {
+        if (listGrpEletmp.size() > 0 ) {
+            int nbtot = 0;
+            for (GrpPhoto listEle : listGrpEletmp) {
+                nbtot += listEle.lstEleFile.size();
+                SimpleDateFormat repDateFormat = new SimpleDateFormat(TriNew.FORMATDATE_YYYY_MM_DD);
+                String nomRep = repDateFormat.format(new Date(listEle.getFirstDate() * 1000)) + "_(" + String.format("%05d", listEle.lstEleFile.size()) + ")";
+                for (ElementFichier eleGrp : listEle.lstEleFile) {
 
-                String newName = ctx.getParamTriNew().getRepertoire50NEW() + nomRep + File.separator + eleGrp.getLcIdxFilename();
+                    String newName = ctx.getParamTriNew().getRepertoire50NEW() + nomRep + File.separator + eleGrp.getLcIdxFilename();
+                    WorkWithFiles.moveFileintoFolder(eleGrp, newName, dbLr);
+
+                }
+            }
+            LOGGER.info("Repertoire New - Nb groupe => " + String.format("%05d", listGrpEletmp.size()) + " pour un total de " + String.format("%05d", nbtot) + " elements ");
+        }
+
+        if (listElekidz.lstEleFile.size() > 0 ) {
+            //deplacement des group d'elements Kidz
+            LOGGER.info("Repertoire New - vers Kidz : " + String.format("%05d", listElekidz.lstEleFile.size()));
+            for (ElementFichier eleGrp : listElekidz.lstEleFile) {
+                String newName = ctx.getParamTriNew().getRepertoireKidz() + File.separator + eleGrp.getLcIdxFilename();
                 WorkWithFiles.moveFileintoFolder(eleGrp, newName, dbLr);
-
             }
         }
-        LOGGER.info("listGrpEletmp nbtot => " + String.format("%05d", nbtot));
 
-        //deplacement des group d'elements Kidz
-        LOGGER.info("listElekidz         => " + String.format("%05d", listElekidz.lstEleFile.size()));
-        for (ElementFichier eleGrp : listElekidz.lstEleFile) {
-            String newName = ctx.getParamTriNew().getRepertoireKidz() + File.separator + eleGrp.getLcIdxFilename();
-            WorkWithFiles.moveFileintoFolder(eleGrp, newName, dbLr);
-        }
-
-        //deplacement des group d'elements Bazar
-        LOGGER.info("listFileBazar       => " + String.format("%05d", listFileBazar.lstEleFile.size()));
-        for (ElementFichier eleGrp : listFileBazar.lstEleFile) {
-            String newName = ctx.getParamTriNew().getRepertoireBazar() + File.separator + eleGrp.getLcIdxFilename();
-            WorkWithFiles.moveFileintoFolder(eleGrp, newName, dbLr);
+        if (listFileBazar.lstEleFile.size() > 0 ) {
+            //deplacement des group d'elements Bazar
+            LOGGER.info("Repertoire New - nb Bazar  : " + String.format("%05d", listFileBazar.lstEleFile.size()));
+            for (ElementFichier eleGrp : listFileBazar.lstEleFile) {
+                String newName = ctx.getParamTriNew().getRepertoireBazar() + File.separator + eleGrp.getLcIdxFilename();
+                WorkWithFiles.moveFileintoFolder(eleGrp, newName, dbLr);
+            }
         }
     }
 
@@ -773,7 +779,7 @@ public class Main {
         ListIterator<RepertoirePhoto> repertoirePhotoIterator = arrayRepertoirePhoto.listIterator();
         while (repertoirePhotoIterator.hasNext()) {
             RepertoirePhoto repPhoto = repertoirePhotoIterator.next();
-            LOGGER.info("UnzipAndExtractAllZip = > " + ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire());
+            LOGGER.debug("UnzipAndExtractAllZip = > " + ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire());
             List<String> listRep = WorkWithRepertory.listRepertoireEligible(ctx.getRepertoire50Phototheque(), repPhoto);
 
             ListIterator<String> repertoireIterator = listRep.listIterator();
@@ -832,16 +838,14 @@ public class Main {
     private static void sauvegardeLightroomConfigSauve() throws ZipException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
-        if (isItTimeToSave()) {
-            // zip file with a folder
-            String repertoireDestZip = ctx.getRepertoireDestZip();
-            File f = new File(repertoireDestZip);
-            if (f.isFile()) {
-                f.delete();
-            }
-            File RepertoireRoamingAdobeLightroom = new File(ctx.getRepertoireRoamingAdobeLightroom());
-            new ZipFile(repertoireDestZip).addFolder(RepertoireRoamingAdobeLightroom);
+        // zip file with a folder
+        String repertoireDestZip = ctx.getRepertoireDestZip();
+        File f = new File(repertoireDestZip);
+        if (f.isFile()) {
+            f.delete();
         }
+        File RepertoireRoamingAdobeLightroom = new File(ctx.getRepertoireRoamingAdobeLightroom());
+        new ZipFile(repertoireDestZip).addFolder(RepertoireRoamingAdobeLightroom);
     }
 
     private static void purgeDesRepertoireVide50Phototheque() {
@@ -873,7 +877,7 @@ public class Main {
         Map<String, Integer> countExt = new HashMap<>();
         Map<String, Integer> countExtDo = new HashMap<>();
         Map<String, Integer> countExtDel = new HashMap<>();
-        LOGGER.debug("arrayFichierRejet     => " +  String.format("%05d", arrayFichierRejet.size()));
+        LOGGER.debug("arrayFichierRejet     => " + String.format("%05d", arrayFichierRejet.size()));
 
         ListIterator<File> arrayFichierRejetIterator = arrayFichierRejet.listIterator();
         while (arrayFichierRejetIterator.hasNext()) {
@@ -904,14 +908,30 @@ public class Main {
                 }
             } else {
                 if (ctx.getParamElementsRejet().getArrayNomFileRejetSup().contains(fileExt.toLowerCase())) {
-                    //todo
-//                    String newName = oldName + "." + ctx.getParamElementsRejet().getExtFileRejet();
-//                    File fsource = new File(oldName);
-//                    File fdest = new File(newName);
-//                    if (fsource.exists() && fsource.isFile() && !fdest.exists()) {
-//                        countExtDo.replace(fileExt, countExtDo.get(fileExt), countExtDo.get(fileExt) + 1);
-//                        WorkWithFiles.renameFile(oldName, newName, dbLr);
-//                    }
+
+                    int i;
+                    List<RepertoirePhoto> arrayRepertoirePhoto = ctx.getArrayRepertoirePhoto();
+                    for (i = 0; i < arrayRepertoirePhoto.size(); i++) {
+                        RepertoirePhoto repertoirePhoto = arrayRepertoirePhoto.get(i);
+                        if (repertoirePhoto.getRepertoire().toLowerCase(Locale.ROOT).contains("rejet")) {
+                            //todo
+                            String oldName = fichier.toString();
+                            File fsource = new File(oldName);
+
+                            File fdest = new File(ctx.getRepertoire50Phototheque() + repertoirePhoto.getRepertoire() + Context.FOLDERDELIM + oldName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_"));
+                            String newName = fdest.toString();
+
+                            if (fsource.exists() && fsource.isFile() && !fdest.exists()) {
+                                countExtDel.replace(fileExt, countExtDel.get(fileExt), countExtDel.get(fileExt) + 1);
+                                WorkWithFiles.renameFile(oldName, newName, dbLr);
+                            } else {
+                                LOGGER.debug("oldName " + oldName + " move impossile to newName : " + newName);
+                                LOGGER.debug("fsource.exists() " + fsource.exists());
+                                LOGGER.debug("fsource.isFile()  " + fsource.isFile());
+                                LOGGER.debug("!fdest.exists() " + !fdest.exists());
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -919,7 +939,7 @@ public class Main {
         Iterator it = countExt.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
-            LOGGER.info("arrayFichierRejet." + pair.getKey() + " => " +  String.format("%05d", pair.getValue()) + " => " +  String.format("%05d", countExtDo.get(pair.getKey())));
+            LOGGER.info("arrayFichierRejet." + pair.getKey() + " => " + String.format("%05d", pair.getValue()) + " => do : " + String.format("%05d", countExtDo.get(pair.getKey())) + " => del : " + String.format("%05d", countExtDel.get(pair.getKey())));
         }
 
 
