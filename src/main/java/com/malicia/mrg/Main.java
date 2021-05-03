@@ -5,6 +5,7 @@ import com.github.fracpete.rsync4j.RSync;
 import com.malicia.mrg.app.EleChamp;
 import com.malicia.mrg.app.WorkWithFiles;
 import com.malicia.mrg.app.WorkWithRepertory;
+import com.malicia.mrg.app.AnalyseGlobalRepertoires;
 import com.malicia.mrg.model.Database;
 import com.malicia.mrg.model.ElementFichier;
 import com.malicia.mrg.param.importjson.RepertoirePhoto;
@@ -54,9 +55,11 @@ public class Main {
     private static final Boolean IS_PURGE_FOLDER____ = GO;
     private static final Boolean IS_SVG_LRCONFIG____ = GO;
     private static final Boolean IS_RSYNC_BIB_______ = GO;
+    private static final Boolean IS_EXEC_FONC_REP___ = GO;
     private static Context ctx;
     private static Database dbLr;
     private static JFrame frame;
+    private static AnalyseGlobalRepertoires analFonctionRep;
 
     public static void main(String[] args) {
         try {
@@ -70,6 +73,7 @@ public class Main {
             // chargement application
             ctx = Context.chargeParam();
             dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat(), IS_DRY_RUN);
+
             SystemFiles.setIsDryRun(IS_DRY_RUN);
             ctx.getActionVersRepertoire().populate(dbLr.getFolderCollection(Context.COLLECTIONS, Context.TAGORG));
             //*
@@ -130,7 +134,7 @@ public class Main {
             }
             if (Boolean.TRUE.equals(IS_WRK_REP_PHOTO___)) {
                 //En Fonction De La Strategies De Rangement
-                analyseFonctionellesDesRepertoires();
+                analFonctionRep = analyseFonctionellesDesRepertoires();
                 //*
             }
             if (Boolean.TRUE.equals(IS_RGP_NEW_________)) {
@@ -174,6 +178,13 @@ public class Main {
                 if (Boolean.TRUE.equals(IS_RSYNC_BIB_______)) {
                     //sauvegarde Vers Réseaux Pour Cloud
                     sauvegardeStudioPhoto2Reseaux();
+                    //*
+                }
+            }
+            if (Boolean.TRUE.equals(IS_WRK_REP_PHOTO___)) {
+                if (Boolean.TRUE.equals(IS_EXEC_FONC_REP___)) {
+                    //Popup Action sur les erreurs Fonctionelle des repertoires
+                    analFonctionRep.action(ctx,dbLr,frame);
                     //*
                 }
             }
@@ -341,6 +352,11 @@ public class Main {
         }
         if (Boolean.TRUE.equals(IS_RSYNC_BIB_______)) {
             txt += "   -  " + "sauvegardeStudioPhoto2Reseaux()" + "\n";
+        }
+        if (Boolean.TRUE.equals(IS_WRK_REP_PHOTO___)) {
+            if (Boolean.TRUE.equals(IS_EXEC_FONC_REP___)) {
+                txt += "   -  - " + "analFonctionRep.action()" + "\n";
+            }
         }
         txt += "   -                                                                               -   " + "\n";
         txt += "   ---------------------------------------------------------------------------------   " + "\n";
@@ -737,7 +753,7 @@ public class Main {
 
     private static void deplacementDesGroupes(GrpPhoto listFileBazar, GrpPhoto listElekidz, List<GrpPhoto> listGrpEletmp) throws IOException, SQLException {
         //deplacement des group d'elements New Trier
-        if (listGrpEletmp.size() > 0 ) {
+        if (listGrpEletmp.size() > 0) {
             int nbtot = 0;
             for (GrpPhoto listEle : listGrpEletmp) {
                 nbtot += listEle.lstEleFile.size();
@@ -753,7 +769,7 @@ public class Main {
             LOGGER.info("Repertoire New - Nb groupe => " + String.format("%05d", listGrpEletmp.size()) + " pour un total de " + String.format("%05d", nbtot) + " elements ");
         }
 
-        if (listElekidz.lstEleFile.size() > 0 ) {
+        if (listElekidz.lstEleFile.size() > 0) {
             //deplacement des group d'elements Kidz
             LOGGER.info("Repertoire New - vers Kidz : " + String.format("%05d", listElekidz.lstEleFile.size()));
             for (ElementFichier eleGrp : listElekidz.lstEleFile) {
@@ -762,7 +778,7 @@ public class Main {
             }
         }
 
-        if (listFileBazar.lstEleFile.size() > 0 ) {
+        if (listFileBazar.lstEleFile.size() > 0) {
             //deplacement des group d'elements Bazar
             LOGGER.info("Repertoire New - nb Bazar  : " + String.format("%05d", listFileBazar.lstEleFile.size()));
             for (ElementFichier eleGrp : listFileBazar.lstEleFile) {
@@ -794,15 +810,15 @@ public class Main {
         }
     }
 
-    private static void analyseFonctionellesDesRepertoires() throws IOException, SQLException {
+    private static AnalyseGlobalRepertoires analyseFonctionellesDesRepertoires() throws IOException, SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
+        AnalyseGlobalRepertoires analyseRepertoires = new AnalyseGlobalRepertoires();
         List<RepertoirePhoto> arrayRepertoirePhoto = ctx.getArrayRepertoirePhoto();
 
         ListIterator<RepertoirePhoto> repertoirePhotoIterator = arrayRepertoirePhoto.listIterator();
         while (repertoirePhotoIterator.hasNext()) {
             RepertoirePhoto repPhoto = repertoirePhotoIterator.next();
-
 
 
             LOGGER.debug("repertoire = > " + ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire());
@@ -813,7 +829,9 @@ public class Main {
                 String repertoire = repertoireIterator.next();
 
                 List<EleChamp> listOfChamp = WorkWithRepertory.calculateLesEleChampsDuRepertoire(dbLr, repertoire, repPhoto, ctx.getParamControleRepertoire());
-                
+
+                analyseRepertoires.add(repPhoto, repertoire, listOfChamp);
+
                 File f = new File(repertoire + Context.FOLDERDELIM + "photoOrganizeAnalyse.json");
                 if (!WorkWithRepertory.CalculateResutlatAnalyseReprertoire(listOfChamp)) {
                     Serialize.writeJSON(listOfChamp, f);
@@ -821,14 +839,17 @@ public class Main {
                 } else {
                     f.delete();
                 }
-                
+
             }
-            
+
             File f = new File(ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire() + Context.FOLDERDELIM + new File(repPhoto.getRepertoire()).getName() + ".svg.json");
             Serialize.writeJSON(repPhoto, f);
             LOGGER.debug("ecriture fichier ->" + f.toString());
 
         }
+
+        LOGGER.info(analyseRepertoires.toString());
+        return analyseRepertoires;
     }
 
     private static void FindZipAndExtractToRejet(String repertoire) throws IOException {
