@@ -8,6 +8,11 @@ import java.util.ListIterator;
 
 public class blocRetourRepertoire {
     private RepertoirePhoto repPhoto;
+
+    public String getRepertoire() {
+        return repertoire;
+    }
+
     private String repertoire;
 
     public List<EleChamp> getListOfControleValRepertoire() {

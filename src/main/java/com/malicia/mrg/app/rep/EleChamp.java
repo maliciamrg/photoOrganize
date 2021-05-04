@@ -18,20 +18,20 @@ public class EleChamp {
 
     private String cChamp;
     private String oValue;
-    private String infoRetourControle;
+    private List<String> infoRetourControle;
     private List<String> compTagRetour;
     private boolean retourControle;
     public EleChamp() {
         this.cChamp = "";
         this.oValue = "";
-        this.infoRetourControle = "";
+        this.infoRetourControle = new ArrayList<>();
         this.compTagRetour = new ArrayList<>();
     }
 
     public EleChamp(String codeChamp, String oldValue) {
         this.cChamp = codeChamp;
         this.oValue = oldValue;
-        this.infoRetourControle = "";
+        this.infoRetourControle = new ArrayList<>();
         this.compTagRetour = new ArrayList<>();
     }
 
@@ -43,7 +43,7 @@ public class EleChamp {
         return retourControle;
     }
 
-    public String getInfoRetourControle() {
+    public List<String> getInfoRetourControle() {
         return infoRetourControle;
     }
 
@@ -83,7 +83,7 @@ public class EleChamp {
             case ControleRepertoire.TAG_WHERE:
             case ControleRepertoire.TAG_WHAT:
             case ControleRepertoire.TAG_WHO:
-                setRetourToFalse(dbLr.getValueForKeyword( nettoyageTag(elechamp)).toString(),"changenomrep_"+elechamp);
+                setRetourToFalse(dbLr.getValueForKeyword( nettoyageTag(elechamp)),"changenomrep_"+elechamp);
                 if (Boolean.TRUE.equals(dbLr.isValueInKeyword(getoValue(), nettoyageTag(elechamp)))) {
                     setRetourToTrue();
                 }
@@ -172,14 +172,20 @@ public class EleChamp {
         return getcChamp.replace("@", "");
     }
 
-    private void setRetourToFalse(String iretourControle,String tagRetour) {
+    private void setRetourToFalse(String iretourControleString, String tagRetour) {
+        List<String> listTmp = new ArrayList<>();
+        listTmp.add(iretourControleString);
+        setRetourToFalse(listTmp, tagRetour);
+    }
+
+    private void setRetourToFalse(List<String> iretourControle, String tagRetour) {
         this.compTagRetour.add(tagRetour);
-        this.infoRetourControle += iretourControle;
+        this.infoRetourControle.addAll(iretourControle);
         retourControle = false;
     }
 
     private void setRetourToTrue() {
-        this.infoRetourControle = ControleRepertoire.CARAC_EMPTY;
+        this.infoRetourControle.add(ControleRepertoire.CARAC_EMPTY);
         this.compTagRetour = new ArrayList<>();
         retourControle = true;
     }
@@ -206,7 +212,7 @@ public class EleChamp {
         return "EleChamp{" +
                 "cChamp='" + cChamp + '\'' +
                 ", oValue='" + oValue + '\'' +
-                ", infoRetourControle='" + infoRetourControle + '\'' +
+                ", infoRetourControle='" + infoRetourControle.toString() + '\'' +
                 ", compTagRetour=" + compTagRetour +
                 ", retourControle=" + retourControle +
                 '}';

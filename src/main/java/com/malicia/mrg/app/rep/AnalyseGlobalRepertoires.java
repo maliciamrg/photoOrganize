@@ -34,7 +34,7 @@ public class AnalyseGlobalRepertoires {
 
     public void action(Context ctx, Database dbLr, JFrame frame) {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        RenameRepertoire.start(listOfretourNomRepertoire.get(5));
+        RenameRepertoire.start(listOfretourNomRepertoire);
     }
 
     @Override
