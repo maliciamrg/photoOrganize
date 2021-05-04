@@ -1,4 +1,4 @@
-package com.malicia.mrg.app;
+package com.malicia.mrg.app.rep;
 
 import com.malicia.mrg.model.Database;
 import com.malicia.mrg.param.importjson.ControleRepertoire;
@@ -201,4 +201,14 @@ public class EleChamp {
     }
 
 
+    @Override
+    public String toString() {
+        return "EleChamp{" +
+                "cChamp='" + cChamp + '\'' +
+                ", oValue='" + oValue + '\'' +
+                ", infoRetourControle='" + infoRetourControle + '\'' +
+                ", compTagRetour=" + compTagRetour +
+                ", retourControle=" + retourControle +
+                '}';
+    }
 }

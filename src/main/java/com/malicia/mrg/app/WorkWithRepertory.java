@@ -1,5 +1,7 @@
 package com.malicia.mrg.app;
 
+import com.malicia.mrg.app.rep.EleChamp;
+import com.malicia.mrg.app.rep.blocRetourRepertoire;
 import com.malicia.mrg.model.Database;
 import com.malicia.mrg.param.importjson.ControleRepertoire;
 import com.malicia.mrg.param.importjson.RepertoirePhoto;
@@ -58,15 +60,16 @@ public class WorkWithRepertory {
         return ret;
     }
 
-    public static List<EleChamp> calculateLesEleChampsDuRepertoire(Database dbLr, String repertoire, RepertoirePhoto repPhoto, ControleRepertoire paramControleRepertoire) throws SQLException, IOException {
+    public static blocRetourRepertoire calculateLesEleChampsDuRepertoire(Database dbLr, String repertoire, RepertoirePhoto repPhoto, ControleRepertoire paramControleRepertoire) throws SQLException, IOException {
         LOGGER.debug("isRepertoireOk : " + repertoire);
+
+        blocRetourRepertoire retourControleRep = new blocRetourRepertoire(repPhoto , repertoire);
 
         String oldNameRepertoire = new File(repertoire).getName();
         String[] oldChamp = oldNameRepertoire.split(ControleRepertoire.CARAC_SEPARATEUR);
 
-        List<EleChamp> listOfChamp = new ArrayList<>();
-
         //controle nom du repertoire
+        List<EleChamp> listOfChampNom = new ArrayList<>();
         int i = 0;
         ListIterator<String> nomRepertoireIterator = repPhoto.getZoneValeurAdmise().listIterator();
         while (nomRepertoireIterator.hasNext()) {
@@ -79,38 +82,27 @@ public class WorkWithRepertory {
                 eChamp = new EleChamp(valeurAdmise, "");
             }
             eChamp.controleChamp(dbLr, repertoire, repPhoto);
-            listOfChamp.add(eChamp);
-
-
+            listOfChampNom.add(eChamp);
             i++;
         }
+        retourControleRep.setListOfControleNom(listOfChampNom);
 
         //controle contenu du repertoire
+        List<EleChamp> listOfChampCtrl = new ArrayList<>();
+
         ListIterator<String> listControleRepertoireIterator = paramControleRepertoire.getlistControleRepertoire().listIterator();
         while (listControleRepertoireIterator.hasNext()) {
             EleChamp eChamp = new EleChamp();
             String ele = listControleRepertoireIterator.next();
             eChamp.setcChamp(ele);
             eChamp.controleChamp(dbLr, repertoire, repPhoto);
-            listOfChamp.add(eChamp);
+            listOfChampCtrl.add(eChamp);
         }
+        retourControleRep.setListOfControleValRepertoire(listOfChampCtrl);
 
-        return listOfChamp;
+        return retourControleRep;
 
     }
-
-    public static boolean CalculateResutlatAnalyseReprertoire(List<EleChamp> listOfChamp) throws IOException {
-        //Resutlat analyse reprertoire
-        boolean retour = true;
-        ListIterator<EleChamp> champIte = listOfChamp.listIterator();
-        while (champIte.hasNext()) {
-            EleChamp elechamp = champIte.next();
-            retour = retour && elechamp.isRetourControle();
-        }
-
-        return retour;
-    }
-
 
     public static void renommerRepertoire(String source, String destination) throws IOException {
         File fsource = new File(source);

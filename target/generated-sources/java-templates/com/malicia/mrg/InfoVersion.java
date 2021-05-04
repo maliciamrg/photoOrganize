@@ -5,7 +5,7 @@ public final class InfoVersion {
     private static final String PROJECT_VERSION = "1.0";
     private static final String PROJECT_GROUP_ID = "malicia.mrg";
     private static final String PROJECT_ARTIFACT_ID = "photoOrganize";
-    private static final String BUILD_NUMBER = "20210503.102122";
+    private static final String BUILD_NUMBER = "20210504.232845";
 
     private InfoVersion() {
         throw new IllegalStateException("Utility class");

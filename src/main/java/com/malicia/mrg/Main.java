@@ -2,10 +2,9 @@ package com.malicia.mrg;
 
 import com.github.fracpete.processoutput4j.output.StreamingProcessOutput;
 import com.github.fracpete.rsync4j.RSync;
-import com.malicia.mrg.app.EleChamp;
-import com.malicia.mrg.app.WorkWithFiles;
-import com.malicia.mrg.app.WorkWithRepertory;
-import com.malicia.mrg.app.AnalyseGlobalRepertoires;
+import com.malicia.mrg.app.*;
+import com.malicia.mrg.app.rep.AnalyseGlobalRepertoires;
+import com.malicia.mrg.app.rep.blocRetourRepertoire;
 import com.malicia.mrg.model.Database;
 import com.malicia.mrg.model.ElementFichier;
 import com.malicia.mrg.param.importjson.RepertoirePhoto;
@@ -826,13 +825,13 @@ public class Main {
             while (repertoireIterator.hasNext()) {
                 String repertoire = repertoireIterator.next();
 
-                List<EleChamp> listOfChamp = WorkWithRepertory.calculateLesEleChampsDuRepertoire(dbLr, repertoire, repPhoto, ctx.getParamControleRepertoire());
+                blocRetourRepertoire retourRepertoire = WorkWithRepertory.calculateLesEleChampsDuRepertoire(dbLr, repertoire, repPhoto, ctx.getParamControleRepertoire());
 
-                analyseRepertoires.add(repPhoto, repertoire, listOfChamp);
+                analyseRepertoires.add(retourRepertoire);
 
                 File f = new File(repertoire + Context.FOLDERDELIM + "photoOrganizeAnalyse.json");
-                if (!WorkWithRepertory.CalculateResutlatAnalyseReprertoire(listOfChamp)) {
-                    Serialize.writeJSON(listOfChamp, f);
+                if (!retourRepertoire.isRepertoireValide()) {
+                    Serialize.writeJSON(retourRepertoire, f);
                     LOGGER.debug(repertoire + "=>" + "ko" + " => " + " ecriture fichier ->" + f.toString());
                 } else {
                     f.delete();
