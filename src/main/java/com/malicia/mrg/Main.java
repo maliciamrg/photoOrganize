@@ -72,6 +72,7 @@ public class Main {
             // chargement application
             ctx = Context.chargeParam();
             dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat(), IS_DRY_RUN);
+            AnalyseGlobalRepertoires.init(ctx,dbLr);
 
             SystemFiles.setIsDryRun(IS_DRY_RUN);
             ctx.getActionVersRepertoire().populate(dbLr.getFolderCollection(Context.COLLECTIONS, Context.TAGORG));
@@ -183,7 +184,7 @@ public class Main {
             if (Boolean.TRUE.equals(IS_WRK_REP_PHOTO_00)) {
                 if (Boolean.TRUE.equals(IS_EXEC_FONC_REP_00)) {
                     //Popup Action sur les erreurs Fonctionelle des repertoires
-                    analFonctionRep.action(ctx,dbLr,frame);
+                    analFonctionRep.action();
                     //*
                 }
             }
@@ -825,7 +826,7 @@ public class Main {
             while (repertoireIterator.hasNext()) {
                 String repertoire = repertoireIterator.next();
 
-                blocRetourRepertoire retourRepertoire = WorkWithRepertory.calculateLesEleChampsDuRepertoire(dbLr, repertoire, repPhoto, ctx.getParamControleRepertoire());
+                blocRetourRepertoire retourRepertoire = AnalyseGlobalRepertoires.calculateLesEleChampsDuRepertoire(repertoire, repPhoto, ctx.getParamControleRepertoire());
 
                 analyseRepertoires.add(retourRepertoire);
 

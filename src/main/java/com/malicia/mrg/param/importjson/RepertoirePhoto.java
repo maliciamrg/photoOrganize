@@ -82,4 +82,8 @@ public class RepertoirePhoto extends Serialize {
         this.repertoire = repertoire;
     }
 
+    @Override
+    public String toString() {
+        return repertoire;
+    }
 }

@@ -26,6 +26,7 @@ public class Context {
     private static final String JSON = ".json";
     private static final Logger LOGGER = LogManager.getLogger(Context.class);
     public static final String POSSIBLE_NEW_GROUP = "possibleRegroupement";
+    public static final String PREFIX = " --- ";
 
     public static int nbDiscretionnaire = 0;
     private final ActionRepertoire actionVersRepertoire;

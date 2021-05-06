@@ -1,12 +1,8 @@
 package com.malicia.mrg.app;
 
-import com.malicia.mrg.app.rep.EleChamp;
-import com.malicia.mrg.app.rep.blocRetourRepertoire;
 import com.malicia.mrg.model.Database;
-import com.malicia.mrg.param.importjson.ControleRepertoire;
 import com.malicia.mrg.param.importjson.RepertoirePhoto;
 import com.malicia.mrg.util.SystemFiles;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,7 +12,6 @@ import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 public class WorkWithRepertory {
 
@@ -58,50 +53,6 @@ public class WorkWithRepertory {
             }
         }
         return ret;
-    }
-
-    public static blocRetourRepertoire calculateLesEleChampsDuRepertoire(Database dbLr, String repertoire, RepertoirePhoto repPhoto, ControleRepertoire paramControleRepertoire) throws SQLException, IOException {
-        LOGGER.debug("isRepertoireOk : " + repertoire);
-
-        blocRetourRepertoire retourControleRep = new blocRetourRepertoire(repPhoto , repertoire);
-
-        String oldNameRepertoire = new File(repertoire).getName();
-        String[] oldChamp = oldNameRepertoire.split(ControleRepertoire.CARAC_SEPARATEUR);
-
-        //controle nom du repertoire
-        List<EleChamp> listOfChampNom = new ArrayList<>();
-        int i = 0;
-        ListIterator<String> nomRepertoireIterator = repPhoto.getZoneValeurAdmise().listIterator();
-        while (nomRepertoireIterator.hasNext()) {
-            String valeurAdmise = nomRepertoireIterator.next();
-
-            EleChamp eChamp;
-            if (i < oldChamp.length) {
-                eChamp = new EleChamp(valeurAdmise, oldChamp[i]);
-            } else {
-                eChamp = new EleChamp(valeurAdmise, "");
-            }
-            eChamp.controleChamp(dbLr, repertoire, repPhoto);
-            listOfChampNom.add(eChamp);
-            i++;
-        }
-        retourControleRep.setListOfControleNom(listOfChampNom);
-
-        //controle contenu du repertoire
-        List<EleChamp> listOfChampCtrl = new ArrayList<>();
-
-        ListIterator<String> listControleRepertoireIterator = paramControleRepertoire.getlistControleRepertoire().listIterator();
-        while (listControleRepertoireIterator.hasNext()) {
-            EleChamp eChamp = new EleChamp();
-            String ele = listControleRepertoireIterator.next();
-            eChamp.setcChamp(ele);
-            eChamp.controleChamp(dbLr, repertoire, repPhoto);
-            listOfChampCtrl.add(eChamp);
-        }
-        retourControleRep.setListOfControleValRepertoire(listOfChampCtrl);
-
-        return retourControleRep;
-
     }
 
     public static void renommerRepertoire(String source, String destination) throws IOException {

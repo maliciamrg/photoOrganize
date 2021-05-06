@@ -7,24 +7,13 @@ import java.util.List;
 import java.util.ListIterator;
 
 public class blocRetourRepertoire {
+    public RepertoirePhoto getRepPhoto() {
+        return repPhoto;
+    }
+
     private RepertoirePhoto repPhoto;
-
-    public String getRepertoire() {
-        return repertoire;
-    }
-
     private String repertoire;
-
-    public List<EleChamp> getListOfControleValRepertoire() {
-        return listOfControleValRepertoire;
-    }
-
     private List<EleChamp> listOfControleValRepertoire;
-
-    public List<EleChamp> getListOfControleNom() {
-        return listOfControleNom;
-    }
-
     private List<EleChamp> listOfControleNom;
     private Boolean nomOk;
     private Boolean valOk;
@@ -36,16 +25,12 @@ public class blocRetourRepertoire {
         valOk = true;
     }
 
-    public Boolean getNomOk() {
-        return nomOk;
+    public String getRepertoire() {
+        return repertoire;
     }
 
-    public Boolean getValOk() {
-        return valOk;
-    }
-
-    public Boolean isRepertoireValide() {
-        return nomOk && valOk;
+    public List<EleChamp> getListOfControleValRepertoire() {
+        return listOfControleValRepertoire;
     }
 
     public void setListOfControleValRepertoire(List<EleChamp> listOfControleValRepertoire) {
@@ -63,6 +48,9 @@ public class blocRetourRepertoire {
 
     }
 
+    public List<EleChamp> getListOfControleNom() {
+        return listOfControleNom;
+    }
 
     public void setListOfControleNom(List<EleChamp> listOfControleNom) {
 
@@ -78,6 +66,18 @@ public class blocRetourRepertoire {
         }
 
 
+    }
+
+    public Boolean getNomOk() {
+        return nomOk;
+    }
+
+    public Boolean getValOk() {
+        return valOk;
+    }
+
+    public Boolean isRepertoireValide() {
+        return nomOk && valOk;
     }
 
 }
