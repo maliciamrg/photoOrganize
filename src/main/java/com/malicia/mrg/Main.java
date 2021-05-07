@@ -396,7 +396,7 @@ public class Main {
         //action collection
         Map<String, String> listeAction = ctx.getActionVersRepertoire().getListeAction();
         for (String key : listeAction.keySet()) {
-            Map<String, Map<String, String>> fileToTag = dbLr.sqlmoveAllFileWithTagtoRep(key, ctx.getRepertoire50Phototheque() + listeAction.get(key));
+            Map<String, Map<String, String>> fileToTag = dbLr.sqllistAllFileWithTagtoRep(key, ctx.getRepertoire50Phototheque() + listeAction.get(key));
             loggerInfo("move " + String.format("%05d", fileToTag.size()) + " - " + key, fileToTag.size());
             for (String keyt : fileToTag.keySet()) {
                 String oldPath = fileToTag.get(keyt).get("oldPath");
@@ -812,6 +812,7 @@ public class Main {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         AnalyseGlobalRepertoires analyseRepertoires = new AnalyseGlobalRepertoires();
+
         List<RepertoirePhoto> arrayRepertoirePhoto = ctx.getArrayRepertoirePhoto();
 
         ListIterator<RepertoirePhoto> repertoirePhotoIterator = arrayRepertoirePhoto.listIterator();

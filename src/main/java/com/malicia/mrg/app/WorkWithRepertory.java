@@ -55,7 +55,7 @@ public class WorkWithRepertory {
         return ret;
     }
 
-    public static void renommerRepertoire(String source, String destination) throws IOException {
+    public static void renommerRepertoire(String source, String destination, Database dbLr) throws IOException, SQLException {
         File fsource = new File(source);
         File fdest = new File(destination);
         if (fsource.compareTo(fdest) != 0) {
@@ -68,6 +68,8 @@ public class WorkWithRepertory {
 
             LOGGER.debug(() -> "move_repertoire p=" + fsource.toString() + " -> " + fdest.toString());
             Files.move(fsource.toPath(), fdest.toPath());
+
+            dbLr.moveRepertory(source, destination);
 
         }
     }

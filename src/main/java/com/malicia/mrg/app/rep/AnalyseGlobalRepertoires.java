@@ -164,8 +164,8 @@ public class AnalyseGlobalRepertoires {
 
         blocRetourRepertoire retourControleRep = new blocRetourRepertoire(repPhoto , repertoire);
 
-        String oldNameRepertoire = new File(repertoire).getName();
-        String[] oldChamp = oldNameRepertoire.split(ControleRepertoire.CARAC_SEPARATEUR);
+        String ancienNomDuRepertoire = new File(repertoire).getName();
+        String[] oldChamp = ancienNomDuRepertoire.split(ControleRepertoire.CARAC_SEPARATEUR);
 
         //controle nom du repertoire
         List<EleChamp> listOfChampNom = new ArrayList<>();

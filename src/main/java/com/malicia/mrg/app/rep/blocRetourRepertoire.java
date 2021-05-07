@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.ListIterator;
 
 public class blocRetourRepertoire {
+    private List<String> lstPhotoPreviewRepertoire;
+
     public RepertoirePhoto getRepPhoto() {
         return repPhoto;
     }
@@ -80,4 +82,11 @@ public class blocRetourRepertoire {
         return nomOk && valOk;
     }
 
+    public void setLstPhotoPreviewRepertoire(List<String> lstPhotoPreviewRepertoire) {
+        this.lstPhotoPreviewRepertoire = lstPhotoPreviewRepertoire;
+    }
+
+    public List<String> getLstPhotoPreviewRepertoire() {
+        return lstPhotoPreviewRepertoire;
+    }
 }

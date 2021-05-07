@@ -329,6 +329,7 @@ public class Database extends SQLiteJDBCDriverConnection {
             ret.replace("Folderidlocal", rsexist.getString("result"));
             ret.put("rootFolder", rsexist.getString("rootFolder"));
             ret.put("absolutePath", rsexist.getString("absolutePath"));
+            ret.put("pathFromRoot", rsexist.getString("pathFromRoot"));
         }
         return ret;
     }
@@ -866,7 +867,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         return ret;
     }
 
-    public Map<String, Map<String, String>> sqlmoveAllFileWithTagtoRep(String tag, String destPath) throws SQLException, IOException {
+    public Map<String, Map<String, String>> sqllistAllFileWithTagtoRep(String tag, String destPath) throws SQLException, IOException {
         Map<String, Map<String, String>> ret2 = new HashMap<>();
         String sql = "select f.id_local as id_local , " +
                 "p.absolutePath as absolutePath , " +
@@ -978,6 +979,21 @@ public class Database extends SQLiteJDBCDriverConnection {
                 "from AgLibraryKeywordImage  " +
                 " where id_local = " + kiIdLocal + " " +
                 " ; ";
+        return executeUpdate(sql);
+    }
+
+    public int moveRepertory(String source, String destination) throws SQLException {
+        Map<String, String> src = getIdlocalforRep(source);
+        String dest = normalizePath(normalizePath(destination + File.separator).replace(normalizePath(src.get("absolutePath")), ""));
+
+        String sql;
+        sql = "" +
+                "update AgLibraryFolder " +
+                "set pathFromRoot = " +
+                "replace( pathFromRoot, '" + src.get("pathFromRoot")  + "' , '" + dest + "' ) " +
+                "where id_local = '" + src.get("Folderidlocal") +
+                ";";
+//        return 1;
         return executeUpdate(sql);
     }
 }
