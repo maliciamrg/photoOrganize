@@ -69,7 +69,8 @@ public class WorkWithRepertory {
             LOGGER.debug(() -> "move_repertoire p=" + fsource.toString() + " -> " + fdest.toString());
             Files.move(fsource.toPath(), fdest.toPath());
 
-            dbLr.moveRepertory(source, destination);
+            int ret = dbLr.moveRepertory(source, destination);
+            LOGGER.debug(() -> "dbLr.moveRepertory(source, destination)=" + ret);
 
         }
     }

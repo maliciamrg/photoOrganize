@@ -991,7 +991,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                 "update AgLibraryFolder " +
                 "set pathFromRoot = " +
                 "replace( pathFromRoot, '" + src.get("pathFromRoot")  + "' , '" + dest + "' ) " +
-                "where id_local = '" + src.get("Folderidlocal") +
+                "where id_local = '" + src.get("Folderidlocal") + "' " +
                 ";";
 //        return 1;
         return executeUpdate(sql);

@@ -46,6 +46,7 @@ public class RenameRepertoire {
     private JTree tree2;
     private JTree tree3;
     private JTree tree4;
+    private JLabel labCompteur;
     private final JTree[] tree = {tree1, tree2, tree3, tree4};
     private List<blocRetourRepertoire> retourRepertoire;
 
@@ -95,14 +96,17 @@ public class RenameRepertoire {
                         + tree[1].getLastSelectedPathComponent().toString() + CARAC_SEPARATEUR
                         + tree[2].getLastSelectedPathComponent().toString() + CARAC_SEPARATEUR
                         + tree[3].getLastSelectedPathComponent().toString();
-                try {
-                    WorkWithRepertory.renommerRepertoire(textField1.getText(),dest,dbLr);
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
+                int ret = JOptionPane.showConfirmDialog(frame, "Done : " + System.lineSeparator() + textField1.getText() + System.lineSeparator() + " to " + System.lineSeparator() + dest);
+                if (ret==0) {
+                    try {
+                        WorkWithRepertory.renommerRepertoire(textField1.getText(), dest, dbLr);
+                        button2.doClick();
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                    }
                 }
-                JOptionPane.showMessageDialog(frame, "Done : " + System.lineSeparator() + textField1.getText() + System.lineSeparator()  + " to " +  System.lineSeparator() + dest);
             }
         });
     }
@@ -136,6 +140,9 @@ public class RenameRepertoire {
             blocRetourRepertoire retourRepertoireEle = retourRepertoire.get(numeroRetRep);
             //enable button validate
             button1.setEnabled(false);
+
+            //compteur
+            labCompteur.setText((numeroRetRep+1) + "/" + retourRepertoire.size());
 
             //repertoire actuel
             textField1.setText(retourRepertoireEle.getRepertoire());
