@@ -14,6 +14,8 @@ import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -46,8 +48,8 @@ public class RenameRepertoire {
     private JTree tree2;
     private JTree tree3;
     private JTree tree4;
-    private JLabel labCompteur;
     private final JTree[] tree = {tree1, tree2, tree3, tree4};
+    private JLabel labCompteur;
     private List<blocRetourRepertoire> retourRepertoire;
 
     public RenameRepertoire(List<blocRetourRepertoire> retourRepertoireOri) {
@@ -55,10 +57,11 @@ public class RenameRepertoire {
         numeroRetRep = 0;
         bgOk = tree1.getBackground();
 
-
+        //initialize button
         button1.setText("Validate Name");
         button2.setText("Next");
 
+        //initializecombobox
         List<RepertoirePhoto> listRepPhoto = ctx.getArrayRepertoirePhoto();
         for (RepertoirePhoto o : listRepPhoto) {
             comboBox1.addItem(o);
@@ -83,19 +86,29 @@ public class RenameRepertoire {
             tree[i].addPropertyChangeListener(new PropertyChangeListener() {
                 @Override
                 public void propertyChange(PropertyChangeEvent evt) {
-                    isValidateButton();
+                    enableButtonValidation();
+                }
+            });
+            tree[i].addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    super.mouseClicked(e);
+                    if (e.getButton() == 3) {
+                        GeneratePopUpJTree(e);
+                    }
                 }
             });
         }
+
         button1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int i;
-                for (i = 0; i < 4; i++) {
-                    if (Arrays.asList(lstTAG).contains(tree[i].getLastSelectedPathComponent().toString())){
-                        createAndSelectNewTag(tree[i].getLastSelectedPathComponent().toString(),tree[i]);
-                    }
-                }
+//                int i;
+//                for (i = 0; i < 4; i++) {
+//                    if (Arrays.asList(lstTAG).contains(tree[i].getLastSelectedPathComponent().toString())){
+//                        createAndSelectNewTag(tree[i].getLastSelectedPathComponent().toString(),tree[i]);
+//                    }
+//                }
 
                 String dest = ctx.getRepertoire50Phototheque() + File.separator
                         + comboBox1.getSelectedItem().toString() + File.separator
@@ -105,7 +118,7 @@ public class RenameRepertoire {
                         + tree[3].getLastSelectedPathComponent().toString();
 
                 int ret = JOptionPane.showConfirmDialog(frame, "Done : " + System.lineSeparator() + textField1.getText() + System.lineSeparator() + " to " + System.lineSeparator() + dest);
-                if (ret==0) {
+                if (ret == 0) {
                     try {
                         WorkWithRepertory.renommerRepertoire(textField1.getText(), dest, dbLr);
                         button2.doClick();
@@ -117,11 +130,48 @@ public class RenameRepertoire {
                 }
             }
         });
+
     }
 
-    private void createAndSelectNewTag(String toString, JTree jTree) {
-        //todo
+    private void GeneratePopUpJTree(MouseEvent e) {
+        // create a popup menu
+        JPopupMenu pm = new JPopupMenu("Message");
+
+        int i;
+        for (i = 0; i < ((JTree) e.getComponent()).getModel().getChildCount(((JTree) e.getComponent()).getModel().getRoot()); i++) {
+            String lblTag = ((JTree) e.getComponent()).getModel().getChild(((JTree) e.getComponent()).getModel().getRoot(), i).toString();
+
+            if (Arrays.asList(lstTAG).contains(lblTag)) {
+
+                // create a label
+                JLabel l = new JLabel("add new Tag :" + lblTag);
+                l.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+
+                        String newTag = JOptionPane.showInputDialog("new Tag pour le Parent " + lblTag);
+                        if (newTag != null) {
+                            if (newTag.length() > 0) {
+                                try {
+                                    dbLr.sqlcreateKeyword( ControleRepertoire.nettoyageTag(lblTag), newTag);
+                                } catch (SQLException throwables) {
+                                    throwables.printStackTrace();
+                                }
+                                majPanel(retourRepertoire);
+                            }
+                        }
+                    }
+                });
+                // add the label to the popup
+                pm.add(l);
+
+            }
+        }
+
+        // add the popup to the frame
+        pm.show(frame, frame.getMousePosition().x, frame.getMousePosition().y);
     }
+
 
     public static void start(Database dbLr, Context ctx, List<blocRetourRepertoire> blRetourRepertoire) {
         RenameRepertoire.dbLr = dbLr;
@@ -150,11 +200,12 @@ public class RenameRepertoire {
     private void majPanel(List<blocRetourRepertoire> retourRepertoire) {
         try {
             blocRetourRepertoire retourRepertoireEle = retourRepertoire.get(numeroRetRep);
+
             //enable button validate
             button1.setEnabled(false);
 
             //compteur
-            labCompteur.setText((numeroRetRep+1) + "/" + retourRepertoire.size());
+            labCompteur.setText((numeroRetRep + 1) + "/" + retourRepertoire.size());
 
             //repertoire actuel
             textField1.setText(retourRepertoireEle.getRepertoire());
@@ -169,26 +220,11 @@ public class RenameRepertoire {
 
                 tree[i].clearSelection();
                 tree[i].getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-                DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
-                List<String> ele = listOfControleNom.get(i).getInfoRetourControle();
-                TreePath selectTree = null;
-                for (String elechamp : ele) {
-                    root.add(new DefaultMutableTreeNode(elechamp));
-                    DefaultMutableTreeNode enc = root.getLastLeaf();
-                    String[] streamNames = sortList(dbLr.getValueForKeyword(ControleRepertoire.nettoyageTag(elechamp))).toArray(new String[0]);
-                    for (Object o : streamNames) {
-                        enc.add(new DefaultMutableTreeNode(o));
-                        if (o.equals(listOfControleNom.get(i).getoValue())) {
-                            selectTree = new TreePath(enc.getLastLeaf().getPath());
-                        }
-                    }
-                    if (elechamp.equals(listOfControleNom.get(i).getoValue())) {
-                        selectTree = new TreePath(enc.getLastLeaf().getPath());
-                    }
-                }
-                treeModelArray[i] = new DefaultTreeModel(root);
-                tree[i].setModel(treeModelArray[i]);
+
+                TreePath selectTree = setTreeModel(listOfControleNom, i);
+
                 expandAllNodes(tree[i], 0, tree[i].getRowCount());
+
                 if (listOfControleNom.get(i).isRetourControle()) {
                     tree[i].setBackground(bgOk);
                     if (selectTree != null) {
@@ -208,7 +244,7 @@ public class RenameRepertoire {
                 tree[i].setBackground(bgOk);
             }
 
-            isValidateButton();
+            enableButtonValidation();
 
 
         } catch (SQLException throwables) {
@@ -216,7 +252,30 @@ public class RenameRepertoire {
         }
     }
 
-    private void isValidateButton() {
+    private TreePath setTreeModel(List<EleChamp> listOfControleNom, int i) throws SQLException {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
+        List<String> ele = listOfControleNom.get(i).getInfoRetourControle();
+        TreePath selectTree = null;
+        for (String elechamp : ele) {
+            root.add(new DefaultMutableTreeNode(elechamp));
+            DefaultMutableTreeNode enc = root.getLastLeaf();
+            String[] streamNames = sortList(dbLr.getValueForKeyword(ControleRepertoire.nettoyageTag(elechamp))).toArray(new String[0]);
+            for (Object o : streamNames) {
+                enc.add(new DefaultMutableTreeNode(o));
+                if (o.equals(listOfControleNom.get(i).getoValue())) {
+                    selectTree = new TreePath(enc.getLastLeaf().getPath());
+                }
+            }
+            if (elechamp.equals(listOfControleNom.get(i).getoValue())) {
+                selectTree = new TreePath(enc.getLastLeaf().getPath());
+            }
+        }
+        treeModelArray[i] = new DefaultTreeModel(root);
+        tree[i].setModel(treeModelArray[i]);
+        return selectTree;
+    }
+
+    private void enableButtonValidation() {
         int i;
         //enable button validate
         boolean readyToValide = true;
