@@ -1,17 +1,14 @@
 package com.malicia.mrg.app.rep;
 
 import com.malicia.mrg.Context;
-import com.malicia.mrg.app.WorkWithRepertory;
 import com.malicia.mrg.model.Database;
 import com.malicia.mrg.param.importjson.ControleRepertoire;
 import com.malicia.mrg.param.importjson.RepertoirePhoto;
-import com.malicia.mrg.param.importjson.TriNew;
 import com.malicia.mrg.util.WhereIAm;
 import com.malicia.mrg.view.RenameRepertoire;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -69,8 +66,8 @@ public class AnalyseGlobalRepertoires {
             case ControleRepertoire.TAG_WHAT:
             case ControleRepertoire.TAG_WHO:
 //                ele.setRetourToFalse(prefixAllElementsList(elechamp,dbLr.getValueForKeyword( nettoyageTag(elechamp))),"changenomrep_"+elechamp);
-                ele.setRetourToFalse(nettoyageTag(elechamp),"changenomrep_"+elechamp);
-                if (Boolean.TRUE.equals(dbLr.isValueInKeyword(ele.getoValue(), nettoyageTag(elechamp)))) {
+                ele.setRetourToFalse(elechamp,"changenomrep_"+elechamp);
+                if (Boolean.TRUE.equals(dbLr.isValueInKeyword(ele.getoValue(), ControleRepertoire.nettoyageTag(elechamp)))) {
                     ele.setRetourToTrue();
                 }
                 break;
@@ -153,10 +150,6 @@ public class AnalyseGlobalRepertoires {
         if (!allStarGood) {
             ele.setRetourToFalse(res.toString(),tag.toString());
         }
-    }
-
-    private static String nettoyageTag(String getcChamp) {
-        return getcChamp.replace("@", "");
     }
 
     public static blocRetourRepertoire calculateLesEleChampsDuRepertoire(String repertoire, RepertoirePhoto repPhoto, ControleRepertoire paramControleRepertoire) throws SQLException, IOException {

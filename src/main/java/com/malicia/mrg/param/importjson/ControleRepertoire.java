@@ -3,6 +3,7 @@ package com.malicia.mrg.param.importjson;
 import com.malicia.mrg.util.Serialize;
 
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,17 @@ public class ControleRepertoire extends Serialize {
     public static final String CARAC_VOID = "-";
     public static final String FORMATDATE_YYYY_MM_DD = "yyyy-MM-dd";
 
+    public static final String[] lstTAG = {
+            TAG_ACTION,
+            TAG_PIECE,
+            TAG_CHANTIER,
+            TAG_EVENT,
+            TAG_PHOTOGRAPHY,
+            TAG_WHERE,
+            TAG_WHAT,
+            TAG_WHO
+    };
+
     private final List<String> listControleRepertoire;
 
     public ControleRepertoire() {
@@ -35,6 +47,10 @@ public class ControleRepertoire extends Serialize {
         listControleRepertoire.add(NB_SELECTIONNER);
         listControleRepertoire.add(NB_PHOTOAPURGER);
         listControleRepertoire.add(NB_LIMITEMAXFOLDER);
+    }
+
+    public static String nettoyageTag(String getcChamp) {
+        return getcChamp.replace("@", "");
     }
 
     public List<String> getlistControleRepertoire() {

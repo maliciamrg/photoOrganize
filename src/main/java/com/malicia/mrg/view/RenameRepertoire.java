@@ -5,8 +5,8 @@ import com.malicia.mrg.app.WorkWithRepertory;
 import com.malicia.mrg.app.rep.EleChamp;
 import com.malicia.mrg.app.rep.blocRetourRepertoire;
 import com.malicia.mrg.model.Database;
+import com.malicia.mrg.param.importjson.ControleRepertoire;
 import com.malicia.mrg.param.importjson.RepertoirePhoto;
-import org.apache.tools.ant.taskdefs.FixCRLF;
 
 
 import javax.swing.*;
@@ -14,7 +14,6 @@ import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -24,6 +23,7 @@ import java.util.*;
 import java.util.List;
 
 import static com.malicia.mrg.param.importjson.ControleRepertoire.CARAC_SEPARATEUR;
+import static com.malicia.mrg.param.importjson.ControleRepertoire.lstTAG;
 
 public class RenameRepertoire {
     private static Database dbLr;
@@ -90,12 +90,20 @@ public class RenameRepertoire {
         button1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                int i;
+                for (i = 0; i < 4; i++) {
+                    if (Arrays.asList(lstTAG).contains(tree[i].getLastSelectedPathComponent().toString())){
+                        createAndSelectNewTag(tree[i].getLastSelectedPathComponent().toString(),tree[i]);
+                    }
+                }
+
                 String dest = ctx.getRepertoire50Phototheque() + File.separator
                         + comboBox1.getSelectedItem().toString() + File.separator
                         + tree[0].getLastSelectedPathComponent().toString() + CARAC_SEPARATEUR
                         + tree[1].getLastSelectedPathComponent().toString() + CARAC_SEPARATEUR
                         + tree[2].getLastSelectedPathComponent().toString() + CARAC_SEPARATEUR
                         + tree[3].getLastSelectedPathComponent().toString();
+
                 int ret = JOptionPane.showConfirmDialog(frame, "Done : " + System.lineSeparator() + textField1.getText() + System.lineSeparator() + " to " + System.lineSeparator() + dest);
                 if (ret==0) {
                     try {
@@ -109,6 +117,10 @@ public class RenameRepertoire {
                 }
             }
         });
+    }
+
+    private void createAndSelectNewTag(String toString, JTree jTree) {
+        //todo
     }
 
     public static void start(Database dbLr, Context ctx, List<blocRetourRepertoire> blRetourRepertoire) {
@@ -163,7 +175,7 @@ public class RenameRepertoire {
                 for (String elechamp : ele) {
                     root.add(new DefaultMutableTreeNode(elechamp));
                     DefaultMutableTreeNode enc = root.getLastLeaf();
-                    String[] streamNames = sortList(dbLr.getValueForKeyword(elechamp)).toArray(new String[0]);
+                    String[] streamNames = sortList(dbLr.getValueForKeyword(ControleRepertoire.nettoyageTag(elechamp))).toArray(new String[0]);
                     for (Object o : streamNames) {
                         enc.add(new DefaultMutableTreeNode(o));
                         if (o.equals(listOfControleNom.get(i).getoValue())) {
