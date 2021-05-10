@@ -12,12 +12,15 @@ import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.List;
 
 import static com.malicia.mrg.util.SystemFiles.normalizePath;
 
@@ -114,7 +117,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                 "set colorLabels = '" + Context.RED + "' " +
                 " where colorLabels <> '" + Context.RED + "' " +
                 " and rootFile in ( " +
-                getStringAllIdLocalFromNew(repertoire50NEW)  +
+                getStringAllIdLocalFromNew(repertoire50NEW) +
                 " ) " +
                 ";";
         return executeUpdate(sql);
@@ -148,8 +151,8 @@ public class Database extends SQLiteJDBCDriverConnection {
                 "set colorLabels = '' " +
                 " where colorLabels = '" + Context.RED + "' " +
                 " and rootFile not in ( " +
-                getStringAllIdLocalFromNew(repertoire50NEW)  +
-                " ) "+
+                getStringAllIdLocalFromNew(repertoire50NEW) +
+                " ) " +
                 ";";
         return executeUpdate(sql);
     }
@@ -163,6 +166,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         int ret = executeUpdate(sql);
         return ret;
     }
+
     public void creationContextEtPurgeKeyword(Map<String, String> listeAction) throws SQLException {
 
     }
@@ -237,6 +241,7 @@ public class Database extends SQLiteJDBCDriverConnection {
 
 
     }
+
     private long sqlGetPrevIdlocalforFolder() throws SQLException {
         String sql = "select * FROM AgLibraryFolder " +
                 "ORDER by id_local desc " +
@@ -672,7 +677,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         return executeUpdate(sql);
     }
 
-    public  Map<String, String> sqlcreateKeyword(String keywordmaitre, String keyword) throws SQLException {
+    public Map<String, String> sqlcreateKeyword(String keywordmaitre, String keyword) throws SQLException {
         Map<String, String> ret = new HashMap<String, String>();
         String keyWordIdlocal = getIdforKeyword(keyword).get("KeyWordIdlocal");
         if (keyWordIdlocal.compareTo("") == 0) {
@@ -700,12 +705,12 @@ public class Database extends SQLiteJDBCDriverConnection {
                     ")" +
                     ";";
             executeUpdate(sql);
-            ret.put("keyWordIdlocal",String.valueOf(idlocal));
-            ret.put("NewkeyWordIdlocal",String.valueOf(Boolean.TRUE));
+            ret.put("keyWordIdlocal", String.valueOf(idlocal));
+            ret.put("NewkeyWordIdlocal", String.valueOf(Boolean.TRUE));
             return ret;
         }
-        ret.put("keyWordIdlocal",keyWordIdlocal);
-        ret.put("NewkeyWordIdlocal",String.valueOf(Boolean.FALSE));
+        ret.put("keyWordIdlocal", keyWordIdlocal);
+        ret.put("NewkeyWordIdlocal", String.valueOf(Boolean.FALSE));
         return ret;
     }
 
@@ -797,11 +802,11 @@ public class Database extends SQLiteJDBCDriverConnection {
     public int purgeGroupeKeyword(String tagorg, List<String> lstIdKey) throws SQLException {
         String sepa = " , ";
         String array = "";
-        for(int i = 0; i < lstIdKey.size(); i++) {
+        for (int i = 0; i < lstIdKey.size(); i++) {
             array += lstIdKey.get(i) + sepa;
         }
-        if (lstIdKey.size()>0) {
-            array = array.substring(0,array.length() - sepa.length());
+        if (lstIdKey.size() > 0) {
+            array = array.substring(0, array.length() - sepa.length());
         }
 
         String sql = " delete " +
@@ -825,10 +830,10 @@ public class Database extends SQLiteJDBCDriverConnection {
         ResultSet rs = select(sql);
         int ko = 0;
         while (rs.next()) {
-            ko ++;
+            ko++;
         }
         int koCor = 0;
-        if (ko > 0 ) {
+        if (ko > 0) {
             koCor += sqlDeletekeywordImage();
         }
         String txtret = "";
@@ -855,13 +860,13 @@ public class Database extends SQLiteJDBCDriverConnection {
         HashMap<String, String> ret = new HashMap<>();
         String sql = " select * " +
                 "from AgLibraryFolder " +
-                "where pathFromRoot REGEXP  '\\/"+collections+"\\/[@&#a-zA-Z 0-9-]*\\/$' " +
+                "where pathFromRoot REGEXP  '\\/" + collections + "\\/[@&#a-zA-Z 0-9-]*\\/$' " +
                 ";";
         ResultSet rs = select(sql);
         while (rs.next()) {
             String pathFromRoot = rs.getString("pathFromRoot");
             String[] split = pathFromRoot.split("/");
-            String tag = split[split.length-1] + tagorg;
+            String tag = split[split.length - 1] + tagorg;
             ret.put(tag, pathFromRoot);
         }
         return ret;
@@ -910,7 +915,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         String sql = " select f.id_local as id_local , p.absolutePath as absolutePath , b.pathFromRoot as pathFromRoot , f.lc_idx_filename as lcIdxFilename , " +
                 " ki.id_local as ki_id_local " +
                 " from AgLibraryKeyword k , AgLibraryKeywordImage ki , Adobe_images e , AgLibraryFile f , AgLibraryFolder b  , AgLibraryRootFolder p " +
-                " where k.name = '" + tag +"' " +
+                " where k.name = '" + tag + "' " +
                 " and k.id_local = ki.tag " +
                 " and ki.image = e.id_local " +
                 " and e.rootFile = f.id_local " +
@@ -957,7 +962,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                 " inner join AgLibraryRootFolder p2 " +
                 " on b2.rootFolder = p2.id_local " +
                 "  where f.id_local = " + fileIdLocal + " " +
-                "  and k.name like '"+ generiquetag +"%' " +
+                "  and k.name like '" + generiquetag + "%' " +
                 "  and b.pathFromRoot <> b2.pathFromRoot " +
                 ";";
         ResultSet rs = select(sql);
@@ -968,8 +973,8 @@ public class Database extends SQLiteJDBCDriverConnection {
             String lcIdxFilename = rs.getString("lcIdxFilename");
             String kiIdLocal = rs.getString("ki_id_local");
             newPath = normalizePath(absolutePath + pathFromRoot + File.separator + lcIdxFilename);
-            ret.put("newPath",newPath);
-            ret.put("kiIdLocal",kiIdLocal);
+            ret.put("newPath", newPath);
+            ret.put("kiIdLocal", kiIdLocal);
         }
         return ret;
     }
@@ -990,11 +995,31 @@ public class Database extends SQLiteJDBCDriverConnection {
         sql = "" +
                 "update AgLibraryFolder " +
                 "set pathFromRoot = " +
-                "replace( pathFromRoot, '" + src.get("pathFromRoot")  + "' , '" + dest + "' ) " +
+                "replace( pathFromRoot, '" + src.get("pathFromRoot") + "' , '" + dest + "' ) " +
                 "where id_local = '" + src.get("Folderidlocal") + "' " +
                 ";";
 //        return 1;
         return executeUpdate(sql);
     }
+
+    public List<Icon> getFourRandomPreviewPhoto(String repertoire) throws SQLException, IOException {
+        List<Icon> listTmp = new ArrayList<>();
+        listTmp.add(resizeImageIcon(new ImageIcon("D:\\JavaProjet\\photoOrganize\\src\\main\\resources\\err404.jpg")));
+        listTmp.add(resizeImageIcon(new ImageIcon("D:\\JavaProjet\\photoOrganize\\src\\main\\resources\\err404.jpg")));
+        listTmp.add(resizeImageIcon(new ImageIcon("D:\\JavaProjet\\photoOrganize\\src\\main\\resources\\err404.jpg")));
+        listTmp.add(resizeImageIcon(new ImageIcon("D:\\JavaProjet\\photoOrganize\\src\\main\\resources\\err404.jpg")));
+        //todo
+        return listTmp;
+    }
+
+    private Icon resizeImageIcon(ImageIcon imageIcon) {
+        Image image = imageIcon.getImage(); // transform it
+        int w = image.getWidth(null);
+        int h = image.getHeight(null);
+        int coef = (Context.INT_WIDTH *100)/w;
+        Image newimg = image.getScaledInstance(w*coef/100, h*coef/100,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
+        return new ImageIcon(newimg);
+    }
+
 }
 

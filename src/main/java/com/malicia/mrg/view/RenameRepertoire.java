@@ -7,8 +7,10 @@ import com.malicia.mrg.app.rep.blocRetourRepertoire;
 import com.malicia.mrg.model.Database;
 import com.malicia.mrg.param.importjson.ControleRepertoire;
 import com.malicia.mrg.param.importjson.RepertoirePhoto;
+import javafx.scene.canvas.GraphicsContext;
 
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.awt.*;
@@ -50,6 +52,10 @@ public class RenameRepertoire {
     private JTree tree4;
     private final JTree[] tree = {tree1, tree2, tree3, tree4};
     private JLabel labCompteur;
+    private JLabel img1;
+    private JLabel img2;
+    private JLabel img3;
+    private JLabel img4;
     private List<blocRetourRepertoire> retourRepertoire;
 
     public RenameRepertoire(List<blocRetourRepertoire> retourRepertoireOri) {
@@ -212,6 +218,17 @@ public class RenameRepertoire {
 
             //combobox reprtoire
             comboBox1.setSelectedItem(retourRepertoireEle.getRepPhoto());
+
+            //imagepreview
+            img1.setText("");
+            img1.setIcon(retourRepertoireEle.previewPhoto.get(0));
+            img2.setText("");
+            img2.setIcon(retourRepertoireEle.previewPhoto.get(1));
+            img3.setText("");
+            img3.setIcon(retourRepertoireEle.previewPhoto.get(2));
+            img4.setText("");
+            img4.setIcon(retourRepertoireEle.previewPhoto.get(3));
+
 
             //Alimentation Jtree
             List<EleChamp> listOfControleNom = retourRepertoireEle.getListOfControleNom();

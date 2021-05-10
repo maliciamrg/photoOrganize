@@ -7,12 +7,14 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class Context {
 
@@ -23,12 +25,15 @@ public class Context {
     public static final String TAGORG = "#ORG#";
     public static final String ACTION01GO = "GO" + Context.TAGORG;
     public static final String COLLECTIONS = "!!Collections";
-    private static final String JSON = ".json";
-    private static final Logger LOGGER = LogManager.getLogger(Context.class);
     public static final String POSSIBLE_NEW_GROUP = "possibleRegroupement";
     public static final String PREFIX = " --- ";
-
+    public static final int INT_WIDTH = 120;
+    private static final String JSON = ".json";
+    private static final Logger LOGGER = LogManager.getLogger(Context.class);
     public static int nbDiscretionnaire = 0;
+    public static String localVoidPhotoUrl;
+    public static String localErr404PhotoUrl;
+    public static String localErrPhotoUrl;
     private final ActionRepertoire actionVersRepertoire;
     private final List<RepertoirePhoto> arrayRepertoirePhoto = new ArrayList<>();
     private ControleRepertoire paramControleRepertoire;
@@ -36,7 +41,7 @@ public class Context {
     private ElementsRejet paramElementsRejet;
     private TriNew paramTriNew;
 
-    public Context() throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public Context() throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, URISyntaxException {
         paramElementsRejet = (ElementsRejet) ElementsRejet.readJSON(ElementsRejet.class, getResourceAsStream("ElementsRejet.json"));
         arrayRepertoirePhoto.add((RepertoirePhoto) RepertoirePhoto.readJSON(RepertoirePhoto.class, getResourceAsStream("repertoirePhoto-Autoconstruction.json")));
         arrayRepertoirePhoto.add((RepertoirePhoto) RepertoirePhoto.readJSON(RepertoirePhoto.class, getResourceAsStream("repertoirePhoto-Events.json")));
@@ -48,11 +53,17 @@ public class Context {
         paramControleRepertoire = (ControleRepertoire) ControleRepertoire.readJSON(ControleRepertoire.class, getResourceAsStream("ControleRepertoire.json"));
         paramTriNew = (TriNew) TriNew.readJSON(TriNew.class, getResourceAsStream("TriNew.json"));
 
-        actionVersRepertoire = new ActionRepertoire() ;
+        actionVersRepertoire = new ActionRepertoire();
+
+//
+//        localVoidPhotoUrl = Objects.requireNonNull(Context.class.getClassLoader().getResource("images.png")).toURI().toURL().toExternalForm();
+//        localErr404PhotoUrl = Objects.requireNonNull(Context.class.getClassLoader().getResource("err404.jpg")).toURI().toURL().toExternalForm();
+//        localErrPhotoUrl = Objects.requireNonNull(Context.class.getClassLoader().getResource("error.jpg")).toURI().toURL().toExternalForm();
+
 
     }
 
-    public static Context chargeParam() throws IOException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    public static Context chargeParam() throws IOException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, URISyntaxException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         return new Context();
     }

@@ -23,6 +23,7 @@ public class ControleRepertoire extends Serialize {
     public static final String NB_PHOTOAPURGER = "nbphotoapurger";
     public static final String NB_ELEMENTS = "nbelements";
     public static final String NB_LIMITEMAXFOLDER = "limitemaxfolder";
+    public static final String PREVIEW_PHOTO = "previewphoto";
     public static final String CARAC_SEPARATEUR = "_";
     public static final String CARAC_EMPTY = "#";
     public static final String CARAC_VOID = "-";

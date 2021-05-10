@@ -6,6 +6,7 @@ import com.malicia.mrg.param.importjson.ControleRepertoire;
 import com.malicia.mrg.param.importjson.RepertoirePhoto;
 import com.malicia.mrg.util.WhereIAm;
 import com.malicia.mrg.view.RenameRepertoire;
+import javafx.scene.image.Image;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,7 +30,7 @@ public class AnalyseGlobalRepertoires {
         this.listOfretourValRepertoire = new ArrayList<>() ;
     }
 
-    public static void controleChamp(String repertoire, RepertoirePhoto repPhoto , EleChamp ele) throws SQLException {
+    public static void controleChamp(String repertoire, RepertoirePhoto repPhoto , EleChamp ele) throws SQLException, IOException {
         LOGGER.debug("controleChamp : {}", ele.getcChamp());
 
         ele.setRetourControle(false);
@@ -44,7 +45,7 @@ public class AnalyseGlobalRepertoires {
         }
     }
 
-    private static void testElementChamp(String repertoire, RepertoirePhoto repPhoto, String elechamp, EleChamp ele) throws SQLException {
+    private static void testElementChamp(String repertoire, RepertoirePhoto repPhoto, String elechamp, EleChamp ele) throws SQLException, IOException {
         int limitemaxfolder = 0;
         int nbSelectionner = 0;
         int nbphotoapurger = 0;
@@ -191,6 +192,11 @@ public class AnalyseGlobalRepertoires {
             listOfChampCtrl.add(eChamp);
         }
         retourControleRep.setListOfControleValRepertoire(listOfChampCtrl);
+
+
+        //Recuperer 4 preview du repertoire
+        retourControleRep.previewPhoto=dbLr.getFourRandomPreviewPhoto(repertoire);
+
 
         return retourControleRep;
 

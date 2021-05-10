@@ -3,6 +3,7 @@ package com.malicia.mrg.app.rep;
 import com.malicia.mrg.model.Database;
 import com.malicia.mrg.param.importjson.ControleRepertoire;
 import com.malicia.mrg.param.importjson.RepertoirePhoto;
+import javafx.scene.image.Image;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -98,4 +99,6 @@ public class EleChamp {
                 ", retourControle=" + retourControle +
                 '}';
     }
+
+
 }
