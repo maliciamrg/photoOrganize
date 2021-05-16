@@ -4,13 +4,12 @@ import com.github.fracpete.processoutput4j.output.StreamingProcessOutput;
 import com.github.fracpete.rsync4j.RSync;
 import com.malicia.mrg.app.*;
 import com.malicia.mrg.app.rep.AnalyseGlobalRepertoires;
-import com.malicia.mrg.app.rep.blocRetourRepertoire;
+import com.malicia.mrg.app.rep.BlocRetourRepertoire;
 import com.malicia.mrg.model.Database;
 import com.malicia.mrg.model.ElementFichier;
 import com.malicia.mrg.param.importjson.RepertoirePhoto;
 import com.malicia.mrg.param.importjson.TriNew;
 import com.malicia.mrg.util.Output;
-import com.malicia.mrg.util.Serialize;
 import com.malicia.mrg.util.SystemFiles;
 import com.malicia.mrg.util.WhereIAm;
 import com.malicia.mrg.view.JTextAreaAppender;
@@ -836,7 +835,7 @@ public class Main {
             while (repertoireIterator.hasNext()) {
                 String repertoire = repertoireIterator.next();
 
-                blocRetourRepertoire retourRepertoire = AnalyseGlobalRepertoires.calculateLesEleChampsDuRepertoire(repertoire, repPhoto, ctx.getParamControleRepertoire());
+                BlocRetourRepertoire retourRepertoire = AnalyseGlobalRepertoires.calculateLesEleChampsDuRepertoire(repertoire, repPhoto, ctx.getParamControleRepertoire());
 
                 analyseRepertoires.add(retourRepertoire);
 
@@ -888,7 +887,7 @@ public class Main {
         new ZipFile(repertoireDestZip).addFolder(repertoireRoamingAdobeLightroom);
     }
 
-    private static void purgeDesRepertoireVide50Phototheque() {
+    private static void purgeDesRepertoireVide50Phototheque() throws IOException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         String folderlocation = ctx.getRepertoire50Phototheque();
@@ -898,7 +897,7 @@ public class Main {
         } while (!isFinished);
     }
 
-    private static void purgeDesRepertoireVide00NEW() {
+    private static void purgeDesRepertoireVide00NEW() throws IOException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         String folderlocation = ctx.getRepertoire00NEW();

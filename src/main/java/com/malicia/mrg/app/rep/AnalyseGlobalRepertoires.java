@@ -6,7 +6,6 @@ import com.malicia.mrg.param.importjson.ControleRepertoire;
 import com.malicia.mrg.param.importjson.RepertoirePhoto;
 import com.malicia.mrg.util.WhereIAm;
 import com.malicia.mrg.view.RenameRepertoire;
-import javafx.scene.image.Image;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,17 +19,17 @@ import java.util.Map;
 
 public class AnalyseGlobalRepertoires {
     private static final Logger LOGGER = LogManager.getLogger(AnalyseGlobalRepertoires.class);
-    private List<blocRetourRepertoire> listOfretourNomRepertoire;
-    private List<blocRetourRepertoire> listOfretourValRepertoire;
     private static Context ctx;
     private static Database dbLr;
+    private List<BlocRetourRepertoire> listOfretourNomRepertoire;
+    private List<BlocRetourRepertoire> listOfretourValRepertoire;
 
     public AnalyseGlobalRepertoires() {
-        this.listOfretourNomRepertoire = new ArrayList<>() ;
-        this.listOfretourValRepertoire = new ArrayList<>() ;
+        this.listOfretourNomRepertoire = new ArrayList<>();
+        this.listOfretourValRepertoire = new ArrayList<>();
     }
 
-    public static void controleChamp(String repertoire, RepertoirePhoto repPhoto , EleChamp ele) throws SQLException, IOException {
+    public static void controleChamp(String repertoire, RepertoirePhoto repPhoto, EleChamp ele) throws SQLException {
         LOGGER.debug("controleChamp : {}", ele.getcChamp());
 
         ele.setRetourControle(false);
@@ -40,12 +39,12 @@ public class AnalyseGlobalRepertoires {
         for (String elechamp : arrayChamp) {
 
             if (!ele.isRetourControle()) {
-                testElementChamp(repertoire, repPhoto, elechamp,ele);
+                testElementChamp(repertoire, repPhoto, elechamp, ele);
             }
         }
     }
 
-    private static void testElementChamp(String repertoire, RepertoirePhoto repPhoto, String elechamp, EleChamp ele) throws SQLException, IOException {
+    private static void testElementChamp(String repertoire, RepertoirePhoto repPhoto, String elechamp, EleChamp ele) throws SQLException {
         int limitemaxfolder = 0;
         int nbSelectionner = 0;
         int nbphotoapurger = 0;
@@ -53,7 +52,7 @@ public class AnalyseGlobalRepertoires {
         switch (elechamp) {
             case ControleRepertoire.DATE_DATE:
                 String date = dbLr.getDate(repertoire);
-                ele.setRetourToFalse(date,"changenomrep_dateto_" + date);
+                ele.setRetourToFalse(date, "changenomrep_dateto_" + date);
                 if (date.compareTo(ele.getoValue()) == 0) {
                     ele.setRetourToTrue();
                 }
@@ -66,43 +65,42 @@ public class AnalyseGlobalRepertoires {
             case ControleRepertoire.TAG_WHERE:
             case ControleRepertoire.TAG_WHAT:
             case ControleRepertoire.TAG_WHO:
-//                ele.setRetourToFalse(prefixAllElementsList(elechamp,dbLr.getValueForKeyword( nettoyageTag(elechamp))),"changenomrep_"+elechamp);
-                ele.setRetourToFalse(elechamp,"changenomrep_"+elechamp);
+                ele.setRetourToFalse(elechamp, "changenomrep_" + elechamp);
                 if (Boolean.TRUE.equals(dbLr.isValueInKeyword(ele.getoValue(), ControleRepertoire.nettoyageTag(elechamp)))) {
                     ele.setRetourToTrue();
                 }
                 break;
             case ControleRepertoire.NB_STAR_VALUE:
-                controleRepertoireNBSTARVALUE(repertoire, repPhoto,ele);
+                controleRepertoireNBSTARVALUE(repertoire, repPhoto, ele);
                 break;
             case ControleRepertoire.NB_ELEMENTS:
                 nbelements = getNbelements(repertoire);
                 ele.setRetourToTrue();
                 if (nbelements == 0) {
-                    ele.setRetourToFalse(String.valueOf(nbelements),"pbrepertoire_zeroelements");
+                    ele.setRetourToFalse(String.valueOf(nbelements), "pbrepertoire_zeroelements");
                 }
                 break;
             case ControleRepertoire.NB_SELECTIONNER:
-                nbSelectionner = dbLr.nbPick( repertoire);
+                nbSelectionner = dbLr.nbPick(repertoire);
                 ele.setRetourToTrue();
                 if (nbSelectionner == 0) {
-                    ele.setRetourToFalse(String.valueOf(nbSelectionner),"pbrepertoire_zeroelements_selectionner");
+                    ele.setRetourToFalse(String.valueOf(nbSelectionner), "pbrepertoire_zeroelements_selectionner");
                 }
                 break;
             case ControleRepertoire.NB_PHOTOAPURGER:
-                limitemaxfolder = (int) ((Double.valueOf(repPhoto.getNbMaxParUniteDeJour()) * dbLr.nbjourfolder( repertoire)) / Double.valueOf(repPhoto.getUniteDeJour()));
-                nbSelectionner = dbLr.nbPick( repertoire);
+                limitemaxfolder = (int) ((Double.valueOf(repPhoto.getNbMaxParUniteDeJour()) * dbLr.nbjourfolder(repertoire)) / Double.valueOf(repPhoto.getUniteDeJour()));
+                nbSelectionner = dbLr.nbPick(repertoire);
                 nbphotoapurger = nbSelectionner - limitemaxfolder;
                 ele.setRetourToTrue();
                 if (nbphotoapurger > 0) {
-                    ele.setRetourToFalse(String.valueOf(nbphotoapurger),"pbrepertoire_purge_" + String.format("%05d",nbphotoapurger));
+                    ele.setRetourToFalse(String.valueOf(nbphotoapurger), "pbrepertoire_purge_" + String.format("%05d", nbphotoapurger));
                 }
                 break;
             case ControleRepertoire.NB_LIMITEMAXFOLDER:
-                limitemaxfolder = (int) ((Double.valueOf(repPhoto.getNbMaxParUniteDeJour()) * dbLr.nbjourfolder( repertoire)) / Double.valueOf(repPhoto.getUniteDeJour()));
+                limitemaxfolder = (int) ((Double.valueOf(repPhoto.getNbMaxParUniteDeJour()) * dbLr.nbjourfolder(repertoire)) / Double.valueOf(repPhoto.getUniteDeJour()));
                 ele.setRetourToTrue();
                 if (limitemaxfolder == 0) {
-                    ele.setRetourToFalse(String.valueOf(limitemaxfolder),"pbrepertoire_limitemaxazero");
+                    ele.setRetourToFalse(String.valueOf(limitemaxfolder), "pbrepertoire_limitemaxazero");
                 }
                 break;
             default:
@@ -125,10 +123,10 @@ public class AnalyseGlobalRepertoires {
         return nbelements;
     }
 
-    private static void controleRepertoireNBSTARVALUE(String repertoire, RepertoirePhoto repPhoto , EleChamp ele) throws SQLException {
+    private static void controleRepertoireNBSTARVALUE(String repertoire, RepertoirePhoto repPhoto, EleChamp ele) throws SQLException {
         int nbSelectionner;
-        nbSelectionner = dbLr.nbPick( repertoire);
-        Map<String, Integer> starValue = dbLr.getStarValue( repertoire);
+        nbSelectionner = dbLr.nbPick(repertoire);
+        Map<String, Integer> starValue = dbLr.getStarValue(repertoire);
         List<Integer> ratio = repPhoto.getratioStarMax();
         StringBuilder res = new StringBuilder();
         StringBuilder tag = new StringBuilder();
@@ -143,20 +141,20 @@ public class AnalyseGlobalRepertoires {
                 allStarGood = false;
                 int i1 = nbmax - starValue.get(String.valueOf(i));
                 res.append(i1);
-                tag.append(starn + "_-" + String.format("%03d",i1));
+                tag.append(starn + "_-" + String.format("%03d", i1));
             }
             res.append(ControleRepertoire.CARAC_SEPARATEUR);
         }
         ele.setRetourToTrue();
         if (!allStarGood) {
-            ele.setRetourToFalse(res.toString(),tag.toString());
+            ele.setRetourToFalse(res.toString(), tag.toString());
         }
     }
 
-    public static blocRetourRepertoire calculateLesEleChampsDuRepertoire(String repertoire, RepertoirePhoto repPhoto, ControleRepertoire paramControleRepertoire) throws SQLException, IOException {
-        LOGGER.debug("isRepertoireOk : " + repertoire);
+    public static BlocRetourRepertoire calculateLesEleChampsDuRepertoire(String repertoire, RepertoirePhoto repPhoto, ControleRepertoire paramControleRepertoire) throws SQLException, IOException {
+        LOGGER.debug("isRepertoireOk :  {}" , repertoire);
 
-        blocRetourRepertoire retourControleRep = new blocRetourRepertoire(repPhoto , repertoire);
+        BlocRetourRepertoire retourControleRep = new BlocRetourRepertoire(repPhoto, repertoire);
 
         String ancienNomDuRepertoire = new File(repertoire).getName();
         String[] oldChamp = ancienNomDuRepertoire.split(ControleRepertoire.CARAC_SEPARATEUR);
@@ -174,7 +172,7 @@ public class AnalyseGlobalRepertoires {
             } else {
                 eChamp = new EleChamp(valeurAdmise, "");
             }
-            controleChamp(repertoire, repPhoto,eChamp);
+            controleChamp(repertoire, repPhoto, eChamp);
             listOfChampNom.add(eChamp);
             i++;
         }
@@ -188,31 +186,20 @@ public class AnalyseGlobalRepertoires {
             EleChamp eChamp = new EleChamp();
             String ele = listControleRepertoireIterator.next();
             eChamp.setcChamp(ele);
-            controleChamp(repertoire, repPhoto,eChamp);
+            controleChamp(repertoire, repPhoto, eChamp);
             listOfChampCtrl.add(eChamp);
         }
         retourControleRep.setListOfControleValRepertoire(listOfChampCtrl);
 
 
         //Recuperer 4 preview du repertoire
-        retourControleRep.previewPhoto=dbLr.getFourRandomPreviewPhoto(repertoire);
+        retourControleRep.setPreviewPhoto( dbLr.getFourRandomPreviewPhoto(repertoire));
 
         //Recuperer lstphoto du rep
-        retourControleRep.lstPhoto=dbLr.getLstPhoto(repertoire);
+        retourControleRep.setLstPhoto(dbLr.getLstPhoto(repertoire));
 
         return retourControleRep;
 
-    }
-
-    public void add(blocRetourRepertoire retourRepertoire) {
-        if (!retourRepertoire.getValOk()) {
-            this.listOfretourValRepertoire.add(retourRepertoire);
-        }
-        if (!retourRepertoire.getNomOk()) {
-            if (retourRepertoire.lstPhoto.size()!=0) {
-                this.listOfretourNomRepertoire.add(retourRepertoire);
-            }
-        }
     }
 
     public static void init(Context ctxIn, Database dbLrIn) {
@@ -220,9 +207,19 @@ public class AnalyseGlobalRepertoires {
         dbLr = dbLrIn;
     }
 
+    public void add(BlocRetourRepertoire retourRepertoire) {
+        if (Boolean.FALSE.equals(retourRepertoire.getValOk())) {
+            this.listOfretourValRepertoire.add(retourRepertoire);
+        }
+        if (Boolean.FALSE.equals(retourRepertoire.getNomOk()) && !retourRepertoire.getLstPhoto().isEmpty()) {
+            this.listOfretourNomRepertoire.add(retourRepertoire);
+        }
+
+    }
+
     public void action() {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        RenameRepertoire.start(dbLr,ctx, listOfretourNomRepertoire);
+        RenameRepertoire.start(dbLr, ctx, listOfretourNomRepertoire);
     }
 
     @Override

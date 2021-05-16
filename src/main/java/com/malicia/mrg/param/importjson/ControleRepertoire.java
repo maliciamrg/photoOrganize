@@ -5,6 +5,7 @@ import com.malicia.mrg.util.Serialize;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ControleRepertoire extends Serialize {
@@ -29,7 +30,7 @@ public class ControleRepertoire extends Serialize {
     public static final String CARAC_VOID = "-";
     public static final String FORMATDATE_YYYY_MM_DD = "yyyy-MM-dd";
 
-    public static final String[] lstTAG = {
+    private static final String[] lstTAG = {
             TAG_ACTION,
             TAG_PIECE,
             TAG_CHANTIER,
@@ -52,6 +53,10 @@ public class ControleRepertoire extends Serialize {
 
     public static String nettoyageTag(String getcChamp) {
         return getcChamp.replace("@", "");
+    }
+
+    public static boolean isTagContains(String lblTag) {
+        return Arrays.asList(lstTAG).contains(lblTag);
     }
 
     public List<String> getlistControleRepertoire() {

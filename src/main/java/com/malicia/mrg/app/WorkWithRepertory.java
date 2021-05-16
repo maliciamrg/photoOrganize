@@ -21,13 +21,13 @@ public class WorkWithRepertory {
         throw new IllegalStateException("Utility class");
     }
 
-    public static boolean deleteEmptyRep(String fileLocation) {
+    public static boolean deleteEmptyRep(String fileLocation) throws IOException {
         boolean isFinished = true;
         File folder = new File(fileLocation);
         File[] listFiles = folder.listFiles();
         if (listFiles.length == 0) {
-            LOGGER.info("Folder Name :: " + folder.getAbsolutePath() + " is deleted.");
-            folder.delete();
+            LOGGER.info("Folder Name :: {} is deleted.",  folder.getAbsolutePath() );
+            Files.delete(folder.toPath());
             isFinished = false;
         } else {
             for (int j = 0; j < listFiles.length; j++) {

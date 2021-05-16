@@ -3,14 +3,12 @@ package com.malicia.mrg.view;
 import com.malicia.mrg.Context;
 import com.malicia.mrg.app.WorkWithRepertory;
 import com.malicia.mrg.app.rep.EleChamp;
-import com.malicia.mrg.app.rep.blocRetourRepertoire;
+import com.malicia.mrg.app.rep.BlocRetourRepertoire;
 import com.malicia.mrg.model.Database;
 import com.malicia.mrg.param.importjson.ControleRepertoire;
 import com.malicia.mrg.param.importjson.RepertoirePhoto;
-import javafx.scene.canvas.GraphicsContext;
 
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.awt.*;
@@ -23,8 +21,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
 
-import static com.malicia.mrg.param.importjson.ControleRepertoire.CARAC_SEPARATEUR;
-import static com.malicia.mrg.param.importjson.ControleRepertoire.lstTAG;
+import static com.malicia.mrg.param.importjson.ControleRepertoire.*;
 
 public class RenameRepertoire {
     private static Database dbLr;
@@ -53,9 +50,9 @@ public class RenameRepertoire {
     private JLabel img2;
     private JLabel img3;
     private JLabel img4;
-    private List<blocRetourRepertoire> retourRepertoire;
+    private List<BlocRetourRepertoire> retourRepertoire;
 
-    public RenameRepertoire(List<blocRetourRepertoire> retourRepertoireOri) {
+    public RenameRepertoire(List<BlocRetourRepertoire> retourRepertoireOri) {
         this.retourRepertoire = retourRepertoireOri;
         numeroRetRep = 0;
         bgOk = tree1.getBackground();
@@ -137,7 +134,7 @@ public class RenameRepertoire {
 
     }
 
-    public static void start(Database dbLr, Context ctx, List<blocRetourRepertoire> blRetourRepertoire) {
+    public static void start(Database dbLr, Context ctx, List<BlocRetourRepertoire> blRetourRepertoire) {
         RenameRepertoire.dbLr = dbLr;
         RenameRepertoire.ctx = ctx;
         frame = new JFrame("rename Repertoire");
@@ -169,7 +166,7 @@ public class RenameRepertoire {
         for (i = 0; i < ((JTree) e.getComponent()).getModel().getChildCount(((JTree) e.getComponent()).getModel().getRoot()); i++) {
             String lblTag = ((JTree) e.getComponent()).getModel().getChild(((JTree) e.getComponent()).getModel().getRoot(), i).toString();
 
-            if (Arrays.asList(lstTAG).contains(lblTag)) {
+            if (isTagContains(lblTag)) {
 
                 // create a label
                 JLabel l = new JLabel("add new Tag :" + lblTag);
@@ -200,9 +197,9 @@ public class RenameRepertoire {
         pm.show(frame, frame.getMousePosition().x, frame.getMousePosition().y);
     }
 
-    private void majPanel(List<blocRetourRepertoire> retourRepertoire) {
+    private void majPanel(List<BlocRetourRepertoire> retourRepertoire) {
         try {
-            blocRetourRepertoire retourRepertoireEle = retourRepertoire.get(numeroRetRep);
+            BlocRetourRepertoire retourRepertoireEle = retourRepertoire.get(numeroRetRep);
 
             //enable button validate
             button1.setEnabled(false);
@@ -227,7 +224,7 @@ public class RenameRepertoire {
             Icon icon4 = getIcon(retourRepertoireEle, 3);
             img4.setIcon(icon4);
 
-            int size = retourRepertoireEle.lstPhoto.size();
+            int size = retourRepertoireEle.getLstPhoto().size();
             if (size == 0) {
                 //compteur
                 labCompteur.setText((numeroRetRep + 1) + "/" + retourRepertoire.size());
@@ -276,11 +273,11 @@ public class RenameRepertoire {
         }
     }
 
-    private Icon getIcon(blocRetourRepertoire retourRepertoireEle, int index) {
+    private Icon getIcon(BlocRetourRepertoire retourRepertoireEle, int index) {
         Icon icon;
         Icon imageError = resizeImageIcon(new ImageIcon(Context.ERR_404_JPG), null);
-        if (index < retourRepertoireEle.previewPhoto.size()) {
-            icon = resizeImageIcon(new ImageIcon(retourRepertoireEle.previewPhoto.get(index)), imageError);
+        if (index < retourRepertoireEle.getPreviewPhoto().size()) {
+            icon = resizeImageIcon(new ImageIcon(retourRepertoireEle.getPreviewPhoto().get(index)), imageError);
         } else {
             icon = imageError;
         }

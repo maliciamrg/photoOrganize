@@ -20,7 +20,7 @@ import static org.apache.logging.log4j.core.layout.PatternLayout.createDefaultLa
 @Plugin(name = "JTextAreaAppender", category = "Core", elementType = "appender", printObject = true)
 public class JTextAreaAppender extends AbstractAppender
 {
-    private static volatile ArrayList<JTextArea> textAreas = new ArrayList<>();
+    private static ArrayList<JTextArea> textAreas = new ArrayList<>();
 
     private int maxLines;
 
@@ -69,13 +69,13 @@ public class JTextAreaAppender extends AbstractAppender
             {
                 for (JTextArea textArea : textAreas)
                 {
-                    try
-                    {
+
+                    try {
                         jtextArea(message, textArea);
-                    } catch (Throwable throwable)
-                    {
-                        throwable.printStackTrace();
+                    } catch (BadLocationException e) {
+                        e.printStackTrace();
                     }
+
                 }
             });
         } catch (IllegalStateException exception)

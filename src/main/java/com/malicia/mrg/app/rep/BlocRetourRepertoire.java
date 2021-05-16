@@ -1,20 +1,30 @@
 package com.malicia.mrg.app.rep;
 
 import com.malicia.mrg.param.importjson.RepertoirePhoto;
-import javafx.scene.image.Image;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.image.BufferedImage;
-import java.beans.Transient;
-import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 
-public class blocRetourRepertoire {
+public class BlocRetourRepertoire {
 
-    public List<String> previewPhoto;
-    public List<String> lstPhoto;
+    public List<String> getPreviewPhoto() {
+        return previewPhoto;
+    }
+
+    public void setPreviewPhoto(List<String> previewPhoto) {
+        this.previewPhoto = previewPhoto;
+    }
+
+    public List<String> getLstPhoto() {
+        return lstPhoto;
+    }
+
+    public void setLstPhoto(List<String> lstPhoto) {
+        this.lstPhoto = lstPhoto;
+    }
+
+    private List<String> previewPhoto;
+    private List<String> lstPhoto;
 
     public RepertoirePhoto getRepPhoto() {
         return repPhoto;
@@ -27,7 +37,7 @@ public class blocRetourRepertoire {
     private Boolean nomOk;
     private Boolean valOk;
 
-    public blocRetourRepertoire(RepertoirePhoto repPhoto, String repertoire) {
+    public BlocRetourRepertoire(RepertoirePhoto repPhoto, String repertoire) {
         this.repPhoto = repPhoto;
         this.repertoire = repertoire;
         nomOk = true;

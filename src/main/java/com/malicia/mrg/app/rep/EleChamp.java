@@ -1,22 +1,9 @@
 package com.malicia.mrg.app.rep;
 
-import com.malicia.mrg.model.Database;
-import com.malicia.mrg.param.importjson.ControleRepertoire;
-import com.malicia.mrg.param.importjson.RepertoirePhoto;
-import javafx.scene.image.Image;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.io.File;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
 
 public class EleChamp {
-
-    private static final Logger LOGGER = LogManager.getLogger(EleChamp.class);
 
     private String cChamp;
     private String oValue;
@@ -67,7 +54,6 @@ public class EleChamp {
     }
 
     public void setRetourToTrue() {
-        //this.infoRetourControle.add(ControleRepertoire.CARAC_EMPTY);
         this.compTagRetour = new ArrayList<>();
         retourControle = true;
     }

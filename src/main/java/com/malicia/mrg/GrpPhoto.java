@@ -7,11 +7,12 @@ import java.util.List;
 
 
 public class GrpPhoto {
-    public long firstDate;
-    List<ElementFichier> lstEleFile = new ArrayList();
+    private long firstDate;
+    List<ElementFichier> lstEleFile = new ArrayList<>();
     private int[] arrayRep = new int[Context.IREP_NEW+1];
 
     public GrpPhoto() {
+        // Do nothing
     }
 
     public int getArrayRep(int i) {
