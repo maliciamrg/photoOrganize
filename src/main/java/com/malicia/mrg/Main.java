@@ -39,21 +39,21 @@ public class Main {
     private static final Boolean IS_DRY_RUN = Boolean.FALSE;
 
     private static final Boolean GO = Boolean.TRUE;
-    private static final Boolean IS_MAINT_LR_0000000 = IS_DRY_RUN;
-    private static final Boolean IS_ACTION_FROM_KEY0 = IS_DRY_RUN;
-    private static final Boolean IS_PURGE_ACTION_000 = IS_DRY_RUN;
-    private static final Boolean IS_TAG_DEL_00000000 = IS_DRY_RUN;
-    private static final Boolean IS_TAG_CR_000000000 = IS_DRY_RUN;
-    private static final Boolean IS_RETAG_RED_000000 = IS_DRY_RUN;
-    private static final Boolean IS_WRK_REJET_000000 = IS_DRY_RUN;
-    private static final Boolean IS_UNZIP_REP_PHOTO0 = IS_DRY_RUN;
+    private static final Boolean IS_MAINT_LR_0000000 = GO;
+    private static final Boolean IS_ACTION_FROM_KEY0 = GO;
+    private static final Boolean IS_PURGE_ACTION_000 = GO;
+    private static final Boolean IS_TAG_DEL_00000000 = GO;
+    private static final Boolean IS_TAG_CR_000000000 = GO;
+    private static final Boolean IS_RETAG_RED_000000 = GO;
+    private static final Boolean IS_WRK_REJET_000000 = GO;
+    private static final Boolean IS_UNZIP_REP_PHOTO0 = GO;
     private static final Boolean IS_WRK_REP_PHOTO_00 = GO;
-    private static final Boolean IS_RGP_NEW_00000000 = IS_DRY_RUN;
-    private static final Boolean IS_LST_RAPP_NEW_REP = IS_DRY_RUN;
-    private static final Boolean IS_TAG_RAPP_NEW_REP = IS_DRY_RUN;
-    private static final Boolean IS_PURGE_FOLDER_000 = IS_DRY_RUN;
-    private static final Boolean IS_SVG_LRCONFIG_000 = IS_DRY_RUN;
-    private static final Boolean IS_RSYNC_BIB_000000 = IS_DRY_RUN;
+    private static final Boolean IS_RGP_NEW_00000000 = GO;
+    private static final Boolean IS_LST_RAPP_NEW_REP = GO;
+    private static final Boolean IS_TAG_RAPP_NEW_REP = GO;
+    private static final Boolean IS_PURGE_FOLDER_000 = GO;
+    private static final Boolean IS_SVG_LRCONFIG_000 = GO;
+    private static final Boolean IS_RSYNC_BIB_000000 = GO;
     private static final Boolean IS_EXEC_FONC_REP_00 = GO;
     private static Context ctx;
     private static Database dbLr;
@@ -168,6 +168,14 @@ public class Main {
                 //*
             }
 
+            if (Boolean.TRUE.equals(IS_WRK_REP_PHOTO_00)) {
+                if (Boolean.TRUE.equals(IS_EXEC_FONC_REP_00)) {
+                    //Popup Action sur les erreurs Fonctionelle des repertoires
+                    analFonctionRep.action();
+                    //*
+                }
+            }
+
             if (isItTimeToSave()) {
                 if (Boolean.TRUE.equals(IS_SVG_LRCONFIG_000)) {
                     //Sauvegarde Lightroom sur Local
@@ -178,13 +186,6 @@ public class Main {
                 if (Boolean.TRUE.equals(IS_RSYNC_BIB_000000)) {
                     //sauvegarde Vers Réseaux Pour Cloud
                     sauvegardeStudioPhoto2Reseaux();
-                    //*
-                }
-            }
-            if (Boolean.TRUE.equals(IS_WRK_REP_PHOTO_00)) {
-                if (Boolean.TRUE.equals(IS_EXEC_FONC_REP_00)) {
-                    //Popup Action sur les erreurs Fonctionelle des repertoires
-                    analFonctionRep.action();
                     //*
                 }
             }
@@ -347,17 +348,18 @@ public class Main {
         if (Boolean.TRUE.equals(IS_MAINT_LR_0000000)) {
             txt += "   -  " + "maintenanceDatabase()" + "\n";
         }
+        if (Boolean.TRUE.equals(IS_WRK_REP_PHOTO_00)) {
+            if (Boolean.TRUE.equals(IS_EXEC_FONC_REP_00)) {
+                txt += "   -  - " + "analFonctionRep.action()" + "\n";
+            }
+        }
         if (Boolean.TRUE.equals(IS_SVG_LRCONFIG_000)) {
             txt += "   -  " + "sauvegardeLightroomConfigSauve()" + "\n";
         }
         if (Boolean.TRUE.equals(IS_RSYNC_BIB_000000)) {
             txt += "   -  " + "sauvegardeStudioPhoto2Reseaux()" + "\n";
         }
-        if (Boolean.TRUE.equals(IS_WRK_REP_PHOTO_00)) {
-            if (Boolean.TRUE.equals(IS_EXEC_FONC_REP_00)) {
-                txt += "   -  - " + "analFonctionRep.action()" + "\n";
-            }
-        }
+
         txt += "   -                                                                               -   " + "\n";
         txt += "   ---------------------------------------------------------------------------------   " + "\n";
         LOGGER.info(txt);
@@ -521,18 +523,25 @@ public class Main {
                 .delete(true)
                 .verbose(true);
 
-        StreamingProcessOutput output = new StreamingProcessOutput(new Output());
+        Output output1 = new Output();
+        StreamingProcessOutput output = new StreamingProcessOutput(output1);
         output.monitor(rsync.builder());
 
-        writeMouchard(rsync);
+        writeMouchard(output1);
     }
 
-    private static void writeMouchard(RSync rsync) throws IOException {
+    private static void writeMouchard(Output output) throws IOException {
         File syncMouchard = new File(ctx.getRepFonctionnel().getRepertoiresyncdest() + ctx.getRepFonctionnel().getSyncdestmouchard());
 
-        String txt = Arrays.toString(ctx.getRepFonctionnel().getRepertoiresyncsource()) + "\n" +
+        Calendar calt = Calendar.getInstance();
+        calt.setTime(new Date());
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+        String txt = " " + sdf.format(calt.getTimeInMillis()) + "\n" +
+                Arrays.toString(ctx.getRepFonctionnel().getRepertoiresyncsource()) + "\n" +
                 " to " + ctx.getRepFonctionnel().getRepertoiresyncdest() + "\n" +
-                " -> " + rsync.getInfo() + "\n" +
+                " -> " + "\n" +
+                output.resumer + "\n" +
                 " ---------------------------------------  \n";
         LOGGER.debug(txt);
 
@@ -831,19 +840,19 @@ public class Main {
 
                 analyseRepertoires.add(retourRepertoire);
 
-                File f = new File(repertoire + Context.FOLDERDELIM + "photoOrganizeAnalyse.json");
-                if (!retourRepertoire.isRepertoireValide()) {
-                    Serialize.writeJSON(retourRepertoire, f);
-                    LOGGER.debug(repertoire + "=>" + "ko" + " => " + " ecriture fichier ->" + f.toString());
-                } else {
-                    f.delete();
-                }
+//                File f = new File(repertoire + Context.FOLDERDELIM + "photoOrganizeAnalyse.json");
+//                if (!retourRepertoire.isRepertoireValide()) {
+//                    Serialize.writeJSON(retourRepertoire, f);
+//                    LOGGER.debug(repertoire + "=>" + "ko" + " => " + " ecriture fichier ->" + f.toString());
+//                } else {
+//                    f.delete();
+//                }
 
             }
 
-            File f = new File(ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire() + Context.FOLDERDELIM + new File(repPhoto.getRepertoire()).getName() + ".svg.json");
-            Serialize.writeJSON(repPhoto, f);
-            LOGGER.debug("ecriture fichier ->" + f.toString());
+//            File f = new File(ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire() + Context.FOLDERDELIM + new File(repPhoto.getRepertoire()).getName() + ".svg.json");
+//            Serialize.writeJSON(repPhoto, f);
+//            LOGGER.debug("ecriture fichier ->" + f.toString());
 
         }
 

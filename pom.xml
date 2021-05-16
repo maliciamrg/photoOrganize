@@ -62,7 +62,7 @@
         <dependency>
             <groupId>github.maliciamrg</groupId>
             <artifactId>utilitaire</artifactId>
-            <version>1.0</version>
+            <version>1.0.2</version>
         </dependency>
     </dependencies>
     <scm>
@@ -204,6 +204,13 @@
         </plugins>
         <finalName>${project.artifactId}-${project.version}.${buildNumber}</finalName>
     </build>
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>github</name>
+            <url>https://maven.pkg.github.com/maliciamrg/*</url>
+        </repository>
+    </distributionManagement>
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>

@@ -197,6 +197,8 @@ public class AnalyseGlobalRepertoires {
         //Recuperer 4 preview du repertoire
         retourControleRep.previewPhoto=dbLr.getFourRandomPreviewPhoto(repertoire);
 
+        //Recuperer lstphoto du rep
+        retourControleRep.lstPhoto=dbLr.getLstPhoto(repertoire);
 
         return retourControleRep;
 
@@ -207,7 +209,9 @@ public class AnalyseGlobalRepertoires {
             this.listOfretourValRepertoire.add(retourRepertoire);
         }
         if (!retourRepertoire.getNomOk()) {
-            this.listOfretourNomRepertoire.add(retourRepertoire);
+            if (retourRepertoire.lstPhoto.size()!=0) {
+                this.listOfretourNomRepertoire.add(retourRepertoire);
+            }
         }
     }
 

@@ -12,8 +12,6 @@ import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -1002,24 +1000,54 @@ public class Database extends SQLiteJDBCDriverConnection {
         return executeUpdate(sql);
     }
 
-    public List<Icon> getFourRandomPreviewPhoto(String repertoire) throws SQLException, IOException {
-        List<Icon> listTmp = new ArrayList<>();
-        listTmp.add(resizeImageIcon(new ImageIcon("D:\\JavaProjet\\photoOrganize\\src\\main\\resources\\err404.jpg")));
-        listTmp.add(resizeImageIcon(new ImageIcon("D:\\JavaProjet\\photoOrganize\\src\\main\\resources\\err404.jpg")));
-        listTmp.add(resizeImageIcon(new ImageIcon("D:\\JavaProjet\\photoOrganize\\src\\main\\resources\\err404.jpg")));
-        listTmp.add(resizeImageIcon(new ImageIcon("D:\\JavaProjet\\photoOrganize\\src\\main\\resources\\err404.jpg")));
-        //todo
+    public List<String> getFourRandomPreviewPhoto(String repertoire) throws SQLException, IOException {
+        Map<String, String> idLocalRep = getIdlocalforRep(repertoire);
+
+        List<String> listTmp = new ArrayList<>();
+
+        Map<String, String> ret = new HashMap<>();
+        String sql = "SELECT random() as TRI , * " +
+                "FROM  AgLibraryFile " +
+                "WHERE folder = '" + idLocalRep.get("Folderidlocal") + "'" +
+                "and extension = '" + Context.JPG + "' " +
+                "order by TRI " +
+                ";";
+        ResultSet rs = select(sql);
+        int nb = 1;
+        while (rs.next() && nb <= 4) {
+            String absolutePath = idLocalRep.get("absolutePath");
+            String pathFromRoot = idLocalRep.get("pathFromRoot");
+            String lcIdxFilename = rs.getString("lc_idx_filename");
+            listTmp.add(normalizePath(absolutePath + pathFromRoot + File.separator + lcIdxFilename));
+            nb++;
+        }
+
+
         return listTmp;
     }
 
-    private Icon resizeImageIcon(ImageIcon imageIcon) {
-        Image image = imageIcon.getImage(); // transform it
-        int w = image.getWidth(null);
-        int h = image.getHeight(null);
-        int coef = (Context.INT_WIDTH *100)/w;
-        Image newimg = image.getScaledInstance(w*coef/100, h*coef/100,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
-        return new ImageIcon(newimg);
-    }
+    public List<String> getLstPhoto(String repertoire) throws SQLException, IOException {
+        Map<String, String> idLocalRep = getIdlocalforRep(repertoire);
 
+        List<String> listTmp = new ArrayList<>();
+
+        Map<String, String> ret = new HashMap<>();
+        String sql = "SELECT * " +
+                "FROM  AgLibraryFile a " +
+                "inner join Adobe_images e  " +
+                " on a.id_local = e.rootFile    " +
+                "WHERE a.folder = '" + idLocalRep.get("Folderidlocal") + "'" +
+                "and a.extension = '" + Context.JPG + "' " +
+                "order by e.captureTime asc " +
+                ";";
+        ResultSet rs = select(sql);
+        while (rs.next()) {
+            String absolutePath = idLocalRep.get("absolutePath");
+            String pathFromRoot = idLocalRep.get("pathFromRoot");
+            String lcIdxFilename = rs.getString("lc_idx_filename");
+            listTmp.add(normalizePath(absolutePath + pathFromRoot + File.separator + lcIdxFilename));
+        }
+        return listTmp;
+    }
 }
 

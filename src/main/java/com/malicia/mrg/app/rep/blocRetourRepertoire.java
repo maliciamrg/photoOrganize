@@ -13,7 +13,8 @@ import java.util.ListIterator;
 
 public class blocRetourRepertoire {
 
-    public transient List<Icon> previewPhoto;
+    public List<String> previewPhoto;
+    public List<String> lstPhoto;
 
     public RepertoirePhoto getRepPhoto() {
         return repPhoto;

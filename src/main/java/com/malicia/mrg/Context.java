@@ -30,6 +30,8 @@ public class Context {
     public static final int INT_WIDTH = 120;
     private static final String JSON = ".json";
     private static final Logger LOGGER = LogManager.getLogger(Context.class);
+    public static final String ERR_404_JPG = "D:\\JavaProjet\\photoOrganize\\src\\main\\resources\\err404.jpg";
+    public static final String JPG = "jpg";
     public static int nbDiscretionnaire = 0;
     public static String localVoidPhotoUrl;
     public static String localErr404PhotoUrl;
