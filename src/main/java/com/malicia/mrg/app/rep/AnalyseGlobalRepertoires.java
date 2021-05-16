@@ -219,7 +219,9 @@ public class AnalyseGlobalRepertoires {
 
     public void action() {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        RenameRepertoire.start(dbLr, ctx, listOfretourNomRepertoire);
+        if(!listOfretourNomRepertoire.isEmpty()) {
+            RenameRepertoire.start(dbLr, ctx, listOfretourNomRepertoire);
+        }
     }
 
     @Override
