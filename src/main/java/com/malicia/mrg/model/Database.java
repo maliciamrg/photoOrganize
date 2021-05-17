@@ -38,8 +38,8 @@ public class Database extends SQLiteJDBCDriverConnection {
         return database;
     }
 
-    public void AddKeywordToFile(String fileIdLocal, String tag) throws SQLException {
-        String idlocaltag = sqlcreateKeyword(Context.TAGORG, tag).get("keyWordIdlocal");
+    public void AddKeywordToFile(String fileIdLocal, String tag, String TagMaitre) throws SQLException {
+        String idlocaltag = sqlcreateKeyword(TagMaitre, tag).get("keyWordIdlocal");
         long idlocalImage = sqlGetAdobeImage(fileIdLocal);
 
         long idlocalKeywordImage = sqlGetAgLibraryKeywordImage(idlocalImage, idlocaltag);
@@ -858,7 +858,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         HashMap<String, String> ret = new HashMap<>();
         String sql = " select * " +
                 "from AgLibraryFolder " +
-                "where pathFromRoot REGEXP  '\\/" + collections + "\\/[@&#a-zA-Z 0-9-]*\\/$' " +
+                "where pathFromRoot REGEXP  '\\/" + collections + "\\/[@&#a-zA-Z _0-9-]*\\/$' " +
                 ";";
         ResultSet rs = select(sql);
         while (rs.next()) {

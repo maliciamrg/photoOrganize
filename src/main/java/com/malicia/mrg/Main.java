@@ -74,7 +74,7 @@ public class Main {
             AnalyseGlobalRepertoires.init(ctx,dbLr);
 
             SystemFiles.setIsDryRun(IS_DRY_RUN);
-            ctx.getActionVersRepertoire().populate(dbLr.getFolderCollection(Context.COLLECTIONS, Context.TAGORG));
+            ctx.getActionVersRepertoire().populate(dbLr.getFolderCollection(Context.COLLECTIONS, Context.TAG_ORG));
             //*
 
             // chargement parameter
@@ -221,7 +221,7 @@ public class Main {
         //action collection
         Map<String, String> listeAction = ctx.getActionVersRepertoire().getListeAction();
         //action GO
-        listeAction.put(Context.ACTION01GO, "");
+        listeAction.put(Context.TAG_ACTION_GO_RAPPROCHEMENT, "");
 
         for (String tag : listeAction.keySet()) {
 
@@ -239,7 +239,7 @@ public class Main {
 
     private static void purgeKeywordProjet(List<String> lstIdKey) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        int nbPurge = dbLr.purgeGroupeKeyword(Context.TAGORG, lstIdKey);
+        int nbPurge = dbLr.purgeGroupeKeyword(Context.TAG_ORG, lstIdKey);
         loggerInfo("purge " + String.format("%05d", nbPurge) + " - keywords ", nbPurge);
     }
 
@@ -250,21 +250,27 @@ public class Main {
 
         Map<String, String> dbLrSqlcreateKeyword = new HashMap<>();
 
-        dbLrSqlcreateKeyword = dbLr.sqlcreateKeyword("", Context.TAGORG);
+        dbLrSqlcreateKeyword = dbLr.sqlcreateKeyword("", Context.TAG_ORG);
         lstIdKey.add(dbLrSqlcreateKeyword.get("keyWordIdlocal"));
         if (Boolean.valueOf(dbLrSqlcreateKeyword.get("NewkeyWordIdlocal"))) {
-            LOGGER.info(getStringLn("Keyword " + Context.TAGORG) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
+            LOGGER.info(getStringLn("Keyword " + Context.TAG_ORG) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
         }
 
-        dbLrSqlcreateKeyword = dbLr.sqlcreateKeyword(Context.TAGORG, Context.ACTION01GO);
+        dbLrSqlcreateKeyword = dbLr.sqlcreateKeyword(Context.TAG_ORG, Context.TAG_RAPPROCHEMENT);
         lstIdKey.add(dbLrSqlcreateKeyword.get("keyWordIdlocal"));
         if (Boolean.valueOf(dbLrSqlcreateKeyword.get("NewkeyWordIdlocal"))) {
-            LOGGER.info(getStringLn("Keyword " + Context.ACTION01GO) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
+            LOGGER.info(getStringLn("Keyword " + Context.TAG_ORG) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
+        }
+
+        dbLrSqlcreateKeyword = dbLr.sqlcreateKeyword(Context.TAG_RAPPROCHEMENT, Context.TAG_ACTION_GO_RAPPROCHEMENT);
+        lstIdKey.add(dbLrSqlcreateKeyword.get("keyWordIdlocal"));
+        if (Boolean.valueOf(dbLrSqlcreateKeyword.get("NewkeyWordIdlocal"))) {
+            LOGGER.info(getStringLn("Keyword " + Context.TAG_ACTION_GO_RAPPROCHEMENT) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
         }
 
         for (String key : ctx.getActionVersRepertoire().getListeAction().keySet()) {
 
-            dbLrSqlcreateKeyword = dbLr.sqlcreateKeyword(Context.TAGORG, key);
+            dbLrSqlcreateKeyword = dbLr.sqlcreateKeyword(Context.TAG_ORG, key);
             lstIdKey.add(dbLrSqlcreateKeyword.get("keyWordIdlocal"));
             if (Boolean.valueOf(dbLrSqlcreateKeyword.get("NewkeyWordIdlocal"))) {
                 LOGGER.info(getStringLn("Keyword " + key) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
@@ -377,22 +383,22 @@ public class Main {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         //Action GO
-        Map<String, Map<String, String>> fileToGo = dbLr.getFileForGoTag(Context.ACTION01GO);
-        loggerInfo("nb de fichier tagger : " + Context.ACTION01GO + " => " + String.format("%05d", fileToGo.size()) + "", fileToGo.size());
+        Map<String, Map<String, String>> fileToGo = dbLr.getFileForGoTag(Context.TAG_ACTION_GO_RAPPROCHEMENT);
+        loggerInfo("nb de fichier tagger : " + Context.TAG_ACTION_GO_RAPPROCHEMENT + " => " + String.format("%05d", fileToGo.size()) + "", fileToGo.size());
         int nb = 0;
         for (String key : fileToGo.keySet()) {
-            Map<String, String> forGoTag = dbLr.getNewPathForGoTagandFileIdlocal(Context.TAGORG, key);
+            Map<String, String> forGoTag = dbLr.getNewPathForGoTagandFileIdlocal(Context.TAG_ORG, key);
             if (forGoTag.size() > 0) {
                 nb++;
                 String source = fileToGo.get(key).get("oldPath");
                 String newPath = forGoTag.get("newPath");
-                LOGGER.debug("---move " + Context.ACTION01GO + " : " + source + " -> " + newPath);
+                LOGGER.debug("---move " + Context.TAG_ACTION_GO_RAPPROCHEMENT + " : " + source + " -> " + newPath);
                 SystemFiles.moveFile(source, newPath);
                 dbLr.sqlmovefile(key, newPath);
                 dbLr.removeKeywordImages(forGoTag.get("kiIdLocal"));
             }
         }
-        loggerInfo("move " + String.format("%05d", nb) + " - " + Context.ACTION01GO, nb);
+        loggerInfo("move " + String.format("%05d", nb) + " - " + Context.TAG_ACTION_GO_RAPPROCHEMENT, nb);
 
         //action collection
         Map<String, String> listeAction = ctx.getActionVersRepertoire().getListeAction();
@@ -737,10 +743,10 @@ public class Main {
             if (listEle.size() > 1 && listEle.getArrayRep(Context.IREP_NEW) > 0 && listEle.size() > listEle.getArrayRep(Context.IREP_NEW)) {
                 Context.nbDiscretionnaire++;
                 String nbDiscr = String.format("%1$03X", Context.nbDiscretionnaire);
-                String tag = Context.TAGORG + "_" + nbDiscr + "_" + Context.POSSIBLE_NEW_GROUP;
+                String tag = Context.TAG_RAPPROCHEMENT + "_" + nbDiscr + "_" + Context.POSSIBLE_NEW_GROUP;
                 LOGGER.info("tag : " + tag + " ==> ");
                 for (ElementFichier eleFile : listEle.lstEleFile) {
-                    dbLr.AddKeywordToFile(eleFile.getFileIdLocal(), tag);
+                    dbLr.AddKeywordToFile(eleFile.getFileIdLocal(), tag, Context.TAG_RAPPROCHEMENT);
                     LOGGER.debug(" --- " + eleFile.getPathFromRoot() + File.separator + eleFile.getLcIdxFilename());
                 }
                 //display info

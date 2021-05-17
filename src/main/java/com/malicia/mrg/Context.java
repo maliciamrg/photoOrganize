@@ -8,13 +8,10 @@ import org.apache.logging.log4j.Logger;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 public class Context {
 
@@ -22,8 +19,10 @@ public class Context {
     public static final int IREP_NEW = 10;
 
     public static final String RED = "Red";
-    public static final String TAGORG = "#ORG#";
-    public static final String ACTION01GO = "GO" + Context.TAGORG;
+    public static final String TAG_ORG = "#ORG#";
+    public static final String TAG_RAPPROCHEMENT = TAG_ORG + "RAPPROCHEMENT";
+    public static final String TAG_ACTION_GO = "GO" + "->";
+    public static final String TAG_ACTION_GO_RAPPROCHEMENT = TAG_ACTION_GO + Context.TAG_RAPPROCHEMENT;
     public static final String COLLECTIONS = "!!Collections";
     public static final String POSSIBLE_NEW_GROUP = "possibleRegroupement";
     public static final String PREFIX = " --- ";
