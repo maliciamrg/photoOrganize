@@ -1,6 +1,6 @@
 package com.malicia.mrg;
 
-public final class InfoVersion {
+public class InfoVersion {
 
     private static final String PROJECT_VERSION = "${project.version}";
     private static final String PROJECT_GROUP_ID = "${project.groupId}";

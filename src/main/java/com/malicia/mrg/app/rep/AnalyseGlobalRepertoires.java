@@ -21,8 +21,8 @@ public class AnalyseGlobalRepertoires {
     private static final Logger LOGGER = LogManager.getLogger(AnalyseGlobalRepertoires.class);
     private static Context ctx;
     private static Database dbLr;
-    private List<BlocRetourRepertoire> listOfretourNomRepertoire;
-    private List<BlocRetourRepertoire> listOfretourValRepertoire;
+    private final List<BlocRetourRepertoire> listOfretourNomRepertoire;
+    private final List<BlocRetourRepertoire> listOfretourValRepertoire;
 
     public AnalyseGlobalRepertoires() {
         this.listOfretourNomRepertoire = new ArrayList<>();
@@ -110,7 +110,6 @@ public class AnalyseGlobalRepertoires {
         }
     }
 
-
     private static int getNbelements(String repertoire) {
         int nbelements;
         nbelements = 0;
@@ -152,7 +151,7 @@ public class AnalyseGlobalRepertoires {
     }
 
     public static BlocRetourRepertoire calculateLesEleChampsDuRepertoire(String repertoire, RepertoirePhoto repPhoto, ControleRepertoire paramControleRepertoire) throws SQLException, IOException {
-        LOGGER.debug("isRepertoireOk :  {}" , repertoire);
+        LOGGER.debug("isRepertoireOk :  {}", repertoire);
 
         BlocRetourRepertoire retourControleRep = new BlocRetourRepertoire(repPhoto, repertoire);
 
@@ -193,7 +192,7 @@ public class AnalyseGlobalRepertoires {
 
 
         //Recuperer 4 preview du repertoire
-        retourControleRep.setPreviewPhoto( dbLr.getFourRandomPreviewPhoto(repertoire));
+        retourControleRep.setPreviewPhoto(dbLr.getFourRandomPreviewPhoto(repertoire));
 
         //Recuperer lstphoto du rep
         retourControleRep.setLstPhoto(dbLr.getLstPhoto(repertoire));
@@ -205,6 +204,10 @@ public class AnalyseGlobalRepertoires {
     public static void init(Context ctxIn, Database dbLrIn) {
         ctx = ctxIn;
         dbLr = dbLrIn;
+    }
+
+    public List<BlocRetourRepertoire> getListOfretourValRepertoire() {
+        return listOfretourValRepertoire;
     }
 
     public void add(BlocRetourRepertoire retourRepertoire) {
@@ -219,7 +222,7 @@ public class AnalyseGlobalRepertoires {
 
     public void action() {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        if(!listOfretourNomRepertoire.isEmpty()) {
+        if (!listOfretourNomRepertoire.isEmpty()) {
             RenameRepertoire.start(dbLr, ctx, listOfretourNomRepertoire);
         }
     }

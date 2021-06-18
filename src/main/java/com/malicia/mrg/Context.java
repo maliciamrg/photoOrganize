@@ -21,6 +21,7 @@ public class Context {
     public static final String RED = "Red";
     public static final String TAG_ORG = "#ORG#";
     public static final String TAG_RAPPROCHEMENT = TAG_ORG + "RAPPROCHEMENT";
+    public static final String TAG_REPSWEEP = TAG_ORG + "REPSWEEP";
     public static final String TAG_ACTION_GO = "GO" + "->";
     public static final String TAG_ACTION_GO_RAPPROCHEMENT = TAG_ACTION_GO + Context.TAG_RAPPROCHEMENT;
     public static final String COLLECTIONS = "!!Collections";

@@ -89,23 +89,40 @@ public class Database extends SQLiteJDBCDriverConnection {
 
     }
 
-    public void AddKeywordToRep(String repertoire, String tag) throws SQLException {
-        //todo
-        String sql;
-        sql = "update Adobe_images " +
-                "set colorLabels = '" + tag + "' " +
-                " where rootFile in ( " +
-                " select a.id_local as file_id_local " +
-                "from AgLibraryFile a  " +
-                "inner join AgLibraryFolder b   " +
-                " on a.folder = b.id_local  " +
-                "inner join AgLibraryRootFolder p   " +
-                " on b.rootFolder = p.id_local  " +
-                "where '" + SystemFiles.normalizePath(repertoire) + "' like p.absolutePath || '%'  " +
-                "and p.absolutePath || b.pathFromRoot like '" + SystemFiles.normalizePath(repertoire) + "' || '%' " +
-                " ) " +
+    public void AddKeywordToRep(String repertoire, String tag, String TagMaitre) throws SQLException {
+
+        Map<String, String> idLocalRep = getIdlocalforRep(repertoire);
+        String idlocaltag = sqlcreateKeyword(TagMaitre, tag).get("keyWordIdlocal");
+
+        Map<String, String> ret = new HashMap<>();
+        String sql = "SELECT e.id_local as idlocalImage " +
+                "FROM  AgLibraryFile a " +
+                "inner join Adobe_images e  " +
+                " on a.id_local = e.rootFile    " +
+                "WHERE a.folder = '" + idLocalRep.get("Folderidlocal") + "'" +
+                "order by e.captureTime asc " +
                 ";";
-        executeUpdate(sql);
+
+        ResultSet rs = select(sql);
+        while (rs.next()) {
+
+            Long idlocalImage = rs.getLong("idlocalImage");
+
+            long idlocalKeywordImage = sqlGetAgLibraryKeywordImage(idlocalImage, idlocaltag);
+            if (idlocalKeywordImage == 0) {
+                idlocalKeywordImage = sqlGetPrevIdlocalforKeywordImage();
+
+                String sqlu;
+                sqlu = "insert into AgLibraryKeywordImage " +
+                        "( 'id_local', 'image', 'tag') " +
+                        "VALUES " +
+                        "('" + idlocalKeywordImage + "', '" + idlocalImage + "', '" + idlocaltag + "');" +
+                        ";";
+                executeUpdate(sqlu);
+            }
+
+        }
+
     }
 
     public int topperARed50NEW(String repertoire50NEW) throws SQLException {
@@ -355,6 +372,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                         "inner join Adobe_images e  " +
                         " on a.id_local = e.rootFile    " +
                         " where " + idLocalRep.get("Folderidlocal") + " = a.folder  " +
+                        " and e.fileFormat != 'VIDEO' " +
                         " group by e.rating " +
                         ";");
 
@@ -397,6 +415,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                         " on a.id_local = e.rootFile " +
                         " where " + idLocalRep.get("Folderidlocal") + " = a.folder " +
                         " and e.pick >= 0 " +
+                        " and e.fileFormat != 'VIDEO' " +
                         ";");
 
         int nbpick = 0;

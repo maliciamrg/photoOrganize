@@ -5,6 +5,7 @@ import com.github.fracpete.rsync4j.RSync;
 import com.malicia.mrg.app.*;
 import com.malicia.mrg.app.rep.AnalyseGlobalRepertoires;
 import com.malicia.mrg.app.rep.BlocRetourRepertoire;
+import com.malicia.mrg.app.rep.EleChamp;
 import com.malicia.mrg.model.Database;
 import com.malicia.mrg.model.ElementFichier;
 import com.malicia.mrg.param.importjson.RepertoirePhoto;
@@ -26,9 +27,12 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
@@ -51,8 +55,8 @@ public class Main {
     private static final Boolean IS_LST_RAPP_NEW_REP = GO;
     private static final Boolean IS_TAG_RAPP_NEW_REP = GO;
     private static final Boolean IS_PURGE_FOLDER_000 = GO;
-    private static final Boolean IS_SVG_LRCONFIG_000 = GO;
-    private static final Boolean IS_RSYNC_BIB_000000 = GO;
+    private static final Boolean IS_SVG_LRCONFIG_000 = IS_DRY_RUN;
+    private static final Boolean IS_RSYNC_BIB_000000 = IS_DRY_RUN;
     private static final Boolean IS_EXEC_FONC_REP_00 = GO;
     private static Context ctx;
     private static Database dbLr;
@@ -71,7 +75,7 @@ public class Main {
             // chargement application
             ctx = Context.chargeParam();
             dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat(), IS_DRY_RUN);
-            AnalyseGlobalRepertoires.init(ctx,dbLr);
+            AnalyseGlobalRepertoires.init(ctx, dbLr);
 
             SystemFiles.setIsDryRun(IS_DRY_RUN);
             ctx.getActionVersRepertoire().populate(dbLr.getFolderCollection(Context.COLLECTIONS, Context.TAG_ORG));
@@ -79,7 +83,7 @@ public class Main {
 
             // chargement parameter
             chargementParametre(ctx, args);
-            //*
+            //*ç
 
             displayBooleen();
 
@@ -173,6 +177,32 @@ public class Main {
                     analFonctionRep.action();
                     //*
                 }
+
+                List<BlocRetourRepertoire> retourValRepertoire = analFonctionRep.getListOfretourValRepertoire();
+                retourValRepertoire.forEach(
+                        (blocRetourRep) -> {
+                            List<EleChamp> eChamp = blocRetourRep.getListOfControleValRepertoire();
+                            eChamp.forEach(
+                                    (champ) -> {
+                                        if (!champ.isRetourControle()) {
+                                            //todo
+//                                            System.out.println(blocRetourRep.getRepertoire() + " -- " + champ.getCompTagRetour());
+                                            LOGGER.info(blocRetourRep.getRepertoire() + " -- " + champ.getCompTagRetour());
+                                            NumberFormat formatter = new DecimalFormat("0000");
+                                            int nbDiscr = ThreadLocalRandom.current().nextInt(0, 9999);
+                                            String number = formatter.format(nbDiscr);
+                                            String tag = Context.TAG_REPSWEEP + "_" + number + "_"+  champ.getCompTagRetour();
+                                            try {
+                                                dbLr.AddKeywordToRep(blocRetourRep.getRepertoire(), tag, Context.TAG_REPSWEEP);
+                                            } catch (SQLException throwables) {
+                                                throwables.printStackTrace();
+                                            }
+                                        }
+                                    }
+                            );
+                        }
+                );
+
             }
 
             if (isItTimeToSave()) {
@@ -257,6 +287,12 @@ public class Main {
         }
 
         dbLrSqlcreateKeyword = dbLr.sqlcreateKeyword(Context.TAG_ORG, Context.TAG_RAPPROCHEMENT);
+        lstIdKey.add(dbLrSqlcreateKeyword.get("keyWordIdlocal"));
+        if (Boolean.valueOf(dbLrSqlcreateKeyword.get("NewkeyWordIdlocal"))) {
+            LOGGER.info(getStringLn("Keyword " + Context.TAG_ORG) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
+        }
+
+        dbLrSqlcreateKeyword = dbLr.sqlcreateKeyword(Context.TAG_ORG, Context.TAG_REPSWEEP);
         lstIdKey.add(dbLrSqlcreateKeyword.get("keyWordIdlocal"));
         if (Boolean.valueOf(dbLrSqlcreateKeyword.get("NewkeyWordIdlocal"))) {
             LOGGER.info(getStringLn("Keyword " + Context.TAG_ORG) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
@@ -673,7 +709,7 @@ public class Main {
             int i;
             for (i = 0; i < arrayRepertoirePhoto.size(); i++) {
                 if (arrayRepertoirePhoto.get(i).isRapprochermentNewOk() && ch.startsWith(SystemFiles.normalizePath(ctx.getRepertoire50Phototheque() + arrayRepertoirePhoto.get(i).getRepertoire()))) {
-                        numeroRep = i;
+                    numeroRep = i;
                 }
             }
             if (ch.startsWith(SystemFiles.normalizePath(ctx.getParamTriNew().getRepertoire50NEW()))) {
