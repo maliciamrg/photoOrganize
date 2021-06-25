@@ -6,6 +6,7 @@ import com.malicia.mrg.param.importjson.ControleRepertoire;
 import com.malicia.mrg.param.importjson.RepertoirePhoto;
 import com.malicia.mrg.util.WhereIAm;
 import com.malicia.mrg.view.RenameRepertoire;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -74,26 +75,26 @@ public class AnalyseGlobalRepertoires {
                 controleRepertoireNBSTARVALUE(repertoire, repPhoto, ele);
                 break;
             case ControleRepertoire.NB_ELEMENTS:
-                nbelements = getNbelements(repertoire);
+                nbelements = getNbelementsPhysiqueNonRejet(repertoire);
                 ele.setRetourToTrue();
                 if (nbelements == 0) {
                     ele.setRetourToFalse(String.valueOf(nbelements), "pbrepertoire_zeroelements");
                 }
                 break;
             case ControleRepertoire.NB_SELECTIONNER:
-                nbSelectionner = dbLr.nbPick(repertoire);
+                nbSelectionner = dbLr.nbPickNoVideo(repertoire);
                 ele.setRetourToTrue();
                 if (nbSelectionner == 0) {
-                    ele.setRetourToFalse(String.valueOf(nbSelectionner), "pbrepertoire_zeroelements_selectionner");
+                    ele.setRetourToFalse(String.valueOf(nbSelectionner), "pbrepertoire_zeroPhotoSelectionner");
                 }
                 break;
             case ControleRepertoire.NB_PHOTOAPURGER:
                 limitemaxfolder = (int) ((Double.valueOf(repPhoto.getNbMaxParUniteDeJour()) * dbLr.nbjourfolder(repertoire)) / Double.valueOf(repPhoto.getUniteDeJour()));
-                nbSelectionner = dbLr.nbPick(repertoire);
+                nbSelectionner = dbLr.nbPickNoVideo(repertoire);
                 nbphotoapurger = nbSelectionner - limitemaxfolder;
                 ele.setRetourToTrue();
                 if (nbphotoapurger > 0) {
-                    ele.setRetourToFalse(String.valueOf(nbphotoapurger), "pbrepertoire_purge_" + String.format("%05d", nbphotoapurger));
+                    ele.setRetourToFalse(String.valueOf(nbphotoapurger), "pbrepertoire_nbPhotoAPurge_" + String.format("%05d", nbphotoapurger));
                 }
                 break;
             case ControleRepertoire.NB_LIMITEMAXFOLDER:
@@ -110,13 +111,16 @@ public class AnalyseGlobalRepertoires {
         }
     }
 
-    private static int getNbelements(String repertoire) {
+    private static int getNbelementsPhysiqueNonRejet(String repertoire) {
         int nbelements;
         nbelements = 0;
         File[] files = new File(repertoire).listFiles();
         for (File file : files) {
             if (!file.isDirectory()) {
-                nbelements++;
+                String fileExt = FilenameUtils.getExtension(file.getName()).toLowerCase();
+                if (ctx.getParamElementsRejet().getArrayNomFileRejet().contains(fileExt.toLowerCase())) {
+                    nbelements++;
+                }
             }
         }
         return nbelements;
@@ -124,7 +128,7 @@ public class AnalyseGlobalRepertoires {
 
     private static void controleRepertoireNBSTARVALUE(String repertoire, RepertoirePhoto repPhoto, EleChamp ele) throws SQLException {
         int nbSelectionner;
-        nbSelectionner = dbLr.nbPick(repertoire);
+        nbSelectionner = dbLr.nbPickNoVideo(repertoire);
         Map<String, Integer> starValue = dbLr.getStarValue(repertoire);
         List<Integer> ratio = repPhoto.getratioStarMax();
         StringBuilder res = new StringBuilder();

@@ -57,7 +57,7 @@ public class Main {
     private static final Boolean IS_PURGE_FOLDER_000 = GO;
     private static final Boolean IS_SVG_LRCONFIG_000 = IS_DRY_RUN;
     private static final Boolean IS_RSYNC_BIB_000000 = IS_DRY_RUN;
-    private static final Boolean IS_EXEC_FONC_REP_00 = GO;
+    private static final Boolean IS_EXEC_FONC_REP_00 = IS_DRY_RUN;
     private static Context ctx;
     private static Database dbLr;
     private static JFrame frame;
@@ -191,12 +191,26 @@ public class Main {
                                             NumberFormat formatter = new DecimalFormat("0000");
                                             int nbDiscr = ThreadLocalRandom.current().nextInt(0, 9999);
                                             String number = formatter.format(nbDiscr);
-                                            String tag = Context.TAG_REPSWEEP + "_" + number + "_"+  champ.getCompTagRetour();
+//                                            String tag = champ.getCompTagRetour() + "_" + "(" + number +")"  ;
+                                            String[] tags = (Context.TAG_REPSWEEP + "_" + champ.getCompTagRetour() + " id:" + number + "").replace("[", "").replace("]", "").split("_");
+
                                             try {
-                                                dbLr.AddKeywordToRep(blocRetourRep.getRepertoire(), tag, Context.TAG_REPSWEEP);
+                                                for (int i = 0; i <= tags.length - 1 - 1; i++) {
+                                                    dbLr.sqlcreateKeyword(tags[i], tags[i + 1]);
+                                                }
+
+                                                int nb = dbLr.AddKeywordToRep(blocRetourRep.getRepertoire(), tags[tags.length - 1], tags[tags.length - 1 - 1]);
+
+                                                if (nb==0){
+                                                    dbLr.topperRepertoireARed(blocRetourRep.getRepertoire());
+                                                    LOGGER.info("   Tag a RED ");
+
+                                                }
+
                                             } catch (SQLException throwables) {
                                                 throwables.printStackTrace();
                                             }
+
                                         }
                                     }
                             );
@@ -323,11 +337,17 @@ public class Main {
 
     private static void reTAGlesColorTagARED() throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+
         int unNbMisARED = dbLr.deTopperARedOld50NEW(ctx.getParamTriNew().getRepertoire50NEW());
         loggerInfo("UnTag a RED " + String.format("%05d", unNbMisARED) + " - images ", unNbMisARED);
+
         dbLr.MiseAzeroDesColorLabels("rouge");
         int nbMisARED = dbLr.topperARed50NEW(ctx.getParamTriNew().getRepertoire50NEW());
         loggerInfo("Tag a RED " + String.format("%05d", nbMisARED) + " - images ", nbMisARED);
+
+        int unNbMisAREDRep = dbLr.deTopperARedOldRepertoire();
+        loggerInfo("UnTag a RED " + String.format("%05d", unNbMisAREDRep) + " - repertoire ", unNbMisAREDRep);
+
     }
 
     private static void displayBooleen() {
@@ -1031,7 +1051,7 @@ public class Main {
         theException.printStackTrace(printWriter);
         printWriter.flush();
         stringWriter.flush();
-        loggerOrigine.fatal("theException = " + "\n" + stringWriter.toString());
+        loggerOrigine.fatal("theException = " + "\n" + stringWriter);
     }
 
 

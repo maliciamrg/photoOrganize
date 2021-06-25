@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.malicia.mrg.util.SystemFiles.normalizePath;
 
@@ -89,12 +90,12 @@ public class Database extends SQLiteJDBCDriverConnection {
 
     }
 
-    public void AddKeywordToRep(String repertoire, String tag, String TagMaitre) throws SQLException {
+    public int AddKeywordToRep(String repertoire, String tag, String TagMaitre) throws SQLException {
 
         Map<String, String> idLocalRep = getIdlocalforRep(repertoire);
         String idlocaltag = sqlcreateKeyword(TagMaitre, tag).get("keyWordIdlocal");
 
-        Map<String, String> ret = new HashMap<>();
+//        Map<String, String> ret = new HashMap<>();
         String sql = "SELECT e.id_local as idlocalImage " +
                 "FROM  AgLibraryFile a " +
                 "inner join Adobe_images e  " +
@@ -104,8 +105,10 @@ public class Database extends SQLiteJDBCDriverConnection {
                 ";";
 
         ResultSet rs = select(sql);
+        int nb = 0;
         while (rs.next()) {
 
+            nb++;
             Long idlocalImage = rs.getLong("idlocalImage");
 
             long idlocalKeywordImage = sqlGetAgLibraryKeywordImage(idlocalImage, idlocaltag);
@@ -122,7 +125,7 @@ public class Database extends SQLiteJDBCDriverConnection {
             }
 
         }
-
+        return nb;
     }
 
     public int topperARed50NEW(String repertoire50NEW) throws SQLException {
@@ -138,6 +141,37 @@ public class Database extends SQLiteJDBCDriverConnection {
         return executeUpdate(sql);
 
     }
+
+    public int topperRepertoireARed(String repertoire) throws SQLException {
+//        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+
+        Map<String, String> idlocalforRep = getIdlocalforRep(repertoire);
+        String Folderidlocal = idlocalforRep.get("Folderidlocal");
+
+        long newIdlocalforFolderLabel = sqlGetPrevIdlocalforFolderLabel();
+
+        if (newIdlocalforFolderLabel == 0) {
+            throw new IllegalStateException("no more idlocal empty for folder");
+        }
+
+        String sql;
+        sql = "INSERT INTO AgLibraryFolderLabel" +
+                "(id_local, " +
+                "id_global, " +
+                "folder, " +
+                "label," +
+                "labelType ) " +
+                "VALUES " +
+                "('" + newIdlocalforFolderLabel + "', " +
+                "'" + UUID.randomUUID().toString().toUpperCase() + "', " +
+                "'" + Folderidlocal + "', " +
+                "'" + Context.RED.toLowerCase(Locale.ROOT) + "' ," +
+                "'Color')" +
+                ";";
+        return executeUpdate(sql);
+    }
+
+
 
     private String getStringAllIdLocalFromNew(String repertoire50NEW) {
         return " select a.id_local as file_id_local " +
@@ -158,6 +192,14 @@ public class Database extends SQLiteJDBCDriverConnection {
                 "where colorLabels = '" + colortag + "' " +
                 ";";
         executeUpdate(sql);
+    }
+
+    public int deTopperARedOldRepertoire() throws SQLException {
+        String sql;
+        sql = "delete from AgLibraryFolderLabel " +
+                " where label = '" + Context.RED.toLowerCase(Locale.ROOT) + "' " +
+                ";";
+        return executeUpdate(sql);
     }
 
     public int deTopperARedOld50NEW(String repertoire50NEW) throws SQLException {
@@ -254,8 +296,39 @@ public class Database extends SQLiteJDBCDriverConnection {
                 ";";
         executeUpdate(sql);
 
-
     }
+
+    private long sqlGetPrevIdlocalforFolderLabel() throws SQLException {
+        String sql = "select * FROM AgLibraryFolderLabel " +
+                "ORDER by id_local desc " +
+                "; ";
+        ResultSet rs = select(sql);
+        boolean first = true;
+        long idLocalCalcul = 0;
+        long idLocal = 0;
+        while (rs.next()) {
+            // Recuperer les info de l'elements
+            idLocal = rs.getLong("id_local");
+            if (first) {
+                idLocalCalcul = idLocal;
+                first = false;
+            } else {
+                idLocalCalcul -= 1;
+                if (idLocalCalcul > idLocal) {
+                    return idLocalCalcul;
+                }
+            }
+        }
+        // 0 ou 1 repertoire dans AgLibraryFolder
+        if (idLocalCalcul == idLocal) {
+            idLocalCalcul = (idLocal / 2) + 1;
+            if (idLocalCalcul == idLocal) {
+                idLocalCalcul = ThreadLocalRandom.current().nextInt((int)idLocalCalcul+1 , (int)idLocalCalcul+99999 + 1);
+            }
+        }
+        return idLocalCalcul;
+    }
+
 
     private long sqlGetPrevIdlocalforFolder() throws SQLException {
         String sql = "select * FROM AgLibraryFolder " +
@@ -406,7 +479,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         return days;
     }
 
-    public int nbPick(String repertoire) throws SQLException {
+    public int nbPickNoVideo(String repertoire) throws SQLException {
         Map<String, String> idLocalRep = getIdlocalforRep(repertoire);
         ResultSet rsexist = select(
                 " select  count(*) as result" +
@@ -544,7 +617,7 @@ public class Database extends SQLiteJDBCDriverConnection {
             File filepath = new File(rs.getString("absolutePath") + rs.getString("pathFromRoot") + rs.getString("lc_idx_filename"));
             nb += 1;
             if (!filepath.exists()) {
-                txtret += "ko = " + "file_id_local" + "(" + rs.getString("file_id_local") + ")" + filepath.toString() + " ";
+                txtret += "ko = " + "file_id_local" + "(" + rs.getString("file_id_local") + ")" + filepath + " ";
                 ko += 1;
                 koCor += sqlDeleteFile(rs.getString("file_id_local"));
             }
@@ -575,7 +648,7 @@ public class Database extends SQLiteJDBCDriverConnection {
             File filepath = new File(rs.getString("absolutePath") + rs.getString("pathFromRoot"));
             nb += 1;
             if (!filepath.exists()) {
-                txtret += "ko = " + "folder_id_local" + "(" + rs.getString("folder_id_local") + ")" + filepath.toString() + "\n";
+                txtret += "ko = " + "folder_id_local" + "(" + rs.getString("folder_id_local") + ")" + filepath + "\n";
                 ko += 1;
                 koCor += sqlDeleteRepertory(rs.getString("folder_id_local"));
             }
@@ -707,7 +780,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                     "keywordType, lastApplied, lc_name, name, parent) " +
                     "VALUES (" +
                     "" + idlocal + " , " +
-                    "'" + UUID.randomUUID().toString() + "', " +
+                    "'" + UUID.randomUUID() + "', " +
                     "'608509497.846982', " +
                     "'" + idforKeywordMaitre.get("genealogy") + "/8" + idlocal + "', " +
                     "'', " +
@@ -827,11 +900,16 @@ public class Database extends SQLiteJDBCDriverConnection {
         }
 
         String sql = " delete " +
-                "from AgLibraryKeyword  " +
-                " where name like '" + tagorg + "%' " +
-                " and name <> '" + tagorg + "' " +
-                " and id_local not in ( " +
+                " from AgLibraryKeyword  " +
+                " WHERE id_local in ( " +
+                " SELECT A.id_local " +
+                " from AgLibraryKeyword A " +
+                " inner join AgLibraryKeyword B " +
+                " on A.genealogy like B.genealogy || '%' " +
+                " where b.name = '" + tagorg + "' " +
+                " and a.id_local not in ( " +
                 " " + array + " " +
+                " ) " +
                 " ) " +
                 " ; ";
         return executeUpdate(sql);
