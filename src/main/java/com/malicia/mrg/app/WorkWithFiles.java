@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import static com.malicia.mrg.util.SystemFiles.normalizePath;
 
@@ -25,28 +26,35 @@ public class WorkWithFiles {
     public static List<File> getFilesFromRepertoryWithFilter(String repertory, List<String> arrayFiltreDeNomDeSubdirectory, String extFileAExclure) {
         List<File> ret = new ArrayList<>();
         File[] files = new File(repertory).listFiles();
-        showFiles(files, ret, arrayFiltreDeNomDeSubdirectory, extFileAExclure, "",true);
+        showFiles(files, ret, arrayFiltreDeNomDeSubdirectory, extFileAExclure, "", true);
         return ret;
     }
 
     public static List<File> getFilesFromRepertoryWithFilter(String repertory, String extFileAInclure) {
         List<File> ret = new ArrayList<>();
         File[] files = new File(repertory).listFiles();
-        showFiles(files, ret, new ArrayList<>(), "",extFileAInclure, false);
+        showFiles(files, ret, new ArrayList<>(), "", extFileAInclure, false);
         return ret;
     }
 
     private static void showFiles(File[] files, List<File> fileRetour, List<String> arrayFiltreRep, String extFileAExclure, String extFileAInclure, boolean onlyRepIn) {
         for (File file : files) {
             if (file.isDirectory()) {
-                boolean onlyRepOut = true;
-                if (stringContainsItemFromList(file.toString(), arrayFiltreRep.toArray(new String[0]))) {
-                    onlyRepOut = false;
-                }
-                showFiles(file.listFiles(), fileRetour, arrayFiltreRep, extFileAExclure, extFileAInclure,onlyRepOut); // Calls same method again.
+                boolean onlyRepOut = !stringContainsItemFromList(file.toString().toLowerCase(Locale.ROOT), arrayFiltreRep.toArray(new String[0]));
+                showFiles(file.listFiles(), fileRetour, arrayFiltreRep, extFileAExclure, extFileAInclure, onlyRepOut); // Calls same method again.
             } else {
-                if ((!onlyRepIn && (FilenameUtils.getExtension(file.getName()).toLowerCase().compareTo(extFileAExclure)) != 0) &&
-                    (!onlyRepIn && (extFileAInclure.compareTo("") ==0 || FilenameUtils.getExtension(file.getName()).toLowerCase().compareTo(extFileAInclure)== 0)) ) {
+                if (
+                        (
+                                !onlyRepIn &&
+                                        (FilenameUtils.getExtension(file.getName()).toLowerCase().compareTo(extFileAExclure)) != 0
+                        )
+                                &&
+                                (
+                                        !onlyRepIn &&
+                                                (extFileAInclure.compareTo("") == 0 || FilenameUtils.getExtension(file.getName()).toLowerCase().compareTo(extFileAInclure) == 0)
+                                )
+                )
+                {
                     fileRetour.add(file);
                 }
             }

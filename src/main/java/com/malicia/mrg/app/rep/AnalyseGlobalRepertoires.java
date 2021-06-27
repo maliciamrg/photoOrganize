@@ -82,7 +82,7 @@ public class AnalyseGlobalRepertoires {
                 }
                 break;
             case ControleRepertoire.NB_SELECTIONNER:
-                nbSelectionner = dbLr.nbPickNoVideo(repertoire);
+                nbSelectionner = dbLr.nbPickAllEle(repertoire);
                 ele.setRetourToTrue();
                 if (nbSelectionner == 0) {
                     ele.setRetourToFalse(String.valueOf(nbSelectionner), "pbrepertoire_zeroPhotoSelectionner");
@@ -140,6 +140,7 @@ public class AnalyseGlobalRepertoires {
             LOGGER.debug(s);
             String starn = "(" + "S" + i + ")";
             res.append(starn);
+            //todo
             if (starValue.get(String.valueOf(i)) > nbmax) {
                 allStarGood = false;
                 int i1 = nbmax - starValue.get(String.valueOf(i));

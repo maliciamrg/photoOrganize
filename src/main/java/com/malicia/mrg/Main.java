@@ -185,7 +185,7 @@ public class Main {
                             eChamp.forEach(
                                     (champ) -> {
                                         if (!champ.isRetourControle()) {
-                                            //todo
+                                            //todo mise en methode
 //                                            System.out.println(blocRetourRep.getRepertoire() + " -- " + champ.getCompTagRetour());
                                             LOGGER.info(blocRetourRep.getRepertoire() + " -- " + champ.getCompTagRetour());
                                             NumberFormat formatter = new DecimalFormat("0000");
@@ -201,9 +201,11 @@ public class Main {
 
                                                 int nb = dbLr.AddKeywordToRep(blocRetourRep.getRepertoire(), tags[tags.length - 1], tags[tags.length - 1 - 1]);
 
-                                                if (nb==0){
-                                                    dbLr.topperRepertoireARed(blocRetourRep.getRepertoire());
-                                                    LOGGER.info("   Tag a RED ");
+                                                if (nb == 0) {
+                                                    int ret = dbLr.topperRepertoireARed(blocRetourRep.getRepertoire());
+                                                    if (ret > 0) {
+                                                        LOGGER.info("   Tag a RED ");
+                                                    }
 
                                                 }
 
@@ -1014,21 +1016,23 @@ public class Main {
                     List<RepertoirePhoto> arrayRepertoirePhoto = ctx.getArrayRepertoirePhoto();
                     for (i = 0; i < arrayRepertoirePhoto.size(); i++) {
                         RepertoirePhoto repertoirePhoto = arrayRepertoirePhoto.get(i);
-                        if (repertoirePhoto.getRepertoire().toLowerCase(Locale.ROOT).contains("rejet")) {
-                            String oldName = fichier.toString();
-                            File fsource = new File(oldName);
+                        if (repertoirePhoto.getRepertoire().toLowerCase(Locale.ROOT).contains("99-rejet")) {
+                            if (!fichier.toString().toLowerCase(Locale.ROOT).contains((ctx.getRepertoire50Phototheque() + repertoirePhoto.getRepertoire()).toLowerCase(Locale.ROOT))) {
+                                String oldName = fichier.toString();
+                                File fsource = new File(oldName);
 
-                            File fdest = new File(ctx.getRepertoire50Phototheque() + repertoirePhoto.getRepertoire() + Context.FOLDERDELIM + oldName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_"));
-                            String newName = fdest.toString();
+                                File fdest = new File(ctx.getRepertoire50Phototheque() + repertoirePhoto.getRepertoire() + Context.FOLDERDELIM + oldName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_"));
+                                String newName = fdest.toString();
 
-                            if (fsource.exists() && fsource.isFile() && !fdest.exists()) {
-                                countExtDel.replace(fileExt, countExtDel.get(fileExt), countExtDel.get(fileExt) + 1);
-                                WorkWithFiles.renameFile(oldName, newName, dbLr);
-                            } else {
-                                LOGGER.debug("oldName " + oldName + " move impossile to newName : " + newName);
-                                LOGGER.debug("fsource.exists() " + fsource.exists());
-                                LOGGER.debug("fsource.isFile()  " + fsource.isFile());
-                                LOGGER.debug("!fdest.exists() " + !fdest.exists());
+                                if (fsource.exists() && fsource.isFile() && !fdest.exists()) {
+                                    countExtDel.replace(fileExt, countExtDel.get(fileExt), countExtDel.get(fileExt) + 1);
+                                    WorkWithFiles.renameFile(oldName, newName, dbLr);
+                                } else {
+                                    LOGGER.debug("oldName " + oldName + " move impossile to newName : " + newName);
+                                    LOGGER.debug("fsource.exists() " + fsource.exists());
+                                    LOGGER.debug("fsource.isFile()  " + fsource.isFile());
+                                    LOGGER.debug("!fdest.exists() " + !fdest.exists());
+                                }
                             }
                         }
                     }

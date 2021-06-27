@@ -148,27 +148,30 @@ public class Database extends SQLiteJDBCDriverConnection {
         Map<String, String> idlocalforRep = getIdlocalforRep(repertoire);
         String Folderidlocal = idlocalforRep.get("Folderidlocal");
 
-        long newIdlocalforFolderLabel = sqlGetPrevIdlocalforFolderLabel();
+        if (Folderidlocal.compareTo("0")!=0) {
+            long newIdlocalforFolderLabel = sqlGetPrevIdlocalforFolderLabel();
 
-        if (newIdlocalforFolderLabel == 0) {
-            throw new IllegalStateException("no more idlocal empty for folder");
+            if (newIdlocalforFolderLabel == 0) {
+                throw new IllegalStateException("no more idlocal empty for folder");
+            }
+
+            String sql;
+            sql = "INSERT INTO AgLibraryFolderLabel" +
+                    "(id_local, " +
+                    "id_global, " +
+                    "folder, " +
+                    "label," +
+                    "labelType ) " +
+                    "VALUES " +
+                    "('" + newIdlocalforFolderLabel + "', " +
+                    "'" + UUID.randomUUID().toString().toUpperCase() + "', " +
+                    "'" + Folderidlocal + "', " +
+                    "'" + Context.RED.toLowerCase(Locale.ROOT) + "' ," +
+                    "'Color')" +
+                    ";";
+            return executeUpdate(sql);
         }
-
-        String sql;
-        sql = "INSERT INTO AgLibraryFolderLabel" +
-                "(id_local, " +
-                "id_global, " +
-                "folder, " +
-                "label," +
-                "labelType ) " +
-                "VALUES " +
-                "('" + newIdlocalforFolderLabel + "', " +
-                "'" + UUID.randomUUID().toString().toUpperCase() + "', " +
-                "'" + Folderidlocal + "', " +
-                "'" + Context.RED.toLowerCase(Locale.ROOT) + "' ," +
-                "'Color')" +
-                ";";
-        return executeUpdate(sql);
+        return 0;
     }
 
 
@@ -477,6 +480,24 @@ public class Database extends SQLiteJDBCDriverConnection {
         }
         double days = Days.daysBetween(captureTimeMin, captureTimeMax).getDays() + 1;
         return days;
+    }
+
+    public int nbPickAllEle(String repertoire) throws SQLException {
+        Map<String, String> idLocalRep = getIdlocalforRep(repertoire);
+        ResultSet rsexist = select(
+                " select  count(*) as result" +
+                        " from AgLibraryFile a  " +
+                        " inner join Adobe_images e " +
+                        " on a.id_local = e.rootFile " +
+                        " where " + idLocalRep.get("Folderidlocal") + " = a.folder " +
+                        " and e.pick >= 0 " +
+                        ";");
+
+        int nbpick = 0;
+        while (rsexist.next()) {
+            nbpick = rsexist.getString("result") == null ? 0 : rsexist.getInt("result");
+        }
+        return nbpick;
     }
 
     public int nbPickNoVideo(String repertoire) throws SQLException {

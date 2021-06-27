@@ -1,4 +1,4 @@
 {
   "fileName" : "D:\\JavaProjet\\photoOrganize\\target\\classes\\objJson\\ControleRepertoire.json",
-  "listControleRepertoire" : [ "starValue", "nbSelectionner", "nbphotoapurger", "limitemaxfolder" ]
+  "listControleRepertoire" : [ "starValue", "nbSelectionner", "nbphotoapurger", "nbelements", "limitemaxfolder" ]
 }

@@ -1,6 +1,6 @@
 {
   "fileName" : "D:\\JavaProjet\\photoOrganize\\target\\classes\\objJson\\ElementsRejet.json",
-  "arrayNomSubdirectoryRejet" :  [ "rejet","dark","offset","flat","brut" ],
+  "arrayNomSubdirectoryRejet" :  [ "rejet","dark","offset","flat","brut","jpg" ],
   "arrayNomFileRejet" :  [ "jpg","tif","dng","jpeg","arw","mp4","thm","png" ],
   "arrayNomFileRejetSup" :  [ "txt","tmp","pto" ],
   "extFileRejet" :  "rejet"
