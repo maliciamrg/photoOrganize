@@ -200,15 +200,13 @@ public class Main {
                                                     dbLr.sqlcreateKeyword(tags[i], tags[i + 1]);
                                                 }
 
-                                                int nb = dbLr.AddKeywordToRep(blocRetourRep.getRepertoire(), tags[tags.length - 1], tags[tags.length - 1 - 1]);
+                                                dbLr.AddKeywordToRep(blocRetourRep.getRepertoire(), tags[tags.length - 1], tags[tags.length - 1 - 1]);
 
-                                                if (nb == 0) {
-                                                    int ret = dbLr.topperRepertoireARed(blocRetourRep.getRepertoire());
-                                                    if (ret > 0) {
-                                                        LOGGER.debug("   Tag a RED ");
-                                                    }
-
+                                                int ret = dbLr.topperRepertoireARed(blocRetourRep.getRepertoire());
+                                                if (ret > 0) {
+                                                    LOGGER.debug("   Tag a RED ");
                                                 }
+
                                                 if (lstIdKey.containsKey(cletrace)) {
                                                     lstIdKey.replace(cletrace, lstIdKey.get(cletrace)+1);
                                                 } else {

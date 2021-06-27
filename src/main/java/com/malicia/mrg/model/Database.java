@@ -155,6 +155,8 @@ public class Database extends SQLiteJDBCDriverConnection {
                 throw new IllegalStateException("no more idlocal empty for folder");
             }
 
+            sqlDeleteIdlocalforFolderLabel(Folderidlocal);
+
             String sql;
             sql = "INSERT INTO AgLibraryFolderLabel" +
                     "(id_local, " +
@@ -299,6 +301,13 @@ public class Database extends SQLiteJDBCDriverConnection {
                 ";";
         executeUpdate(sql);
 
+    }
+
+    private void sqlDeleteIdlocalforFolderLabel(String folderIdLocal) throws SQLException {
+        String sql = "delete FROM AgLibraryFolderLabel " +
+                "where folder =  " + folderIdLocal + " " +
+                "; ";
+        executeUpdate(sql);
     }
 
     private long sqlGetPrevIdlocalforFolderLabel() throws SQLException {

@@ -78,14 +78,14 @@ public class AnalyseGlobalRepertoires {
                 nbelements = getNbelementsPhysiqueNonRejet(repertoire);
                 ele.setRetourToTrue();
                 if (nbelements == 0) {
-                    ele.setRetourToFalse(String.valueOf(nbelements), "pbrepertoire_zeroelements_" + repertoire);
+                    ele.setRetourToFalse(String.valueOf(nbelements), "pbrepertoire_zeroelements_" + repertoire.replace(repPhoto.getRepertoire()+"\\","").replace(ctx.getRepertoire50Phototheque(),"").replace("_"," "));
                 }
                 break;
             case ControleRepertoire.NB_SELECTIONNER:
                 nbSelectionner = dbLr.nbPickAllEle(repertoire);
                 ele.setRetourToTrue();
                 if (nbSelectionner == 0) {
-                    ele.setRetourToFalse(String.valueOf(nbSelectionner), "pbrepertoire_zeroPhotoSelectionner_" + repertoire);
+                    ele.setRetourToFalse(String.valueOf(nbSelectionner), "pbrepertoire_zeroPhotoSelectionner_" + repertoire.replace(repPhoto.getRepertoire()+"\\","").replace(ctx.getRepertoire50Phototheque(),"").replace("_"," "));
                 }
                 break;
             case ControleRepertoire.NB_PHOTOAPURGER:
@@ -132,27 +132,34 @@ public class AnalyseGlobalRepertoires {
         nbSelectionner = dbLr.nbPickNoVideo(repertoire);
         Map<String, Integer> starValue = dbLr.getStarValue(repertoire);
         List<Integer> ratio = repPhoto.getratioStarMax();
+
         StringBuilder res = new StringBuilder();
         StringBuilder tag = new StringBuilder();
+
         boolean allStarGood = true;
         for (int i = 1; i < 6; i++) {
+            int nbmin = (int) Math.round((ratio.get(i - 1) * Double.valueOf(nbSelectionner)) / 100 / 2);
             int nbmax = (int) Math.ceil((ratio.get(i - 1) * Double.valueOf(nbSelectionner)) / 100);
-            String s = "(" + i + ")" + " ---star-: " + starValue.get(String.valueOf(i)) + " ---ratio-: " + ratio.get(i - 1) + " ---nbmax-: " + nbmax;
+
+            String strInfo = "(" + "S" + i + "){" + String.format("%03d", starValue.get(String.valueOf(i))) + "{" + String.format("%03d", nbmin) + "/" + String.format("%03d", nbmax) + "}" + "}";
+
+            String s = "(" + i + ")" + " ---star-: " + starValue.get(String.valueOf(i)) + " ---ratio-: " + ratio.get(i - 1) + " ---nbmin-: " + nbmin + " ---nbmax-: " + nbmax;
             LOGGER.debug(s);
-            String starn = "(" + "S" + i + ")";
-            res.append(starn);
-            //todo
-            if (starValue.get(String.valueOf(i)) > nbmax) {
+
+            res.append(strInfo);
+
+            if (nbmin > starValue.get(String.valueOf(i)) || starValue.get(String.valueOf(i)) > nbmax) {
                 allStarGood = false;
-                int i1 = nbmax - starValue.get(String.valueOf(i));
-                res.append(i1);
-                tag.append(starn + "_-" + String.format("%03d", i1));
+
+                tag.append(strInfo + " ");
+
             }
+
             res.append(ControleRepertoire.CARAC_SEPARATEUR);
         }
         ele.setRetourToTrue();
         if (!allStarGood) {
-            ele.setRetourToFalse(res.toString(), tag.toString());
+            ele.setRetourToFalse(res.toString(), "pbrepertoire_nbStarErreur_" + tag);
         }
     }
 
