@@ -78,14 +78,14 @@ public class AnalyseGlobalRepertoires {
                 nbelements = getNbelementsPhysiqueNonRejet(repertoire);
                 ele.setRetourToTrue();
                 if (nbelements == 0) {
-                    ele.setRetourToFalse(String.valueOf(nbelements), "pbrepertoire_zeroelements");
+                    ele.setRetourToFalse(String.valueOf(nbelements), "pbrepertoire_zeroelements_" + repertoire);
                 }
                 break;
             case ControleRepertoire.NB_SELECTIONNER:
                 nbSelectionner = dbLr.nbPickAllEle(repertoire);
                 ele.setRetourToTrue();
                 if (nbSelectionner == 0) {
-                    ele.setRetourToFalse(String.valueOf(nbSelectionner), "pbrepertoire_zeroPhotoSelectionner");
+                    ele.setRetourToFalse(String.valueOf(nbSelectionner), "pbrepertoire_zeroPhotoSelectionner_" + repertoire);
                 }
                 break;
             case ControleRepertoire.NB_PHOTOAPURGER:
@@ -101,7 +101,7 @@ public class AnalyseGlobalRepertoires {
                 limitemaxfolder = (int) ((Double.valueOf(repPhoto.getNbMaxParUniteDeJour()) * dbLr.nbjourfolder(repertoire)) / Double.valueOf(repPhoto.getUniteDeJour()));
                 ele.setRetourToTrue();
                 if (limitemaxfolder == 0) {
-                    ele.setRetourToFalse(String.valueOf(limitemaxfolder), "pbrepertoire_limitemaxazero");
+                    ele.setRetourToFalse(String.valueOf(limitemaxfolder), "pbrepertoire_limitemaxazero_" + repertoire);
                 }
                 break;
             default:
@@ -127,6 +127,7 @@ public class AnalyseGlobalRepertoires {
     }
 
     private static void controleRepertoireNBSTARVALUE(String repertoire, RepertoirePhoto repPhoto, EleChamp ele) throws SQLException {
+        //todo
         int nbSelectionner;
         nbSelectionner = dbLr.nbPickNoVideo(repertoire);
         Map<String, Integer> starValue = dbLr.getStarValue(repertoire);

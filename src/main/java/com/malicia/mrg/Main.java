@@ -194,7 +194,7 @@ public class Main {
                                             String number = formatter.format(nbDiscr);
 //                                            String tag = champ.getCompTagRetour() + "_" + "(" + number +")"  ;
                                             String[] tags = (Context.TAG_REPSWEEP + "_" + champ.getCompTagRetour() + " id:" + number + "").replace("[", "").replace("]", "").split("_");
-                                            String cletrace = tags[0] + ":" + tags[1];
+                                            String cletrace = tags[1] + ":" + tags[2];
                                             try {
                                                 for (int i = 0; i <= tags.length - 1 - 1; i++) {
                                                     dbLr.sqlcreateKeyword(tags[i], tags[i + 1]);
