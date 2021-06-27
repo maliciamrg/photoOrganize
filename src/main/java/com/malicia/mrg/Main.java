@@ -179,6 +179,7 @@ public class Main {
                 }
 
                 List<BlocRetourRepertoire> retourValRepertoire = analFonctionRep.getListOfretourValRepertoire();
+                HashMap<String, Integer>  lstIdKey = new HashMap<>();
                 retourValRepertoire.forEach(
                         (blocRetourRep) -> {
                             List<EleChamp> eChamp = blocRetourRep.getListOfControleValRepertoire();
@@ -187,13 +188,13 @@ public class Main {
                                         if (!champ.isRetourControle()) {
                                             //todo mise en methode
 //                                            System.out.println(blocRetourRep.getRepertoire() + " -- " + champ.getCompTagRetour());
-                                            LOGGER.info(blocRetourRep.getRepertoire() + " -- " + champ.getCompTagRetour());
+                                            LOGGER.debug(blocRetourRep.getRepertoire() + " -- " + champ.getCompTagRetour());
                                             NumberFormat formatter = new DecimalFormat("0000");
                                             int nbDiscr = ThreadLocalRandom.current().nextInt(0, 9999);
                                             String number = formatter.format(nbDiscr);
 //                                            String tag = champ.getCompTagRetour() + "_" + "(" + number +")"  ;
                                             String[] tags = (Context.TAG_REPSWEEP + "_" + champ.getCompTagRetour() + " id:" + number + "").replace("[", "").replace("]", "").split("_");
-
+                                            String cletrace = tags[0] + ":" + tags[1];
                                             try {
                                                 for (int i = 0; i <= tags.length - 1 - 1; i++) {
                                                     dbLr.sqlcreateKeyword(tags[i], tags[i + 1]);
@@ -204,9 +205,14 @@ public class Main {
                                                 if (nb == 0) {
                                                     int ret = dbLr.topperRepertoireARed(blocRetourRep.getRepertoire());
                                                     if (ret > 0) {
-                                                        LOGGER.info("   Tag a RED ");
+                                                        LOGGER.debug("   Tag a RED ");
                                                     }
 
+                                                }
+                                                if (lstIdKey.containsKey(cletrace)) {
+                                                    lstIdKey.replace(cletrace, lstIdKey.get(cletrace)+1);
+                                                } else {
+                                                    lstIdKey.put(cletrace, 1);
                                                 }
 
                                             } catch (SQLException throwables) {
@@ -218,6 +224,10 @@ public class Main {
                             );
                         }
                 );
+                NumberFormat formatter = new DecimalFormat("00000");
+                for (Map.Entry<String, Integer> set : lstIdKey.entrySet()) {
+                    LOGGER.info(getStringLn(set.getKey()) + " = " + formatter.format(set.getValue()));
+                }
 
             }
 
