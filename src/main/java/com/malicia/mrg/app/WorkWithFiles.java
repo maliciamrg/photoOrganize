@@ -68,6 +68,8 @@ public class WorkWithFiles {
     public static void renameFile(String oldName, String newName, Database dbLr) throws IOException, SQLException {
         if (normalizePath(oldName).compareTo(normalizePath(newName)) != 0) {
 
+            WorkWithRepertory.sqlMkdirRepertory(new File(newName).getParent() + File.separator, dbLr);
+
             SystemFiles.moveFile(oldName, newName);
 
             dbLr.renameFileLogique(oldName, newName);

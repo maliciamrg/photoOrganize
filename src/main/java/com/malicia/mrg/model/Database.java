@@ -378,7 +378,8 @@ public class Database extends SQLiteJDBCDriverConnection {
 
     public void renameFileLogique(String oldName, String newName) throws SQLException {
         long idlocal = getIdlocalforFilePath(oldName).get("idlocal");
-        if (idlocal > 0) {
+        long idfoldernew = Long.parseLong(getIdlocalforRep(newName).get("Folderidlocal"));
+        if (idlocal > 0 && idfoldernew > 0) {
             File fdest = new File(newName);
             String sql;
             String baseName = FilenameUtils.getBaseName(newName);
@@ -390,7 +391,8 @@ public class Database extends SQLiteJDBCDriverConnection {
                     " idx_filename =  '" + fdest.getName() + "' , " +
                     " extension =  '" + ext + "' , " +
                     " lc_idx_filename =  '" + fdest.getName().toLowerCase() + "' , " +
-                    " lc_idx_filenameExtension =  '" + ext.toLowerCase() + "'  " +
+                    " lc_idx_filenameExtension =  '" + ext.toLowerCase() + "' , " +
+                    " folder =  " + idfoldernew + " " +
                     "where id_local =  " + idlocal + " " +
                     ";";
             executeUpdate(sql);
@@ -1200,6 +1202,26 @@ public class Database extends SQLiteJDBCDriverConnection {
             String pathFromRoot = idLocalRep.get("pathFromRoot");
             String lcIdxFilename = rs.getString("lc_idx_filename");
             listTmp.add(normalizePath(absolutePath + pathFromRoot + File.separator + lcIdxFilename));
+        }
+        return listTmp;
+    }
+
+    public List<String>  getlistPhotoFlagRejeter() throws SQLException {
+        List<String> listTmp = new ArrayList<>();
+
+        String sql = "select p.absolutePath || b.pathFromRoot || a.lc_idx_filename as filepath" +
+                " from Adobe_images e " +
+                " inner join AgLibraryFile a " +
+                "  on a.id_local = e.rootFile " +
+                " inner join AgLibraryFolder b " +
+                "  on a.folder = b.id_local  " +
+                " inner join AgLibraryRootFolder p " +
+                "  on b.rootFolder = p.id_local " +
+                " where e.pick < 0 " +
+                ";";
+        ResultSet rs = select(sql);
+        while (rs.next()) {
+            listTmp.add(normalizePath(rs.getString("filepath")));
         }
         return listTmp;
     }

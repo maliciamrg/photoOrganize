@@ -1,5 +1,6 @@
 package com.malicia.mrg;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.github.fracpete.processoutput4j.output.StreamingProcessOutput;
 import com.github.fracpete.rsync4j.RSync;
 import com.malicia.mrg.app.*;
@@ -995,22 +996,30 @@ public class Main {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         List<File> arrayFichierRejet = WorkWithFiles.getFilesFromRepertoryWithFilter(ctx.getRepertoire50Phototheque(), ctx.getArrayNomSubdirectoryRejet(), ctx.getParamElementsRejet().getExtFileRejet());
-        for (int y = 0; y < arrayFichierRejet.size(); y++) {
-            if (arrayFichierRejet.get(y).toString().toLowerCase(Locale.ROOT).contains((ctx.getRepertoire50Phototheque() + "99-rejet").toLowerCase(Locale.ROOT)) ) {
-                arrayFichierRejet.remove(y);
+
+        List<String> arrayFichierRejetStr = new ArrayList<>();
+        for (File FichierRejet : arrayFichierRejet) {
+            arrayFichierRejetStr.add(FichierRejet.toString());
+        }
+
+        for (int y = 0; y < arrayFichierRejetStr.size(); y++) {
+            if (arrayFichierRejetStr.get(y).toString().toLowerCase(Locale.ROOT).contains((ctx.getRepertoire50Phototheque() + "99-rejet").toLowerCase(Locale.ROOT)) ) {
+                arrayFichierRejetStr.remove(y);
                 y--;
             }
         }
 
+        //todo add all photo rejected to arrayFichierRejetStr
+        arrayFichierRejetStr.addAll(dbLr.getlistPhotoFlagRejeter());
 
         Map<String, Integer> countExt = new HashMap<>();
         Map<String, Integer> countExtDo = new HashMap<>();
         Map<String, Integer> countExtDel = new HashMap<>();
-        LOGGER.debug("arrayFichierRejet     => " + String.format("%05d", arrayFichierRejet.size()));
+        LOGGER.debug("arrayFichierRejet     => " + String.format("%05d", arrayFichierRejetStr.size()));
 
-        for (int y = 0; y < arrayFichierRejet.size(); y++) {
-            File fichier = arrayFichierRejet.get(y);
-            String fileExt = FilenameUtils.getExtension(fichier.getName()).toLowerCase();
+        for (int y = 0; y < arrayFichierRejetStr.size(); y++) {
+            String fichierStr = arrayFichierRejetStr.get(y);
+            String fileExt = FilenameUtils.getExtension(fichierStr).toLowerCase();
 
             if (countExt.containsKey(fileExt)) {
                 countExt.replace(fileExt, countExt.get(fileExt), countExt.get(fileExt) + 1);
@@ -1021,14 +1030,14 @@ public class Main {
             }
 
             if (fileExt.toLowerCase().compareTo("zip") == 0) {
-                LOGGER.info("unzip :" + fichier);
-                WorkWithFiles.extractZipFile(fichier);
+                LOGGER.info("unzip :" + fichierStr);
+                WorkWithFiles.extractZipFile(new File(fichierStr));
             }
 
             if (ctx.getParamElementsRejet().getArrayNomFileRejet().contains(fileExt.toLowerCase())) {
-                //rename to rejzt dans meme repertoire
-                String oldName = fichier.toString();
-                String newName = oldName + "." + ctx.getParamElementsRejet().getExtFileRejet();
+                //rename to rejet dans meme repertoire
+                String oldName = fichierStr;
+                String newName = addRejetSubRepToPath(oldName) + "." + ctx.getParamElementsRejet().getExtFileRejet();
                 File fsource = new File(oldName);
                 File fdest = new File(newName);
                 if (fsource.exists() && fsource.isFile() && !fdest.exists()) {
@@ -1044,7 +1053,7 @@ public class Main {
                         RepertoirePhoto repertoirePhoto = arrayRepertoirePhoto.get(i);
                         if (repertoirePhoto.getRepertoire().toLowerCase(Locale.ROOT).contains("99-rejet")) {
 
-                                String oldName = fichier.toString();
+                                String oldName = fichierStr;
                                 File fsource = new File(oldName);
 
                                 File fdest = new File(ctx.getRepertoire50Phototheque() + repertoirePhoto.getRepertoire() + Context.FOLDERDELIM + oldName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_"));
@@ -1073,6 +1082,15 @@ public class Main {
         }
 
 
+    }
+
+    private static String addRejetSubRepToPath(String fichierStr) throws SQLException {
+        if (fichierStr.toLowerCase(Locale.ROOT).contains("\\rejet\\")){
+            return fichierStr;
+        } else {
+            String rejetPath = FilenameUtils.concat(FilenameUtils.getFullPath(fichierStr), "rejet");
+            return FilenameUtils.concat(rejetPath,FilenameUtils.getName(fichierStr));
+        }
     }
 
     public static void exceptionLog(Exception theException, Logger loggerOrigine) {
