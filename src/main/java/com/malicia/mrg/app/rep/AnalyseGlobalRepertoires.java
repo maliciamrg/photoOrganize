@@ -48,6 +48,7 @@ public class AnalyseGlobalRepertoires {
     private static void testElementChamp(String repertoire, RepertoirePhoto repPhoto, String elechamp, EleChamp ele) throws SQLException {
         int limitemaxfolder = 0;
         int nbSelectionner = 0;
+        int nbNonSelectionner =0;
         int nbphotoapurger = 0;
         int nbelements = 0;
         switch (elechamp) {
@@ -78,14 +79,21 @@ public class AnalyseGlobalRepertoires {
                 nbelements = getNbelementsPhysiqueNonRejet(repertoire);
                 ele.setRetourToTrue();
                 if (nbelements == 0) {
-                    ele.setRetourToFalse(String.valueOf(nbelements), "pbrepertoire_zeroelements_" + repertoire.replace(repPhoto.getRepertoire()+"\\","").replace(ctx.getRepertoire50Phototheque(),"").replace("_"," "));
+                    ele.setRetourToFalse(String.valueOf(nbelements), "Phase0-pbrepertoire_zeroelements_" + repertoire.replace(repPhoto.getRepertoire() + "\\", "").replace(ctx.getRepertoire50Phototheque(), "").replace("_", " "));
                 }
                 break;
             case ControleRepertoire.NB_SELECTIONNER:
-                nbSelectionner = dbLr.nbPickAllEle(repertoire);
+                nbSelectionner = dbLr.nbPickNoVideo(repertoire);
                 ele.setRetourToTrue();
                 if (nbSelectionner == 0) {
-                    ele.setRetourToFalse(String.valueOf(nbSelectionner), "pbrepertoire_zeroPhotoSelectionner_" + repertoire.replace(repPhoto.getRepertoire()+"\\","").replace(ctx.getRepertoire50Phototheque(),"").replace("_"," "));
+                    ele.setRetourToFalse(String.valueOf(nbSelectionner), "Phase1-1_zeroElePhotoSelectionner_" + repertoire.replace(repPhoto.getRepertoire() + "\\", "").replace(ctx.getRepertoire50Phototheque(), "").replace("_", " "));
+                }
+                break;
+            case ControleRepertoire.NB_NONSELECTIONNER:
+                nbNonSelectionner = dbLr.nbNoPickNoVideo(repertoire);
+                ele.setRetourToTrue();
+                if (nbNonSelectionner != 0) {
+                    ele.setRetourToFalse(String.valueOf(nbNonSelectionner), "Phase1-1_nbPhotoNonSelectionner_"  + String.format("%05d", nbNonSelectionner));
                 }
                 break;
             case ControleRepertoire.NB_PHOTOAPURGER:
@@ -94,14 +102,14 @@ public class AnalyseGlobalRepertoires {
                 nbphotoapurger = nbSelectionner - limitemaxfolder;
                 ele.setRetourToTrue();
                 if (nbphotoapurger > 0) {
-                    ele.setRetourToFalse(String.valueOf(nbphotoapurger), "pbrepertoire_nbPhotoAPurge_" + String.format("%05d", nbphotoapurger));
+                    ele.setRetourToFalse(String.valueOf(nbphotoapurger), "Phase1-2_nbPhotoAPurge_" + String.format("%05d", nbphotoapurger));
                 }
                 break;
             case ControleRepertoire.NB_LIMITEMAXFOLDER:
                 limitemaxfolder = (int) ((Double.valueOf(repPhoto.getNbMaxParUniteDeJour()) * dbLr.nbjourfolder(repertoire)) / Double.valueOf(repPhoto.getUniteDeJour()));
                 ele.setRetourToTrue();
                 if (limitemaxfolder == 0) {
-                    ele.setRetourToFalse(String.valueOf(limitemaxfolder), "pbrepertoire_limitemaxazero_" + repertoire);
+                    ele.setRetourToFalse(String.valueOf(limitemaxfolder), "Phase0-pbrepertoire_limitemaxazero_" + repertoire);
                 }
                 break;
             default:
@@ -130,12 +138,12 @@ public class AnalyseGlobalRepertoires {
         //todo
         int nbSelectionner;
         nbSelectionner = dbLr.nbPickNoVideo(repertoire);
-        Map<String, Integer> starValue = dbLr.getStarValue(repertoire);
+        Map<String, Integer> starValue = dbLr.getStarValueNoVideo(repertoire);
         List<Integer> ratio = repPhoto.getratioStarMax();
 
         StringBuilder res = new StringBuilder();
-        StringBuilder tag = new StringBuilder();
 
+        List<String> tag = new ArrayList<>();
         boolean allStarGood = true;
         for (int i = 1; i < 6; i++) {
             int nbmin = (int) Math.round((ratio.get(i - 1) * Double.valueOf(nbSelectionner)) / 100 / 2);
@@ -151,7 +159,7 @@ public class AnalyseGlobalRepertoires {
             if (nbmin > starValue.get(String.valueOf(i)) || starValue.get(String.valueOf(i)) > nbmax) {
                 allStarGood = false;
 
-                tag.append(strInfo + " ");
+                tag.add("Phase2-" + i + "_nbStarErreur_" + strInfo + " ");
 
             }
 
@@ -159,7 +167,7 @@ public class AnalyseGlobalRepertoires {
         }
         ele.setRetourToTrue();
         if (!allStarGood) {
-            ele.setRetourToFalse(res.toString(), "pbrepertoire_nbStarErreur_" + tag);
+            ele.setRetourToFalse(res.toString(), tag);
         }
     }
 

@@ -21,6 +21,7 @@ public class ControleRepertoire extends Serialize {
     public static final String TAG_WHO = "@00_WHO@";
     public static final String NB_STAR_VALUE = "starValue";
     public static final String NB_SELECTIONNER = "nbSelectionner";
+    public static final String NB_NONSELECTIONNER = "nbNonSelectionner";
     public static final String NB_PHOTOAPURGER = "nbphotoapurger";
     public static final String NB_ELEMENTS = "nbelements";
     public static final String NB_LIMITEMAXFOLDER = "limitemaxfolder";

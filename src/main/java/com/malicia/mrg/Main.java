@@ -178,54 +178,65 @@ public class Main {
                     //*
                 }
 
+                //todo mise en methode
                 List<BlocRetourRepertoire> retourValRepertoire = analFonctionRep.getListOfretourValRepertoire();
-                HashMap<String, Integer>  lstIdKey = new HashMap<>();
+                HashMap<String, Integer> lstIdKey = new HashMap<>();
                 retourValRepertoire.forEach(
                         (blocRetourRep) -> {
                             List<EleChamp> eChamp = blocRetourRep.getListOfControleValRepertoire();
                             eChamp.forEach(
                                     (champ) -> {
                                         if (!champ.isRetourControle()) {
-                                            //todo mise en methode
+
+                                            champ.getCompTagRetour().forEach((TagRetour) -> {
+
 //                                            System.out.println(blocRetourRep.getRepertoire() + " -- " + champ.getCompTagRetour());
-                                            LOGGER.debug(blocRetourRep.getRepertoire() + " -- " + champ.getCompTagRetour());
-                                            NumberFormat formatter = new DecimalFormat("0000");
-                                            int nbDiscr = ThreadLocalRandom.current().nextInt(0, 9999);
-                                            String number = formatter.format(nbDiscr);
+                                                LOGGER.debug(blocRetourRep.getRepertoire() + " -- " + TagRetour);
+                                                NumberFormat formatter = new DecimalFormat("0000");
+                                                int nbDiscr = ThreadLocalRandom.current().nextInt(0, 9999);
+                                                String number = formatter.format(nbDiscr);
 //                                            String tag = champ.getCompTagRetour() + "_" + "(" + number +")"  ;
-                                            String[] tags = (Context.TAG_REPSWEEP + "_" + champ.getCompTagRetour() + " id:" + number + "").replace("[", "").replace("]", "").split("_");
-                                            String cletrace = tags[1] + ":" + tags[2];
-                                            try {
-                                                for (int i = 0; i <= tags.length - 1 - 1; i++) {
-                                                    dbLr.sqlcreateKeyword(tags[i], tags[i + 1]);
+
+                                                String[] tags = (Context.TAG_REPSWEEP + "_" + TagRetour + " id:" + number + "").replace("[", "").replace("]", "").split("_");
+
+
+                                                String cletrace = tags[1] + ":" + tags[2];
+                                                try {
+                                                    for (int i = 0; i <= tags.length - 1 - 1; i++) {
+                                                        dbLr.sqlcreateKeyword(tags[i], tags[i + 1]);
+                                                    }
+
+                                                    dbLr.AddKeywordToRepNoVideo(blocRetourRep.getRepertoire(), tags[tags.length - 1], tags[tags.length - 1 - 1]);
+
+                                                    int ret = dbLr.topperRepertoireARed(blocRetourRep.getRepertoire());
+                                                    if (ret > 0) {
+                                                        LOGGER.debug("   Tag a RED ");
+                                                    }
+
+                                                    if (lstIdKey.containsKey(cletrace)) {
+                                                        lstIdKey.replace(cletrace, lstIdKey.get(cletrace) + 1);
+                                                    } else {
+                                                        lstIdKey.put(cletrace, 1);
+                                                    }
+
+                                                } catch (SQLException throwables) {
+                                                    throwables.printStackTrace();
                                                 }
 
-                                                dbLr.AddKeywordToRep(blocRetourRep.getRepertoire(), tags[tags.length - 1], tags[tags.length - 1 - 1]);
-
-                                                int ret = dbLr.topperRepertoireARed(blocRetourRep.getRepertoire());
-                                                if (ret > 0) {
-                                                    LOGGER.debug("   Tag a RED ");
-                                                }
-
-                                                if (lstIdKey.containsKey(cletrace)) {
-                                                    lstIdKey.replace(cletrace, lstIdKey.get(cletrace)+1);
-                                                } else {
-                                                    lstIdKey.put(cletrace, 1);
-                                                }
-
-                                            } catch (SQLException throwables) {
-                                                throwables.printStackTrace();
-                                            }
-
+                                            });
                                         }
                                     }
                             );
                         }
                 );
+
                 NumberFormat formatter = new DecimalFormat("00000");
-                for (Map.Entry<String, Integer> set : lstIdKey.entrySet()) {
-                    LOGGER.info(getStringLn(set.getKey()) + " = " + formatter.format(set.getValue()));
-                }
+
+                List<String> lstIdKeyByKey = new ArrayList<>(lstIdKey.keySet());
+                Collections.sort(lstIdKeyByKey);
+                lstIdKeyByKey.forEach((tempKey) -> {
+                    LOGGER.info(getStringLn(tempKey) + " = " + formatter.format(lstIdKey.get(tempKey)));
+                });
 
             }
 
@@ -984,15 +995,21 @@ public class Main {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         List<File> arrayFichierRejet = WorkWithFiles.getFilesFromRepertoryWithFilter(ctx.getRepertoire50Phototheque(), ctx.getArrayNomSubdirectoryRejet(), ctx.getParamElementsRejet().getExtFileRejet());
+        for (int y = 0; y < arrayFichierRejet.size(); y++) {
+            if (arrayFichierRejet.get(y).toString().toLowerCase(Locale.ROOT).contains((ctx.getRepertoire50Phototheque() + "99-rejet").toLowerCase(Locale.ROOT)) ) {
+                arrayFichierRejet.remove(y);
+                y--;
+            }
+        }
+
 
         Map<String, Integer> countExt = new HashMap<>();
         Map<String, Integer> countExtDo = new HashMap<>();
         Map<String, Integer> countExtDel = new HashMap<>();
         LOGGER.debug("arrayFichierRejet     => " + String.format("%05d", arrayFichierRejet.size()));
 
-        ListIterator<File> arrayFichierRejetIterator = arrayFichierRejet.listIterator();
-        while (arrayFichierRejetIterator.hasNext()) {
-            File fichier = arrayFichierRejetIterator.next();
+        for (int y = 0; y < arrayFichierRejet.size(); y++) {
+            File fichier = arrayFichierRejet.get(y);
             String fileExt = FilenameUtils.getExtension(fichier.getName()).toLowerCase();
 
             if (countExt.containsKey(fileExt)) {
@@ -1009,6 +1026,7 @@ public class Main {
             }
 
             if (ctx.getParamElementsRejet().getArrayNomFileRejet().contains(fileExt.toLowerCase())) {
+                //rename to rejzt dans meme repertoire
                 String oldName = fichier.toString();
                 String newName = oldName + "." + ctx.getParamElementsRejet().getExtFileRejet();
                 File fsource = new File(oldName);
@@ -1019,13 +1037,13 @@ public class Main {
                 }
             } else {
                 if (ctx.getParamElementsRejet().getArrayNomFileRejetSup().contains(fileExt.toLowerCase())) {
-
+                    //move to 99-rejet
                     int i;
                     List<RepertoirePhoto> arrayRepertoirePhoto = ctx.getArrayRepertoirePhoto();
                     for (i = 0; i < arrayRepertoirePhoto.size(); i++) {
                         RepertoirePhoto repertoirePhoto = arrayRepertoirePhoto.get(i);
                         if (repertoirePhoto.getRepertoire().toLowerCase(Locale.ROOT).contains("99-rejet")) {
-                            if (!fichier.toString().toLowerCase(Locale.ROOT).contains((ctx.getRepertoire50Phototheque() + repertoirePhoto.getRepertoire()).toLowerCase(Locale.ROOT))) {
+
                                 String oldName = fichier.toString();
                                 File fsource = new File(oldName);
 
@@ -1041,7 +1059,7 @@ public class Main {
                                     LOGGER.debug("fsource.isFile()  " + fsource.isFile());
                                     LOGGER.debug("!fdest.exists() " + !fdest.exists());
                                 }
-                            }
+
                         }
                     }
                 }

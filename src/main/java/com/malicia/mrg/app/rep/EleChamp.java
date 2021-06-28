@@ -41,14 +41,21 @@ public class EleChamp {
         return infoRetourControle;
     }
 
-    public void setRetourToFalse(String iretourControleString, String tagRetour) {
+
+    public void setRetourToFalse(String iretourControleString, List<String> tagRetour) {
         List<String> listTmp = new ArrayList<>();
         listTmp.add(iretourControleString);
         setRetourToFalse(listTmp, tagRetour);
     }
-
-    public void setRetourToFalse(List<String> iretourControle, String tagRetour) {
-        this.compTagRetour.add(tagRetour);
+    public void setRetourToFalse(String iretourControleString, String tagRetour) {
+        List<String> listTmp = new ArrayList<>();
+        listTmp.add(iretourControleString);
+        List<String> listTmpRet = new ArrayList<>();
+        listTmpRet.add(tagRetour);
+        setRetourToFalse(listTmp, listTmpRet);
+    }
+    public void setRetourToFalse(List<String> iretourControle, List<String> tagRetour) {
+        this.compTagRetour.addAll(tagRetour);
         this.infoRetourControle.addAll(iretourControle);
         retourControle = false;
     }

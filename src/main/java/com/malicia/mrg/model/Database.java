@@ -91,6 +91,12 @@ public class Database extends SQLiteJDBCDriverConnection {
     }
 
     public int AddKeywordToRep(String repertoire, String tag, String TagMaitre) throws SQLException {
+        return AddKeywordToRep(repertoire, tag, TagMaitre, "");
+    }
+    public int AddKeywordToRepNoVideo(String repertoire, String tag, String TagMaitre) throws SQLException {
+        return AddKeywordToRep(repertoire, tag, TagMaitre, " and e.fileFormat != 'VIDEO' ");
+    }
+    private int AddKeywordToRep(String repertoire, String tag, String TagMaitre ,String OptionalNoVideoCriteria ) throws SQLException {
 
         Map<String, String> idLocalRep = getIdlocalforRep(repertoire);
         String idlocaltag = sqlcreateKeyword(TagMaitre, tag).get("keyWordIdlocal");
@@ -101,6 +107,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                 "inner join Adobe_images e  " +
                 " on a.id_local = e.rootFile    " +
                 "WHERE a.folder = '" + idLocalRep.get("Folderidlocal") + "'" +
+                OptionalNoVideoCriteria +
                 "order by e.captureTime asc " +
                 ";";
 
@@ -148,7 +155,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         Map<String, String> idlocalforRep = getIdlocalforRep(repertoire);
         String Folderidlocal = idlocalforRep.get("Folderidlocal");
 
-        if (Folderidlocal.compareTo("0")!=0) {
+        if (Folderidlocal.compareTo("0") != 0) {
             long newIdlocalforFolderLabel = sqlGetPrevIdlocalforFolderLabel();
 
             if (newIdlocalforFolderLabel == 0) {
@@ -175,7 +182,6 @@ public class Database extends SQLiteJDBCDriverConnection {
         }
         return 0;
     }
-
 
 
     private String getStringAllIdLocalFromNew(String repertoire50NEW) {
@@ -335,7 +341,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         if (idLocalCalcul == idLocal) {
             idLocalCalcul = (idLocal / 2) + 1;
             if (idLocalCalcul == idLocal) {
-                idLocalCalcul = ThreadLocalRandom.current().nextInt((int)idLocalCalcul+1 , (int)idLocalCalcul+99999 + 1);
+                idLocalCalcul = ThreadLocalRandom.current().nextInt((int) idLocalCalcul + 1, (int) idLocalCalcul + 99999 + 1);
             }
         }
         return idLocalCalcul;
@@ -440,6 +446,12 @@ public class Database extends SQLiteJDBCDriverConnection {
     }
 
     public Map<String, Integer> getStarValue(String repertoire) throws SQLException {
+        return getStarValue( repertoire , "");
+    }
+    public Map<String, Integer> getStarValueNoVideo(String repertoire) throws SQLException {
+        return getStarValue( repertoire, " and e.fileFormat != 'VIDEO' ");
+    }
+    private Map<String, Integer> getStarValue(String repertoire,String OptionalNoVideoCriteria) throws SQLException {
         Map<String, String> idLocalRep = getIdlocalforRep(repertoire);
         Map<String, Integer> idlocal = new HashMap<>();
         idlocal.put("0", 0);
@@ -457,7 +469,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                         "inner join Adobe_images e  " +
                         " on a.id_local = e.rootFile    " +
                         " where " + idLocalRep.get("Folderidlocal") + " = a.folder  " +
-                        " and e.fileFormat != 'VIDEO' " +
+                        OptionalNoVideoCriteria +
                         " group by e.rating " +
                         ";");
 
@@ -491,7 +503,16 @@ public class Database extends SQLiteJDBCDriverConnection {
         return days;
     }
 
-    public int nbPickAllEle(String repertoire) throws SQLException {
+    public int nbPickAllEle(String repertoire)  throws SQLException {
+        return nbPick( repertoire ," and e.pick > 0 " ,"");
+    }
+    public int nbPickNoVideo(String repertoire)  throws SQLException {
+        return nbPick( repertoire, " and e.pick > 0 "," and e.fileFormat != 'VIDEO' ");
+    }
+    public int nbNoPickNoVideo(String repertoire)  throws SQLException {
+        return nbPick( repertoire, " and e.pick = 0 "," and e.fileFormat != 'VIDEO' ");
+    }
+    private int nbPick(String repertoire,String PickCriteria,String OptionalNoVideoCriteria) throws SQLException {
         Map<String, String> idLocalRep = getIdlocalforRep(repertoire);
         ResultSet rsexist = select(
                 " select  count(*) as result" +
@@ -499,7 +520,8 @@ public class Database extends SQLiteJDBCDriverConnection {
                         " inner join Adobe_images e " +
                         " on a.id_local = e.rootFile " +
                         " where " + idLocalRep.get("Folderidlocal") + " = a.folder " +
-                        " and e.pick >= 0 " +
+                        PickCriteria +
+                        OptionalNoVideoCriteria +
                         ";");
 
         int nbpick = 0;
@@ -509,24 +531,6 @@ public class Database extends SQLiteJDBCDriverConnection {
         return nbpick;
     }
 
-    public int nbPickNoVideo(String repertoire) throws SQLException {
-        Map<String, String> idLocalRep = getIdlocalforRep(repertoire);
-        ResultSet rsexist = select(
-                " select  count(*) as result" +
-                        " from AgLibraryFile a  " +
-                        " inner join Adobe_images e " +
-                        " on a.id_local = e.rootFile " +
-                        " where " + idLocalRep.get("Folderidlocal") + " = a.folder " +
-                        " and e.pick >= 0 " +
-                        " and e.fileFormat != 'VIDEO' " +
-                        ";");
-
-        int nbpick = 0;
-        while (rsexist.next()) {
-            nbpick = rsexist.getString("result") == null ? 0 : rsexist.getInt("result");
-        }
-        return nbpick;
-    }
 
     public String getDate(String repertoire) throws SQLException {
         Map<String, String> idLocalRep = getIdlocalforRep(repertoire);
