@@ -480,7 +480,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         return idlocal;
     }
 
-    public double nbjourfolder(String repertoire) throws SQLException {
+    public double ecartJourFolder(String repertoire) throws SQLException {
         Map<String, String> idLocalRep = getIdlocalforRep(repertoire);
         ResultSet rsexist = select(
                 " select min(strftime('%s', e.captureTime)) as captureTimeMin , " +
@@ -500,6 +500,29 @@ public class Database extends SQLiteJDBCDriverConnection {
             captureTimeMax = new DateTime(rsexist.getLong("captureTimeMax") * 1000);
         }
         double days = Days.daysBetween(captureTimeMin, captureTimeMax).getDays() + 1;
+        return days;
+    }
+
+    public double nbJourFolderNoVideo(String repertoire) throws SQLException {
+        Map<String, String> idLocalRep = getIdlocalforRep(repertoire);
+        ResultSet rsexist = select(
+                " select " +
+                        " count(*) , " +
+                        " strftime('%Y%m%d', e.captureTime) " +
+                        " from AgLibraryFile a" +
+                        " inner join Adobe_images e" +
+                        " on a.id_local = e.rootFile" +
+                        " where " + idLocalRep.get("Folderidlocal") + " = a.folder" +
+                        " and e.pick >= 0" +
+                        " and e.fileFormat != 'VIDEO' " +
+                        " group by strftime('%Y%m%d', e.captureTime)" +
+                        " ;");
+
+
+        double days = 0;
+        while (rsexist.next()) {
+            days++;
+        }
         return days;
     }
 

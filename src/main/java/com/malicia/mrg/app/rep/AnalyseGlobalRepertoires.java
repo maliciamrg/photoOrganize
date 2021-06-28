@@ -79,37 +79,37 @@ public class AnalyseGlobalRepertoires {
                 nbelements = getNbelementsPhysiqueNonRejet(repertoire);
                 ele.setRetourToTrue();
                 if (nbelements == 0) {
-                    ele.setRetourToFalse(String.valueOf(nbelements), "Phase0-pbrepertoire_zeroelements_" + repertoire.replace(repPhoto.getRepertoire() + "\\", "").replace(ctx.getRepertoire50Phototheque(), "").replace("_", " "));
+                    ele.setRetourToFalse(String.valueOf(nbelements), "Phase0-pbrepertoire_zeroelements_" + "(0ele)" + repertoire.replace(repPhoto.getRepertoire() + "\\", "").replace(ctx.getRepertoire50Phototheque(), "").replace("_", " "));
                 }
                 break;
             case ControleRepertoire.NB_SELECTIONNER:
                 nbSelectionner = dbLr.nbPickNoVideo(repertoire);
                 ele.setRetourToTrue();
                 if (nbSelectionner == 0) {
-                    ele.setRetourToFalse(String.valueOf(nbSelectionner), "Phase1-1_zeroElePhotoSelectionner_" + repertoire.replace(repPhoto.getRepertoire() + "\\", "").replace(ctx.getRepertoire50Phototheque(), "").replace("_", " "));
+                    ele.setRetourToFalse(String.valueOf(nbSelectionner), "Phase1_1-zeroElePhotoSelectionner_" + "(0select)" + repertoire.replace(repPhoto.getRepertoire() + "\\", "").replace(ctx.getRepertoire50Phototheque(), "").replace("_", " "));
                 }
                 break;
             case ControleRepertoire.NB_NONSELECTIONNER:
                 nbNonSelectionner = dbLr.nbNoPickNoVideo(repertoire);
                 ele.setRetourToTrue();
                 if (nbNonSelectionner != 0) {
-                    ele.setRetourToFalse(String.valueOf(nbNonSelectionner), "Phase1-1_nbPhotoNonSelectionner_"  + String.format("%05d", nbNonSelectionner));
+                    ele.setRetourToFalse(String.valueOf(nbNonSelectionner), "Phase1_1-nbPhotoNonSelectionner_"  +  "(nbNselect)" +String.format("%05d", nbNonSelectionner));
                 }
                 break;
             case ControleRepertoire.NB_PHOTOAPURGER:
-                limitemaxfolder = (int) ((Double.valueOf(repPhoto.getNbMaxParUniteDeJour()) * dbLr.nbjourfolder(repertoire)) / Double.valueOf(repPhoto.getUniteDeJour()));
+                limitemaxfolder = (int) ((Double.valueOf(repPhoto.getNbMaxParUniteDeJour()) * dbLr.nbJourFolderNoVideo(repertoire)) / Double.valueOf(repPhoto.getUniteDeJour()));
                 nbSelectionner = dbLr.nbPickNoVideo(repertoire);
                 nbphotoapurger = nbSelectionner - limitemaxfolder;
                 ele.setRetourToTrue();
                 if (nbphotoapurger > 0) {
-                    ele.setRetourToFalse(String.valueOf(nbphotoapurger), "Phase1-2_nbPhotoAPurge_" + String.format("%05d", nbphotoapurger));
+                    ele.setRetourToFalse(String.valueOf(nbphotoapurger), "Phase1_2-nbPhotoAPurge_" + "(nbpurge)" + String.format("%05d", nbphotoapurger));
                 }
                 break;
             case ControleRepertoire.NB_LIMITEMAXFOLDER:
-                limitemaxfolder = (int) ((Double.valueOf(repPhoto.getNbMaxParUniteDeJour()) * dbLr.nbjourfolder(repertoire)) / Double.valueOf(repPhoto.getUniteDeJour()));
+                limitemaxfolder = (int) ((Double.valueOf(repPhoto.getNbMaxParUniteDeJour()) * dbLr.ecartJourFolder(repertoire)) / Double.valueOf(repPhoto.getUniteDeJour()));
                 ele.setRetourToTrue();
                 if (limitemaxfolder == 0) {
-                    ele.setRetourToFalse(String.valueOf(limitemaxfolder), "Phase0-pbrepertoire_limitemaxazero_" + repertoire);
+                    ele.setRetourToFalse(String.valueOf(limitemaxfolder), "Phase0-pbrepertoire_limitemaxazero_" + "(noLMax)" + repertoire);
                 }
                 break;
             default:
@@ -159,7 +159,7 @@ public class AnalyseGlobalRepertoires {
             if (nbmin > starValue.get(String.valueOf(i)) || starValue.get(String.valueOf(i)) > nbmax) {
                 allStarGood = false;
 
-                tag.add("Phase2-" + i + "_nbStarErreur_" + strInfo + " ");
+                tag.add("Phase2_nbStarErreur" + i + "_" + strInfo + " ");
 
             }
 
