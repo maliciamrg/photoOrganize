@@ -233,7 +233,7 @@ public class Main {
 
                 NumberFormat formatter = new DecimalFormat("00000");
 
-                List<String> lstIdKeyByKey = new ArrayList<>(lstIdKey.keySet());
+               List<String> lstIdKeyByKey = new ArrayList<>(lstIdKey.keySet());
                 Collections.sort(lstIdKeyByKey);
                 lstIdKeyByKey.forEach((tempKey) -> {
                     LOGGER.info(getStringLn(tempKey) + " = " + formatter.format(lstIdKey.get(tempKey)));
@@ -1003,7 +1003,7 @@ public class Main {
         }
 
         for (int y = 0; y < arrayFichierRejetStr.size(); y++) {
-            if (arrayFichierRejetStr.get(y).toString().toLowerCase(Locale.ROOT).contains((ctx.getRepertoire50Phototheque() + "99-rejet").toLowerCase(Locale.ROOT)) ) {
+            if (arrayFichierRejetStr.get(y).toLowerCase(Locale.ROOT).contains((ctx.getRepertoire50Phototheque() + "99-rejet").toLowerCase(Locale.ROOT))) {
                 arrayFichierRejetStr.remove(y);
                 y--;
             }
@@ -1020,6 +1020,7 @@ public class Main {
         for (int y = 0; y < arrayFichierRejetStr.size(); y++) {
             String fichierStr = arrayFichierRejetStr.get(y);
             String fileExt = FilenameUtils.getExtension(fichierStr).toLowerCase();
+            String filepath = FilenameUtils.getFullPath(fichierStr).toLowerCase();
 
             if (countExt.containsKey(fileExt)) {
                 countExt.replace(fileExt, countExt.get(fileExt), countExt.get(fileExt) + 1);
@@ -1034,7 +1035,12 @@ public class Main {
                 WorkWithFiles.extractZipFile(new File(fichierStr));
             }
 
-            if (ctx.getParamElementsRejet().getArrayNomFileRejet().contains(fileExt.toLowerCase())) {
+            if (ctx.getParamElementsRejet().getArrayNomFileRejet().contains(fileExt.toLowerCase()) ||
+                    (
+                            ctx.getParamElementsRejet().getExtFileRejet().compareTo(fileExt.toLowerCase()) == 0
+                                    && !ctx.getParamElementsRejet().getArrayNomSubdirectoryRejet().stream().anyMatch(filepath::contains)
+                    )
+            ) {
                 //rename to rejet dans meme repertoire
                 String oldName = fichierStr;
                 String newName = addRejetSubRepToPath(oldName) + "." + ctx.getParamElementsRejet().getExtFileRejet();
@@ -1053,21 +1059,21 @@ public class Main {
                         RepertoirePhoto repertoirePhoto = arrayRepertoirePhoto.get(i);
                         if (repertoirePhoto.getRepertoire().toLowerCase(Locale.ROOT).contains("99-rejet")) {
 
-                                String oldName = fichierStr;
-                                File fsource = new File(oldName);
+                            String oldName = fichierStr;
+                            File fsource = new File(oldName);
 
-                                File fdest = new File(ctx.getRepertoire50Phototheque() + repertoirePhoto.getRepertoire() + Context.FOLDERDELIM + oldName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_"));
-                                String newName = fdest.toString();
+                            File fdest = new File(ctx.getRepertoire50Phototheque() + repertoirePhoto.getRepertoire() + Context.FOLDERDELIM + oldName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_"));
+                            String newName = fdest.toString();
 
-                                if (fsource.exists() && fsource.isFile() && !fdest.exists()) {
-                                    countExtDel.replace(fileExt, countExtDel.get(fileExt), countExtDel.get(fileExt) + 1);
-                                    WorkWithFiles.renameFile(oldName, newName, dbLr);
-                                } else {
-                                    LOGGER.debug("oldName " + oldName + " move impossile to newName : " + newName);
-                                    LOGGER.debug("fsource.exists() " + fsource.exists());
-                                    LOGGER.debug("fsource.isFile()  " + fsource.isFile());
-                                    LOGGER.debug("!fdest.exists() " + !fdest.exists());
-                                }
+                            if (fsource.exists() && fsource.isFile() && !fdest.exists()) {
+                                countExtDel.replace(fileExt, countExtDel.get(fileExt), countExtDel.get(fileExt) + 1);
+                                WorkWithFiles.renameFile(oldName, newName, dbLr);
+                            } else {
+                                LOGGER.debug("oldName " + oldName + " move impossile to newName : " + newName);
+                                LOGGER.debug("fsource.exists() " + fsource.exists());
+                                LOGGER.debug("fsource.isFile()  " + fsource.isFile());
+                                LOGGER.debug("!fdest.exists() " + !fdest.exists());
+                            }
 
                         }
                     }
@@ -1085,11 +1091,11 @@ public class Main {
     }
 
     private static String addRejetSubRepToPath(String fichierStr) throws SQLException {
-        if (fichierStr.toLowerCase(Locale.ROOT).contains("\\rejet\\")){
+        if (fichierStr.toLowerCase(Locale.ROOT).contains("\\rejet\\")) {
             return fichierStr;
         } else {
             String rejetPath = FilenameUtils.concat(FilenameUtils.getFullPath(fichierStr), "rejet");
-            return FilenameUtils.concat(rejetPath,FilenameUtils.getName(fichierStr));
+            return FilenameUtils.concat(rejetPath, FilenameUtils.getName(fichierStr));
         }
     }
 

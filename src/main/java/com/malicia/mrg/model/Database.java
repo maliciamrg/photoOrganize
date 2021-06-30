@@ -676,7 +676,7 @@ public class Database extends SQLiteJDBCDriverConnection {
             File filepath = new File(rs.getString("absolutePath") + rs.getString("pathFromRoot") + rs.getString("lc_idx_filename"));
             nb += 1;
             if (!filepath.exists()) {
-                txtret += "ko = " + "file_id_local" + "(" + rs.getString("file_id_local") + ")" + filepath + " ";
+                txtret += "ko = " + "file_id_local" + "(" + rs.getString("file_id_local") + ")" + filepath + " "+ "\n";
                 ko += 1;
                 koCor += sqlDeleteFile(rs.getString("file_id_local"));
             }
