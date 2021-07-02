@@ -135,7 +135,6 @@ public class AnalyseGlobalRepertoires {
     }
 
     private static void controleRepertoireNBSTARVALUE(String repertoire, RepertoirePhoto repPhoto, EleChamp ele) throws SQLException {
-        //todo
         int nbSelectionner;
         nbSelectionner = dbLr.nbPickNoVideo(repertoire);
         Map<String, Integer> starValue = dbLr.getStarValueNoVideo(repertoire);

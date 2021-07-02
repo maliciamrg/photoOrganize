@@ -41,14 +41,6 @@ public class ControleRepertoire {
 
     public List<String> listControleRepertoire = new ArrayList<>();
 
-
-//    public ControleRepertoire() {
-////        listControleRepertoire.add(NB_STAR_VALUE);
-////        listControleRepertoire.add(NB_SELECTIONNER);
-////        listControleRepertoire.add(NB_PHOTOAPURGER);
-////        listControleRepertoire.add(NB_LIMITEMAXFOLDER);
-//    }
-
     public static String nettoyageTag(String getcChamp) {
         return getcChamp.replace("@", "");
     }
