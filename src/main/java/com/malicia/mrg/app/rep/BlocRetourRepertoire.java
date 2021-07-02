@@ -1,6 +1,6 @@
 package com.malicia.mrg.app.rep;
 
-import com.malicia.mrg.param.importjson.RepertoirePhoto;
+import com.malicia.mrg.param.electx.RepertoirePhoto;
 
 import java.util.List;
 import java.util.ListIterator;

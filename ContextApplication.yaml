@@ -1,0 +1,177 @@
+workflow:
+  IS_DRY_RUN: false
+  TODO:
+    - IS_MAINT_LR_0000000 #
+    - IS_ACTION_FROM_KEY0 #
+    - IS_PURGE_ACTION_000 #
+    - IS_TAG_DEL_00000000 #
+    - IS_TAG_CR_000000000 #
+    - IS_RETAG_RED_000000 #
+    - IS_WRK_REJET_000000 #
+    - IS_UNZIP_REP_PHOTO0 #
+    - IS_WRK_REP_PHOTO_00 #
+    - IS_RGP_NEW_00000000 #
+    - IS_LST_RAPP_NEW_REP #
+    - IS_TAG_RAPP_NEW_REP #
+    - IS_PURGE_FOLDER_000 #
+  NOTTODO:
+    - IS_SVG_LRCONFIG_000 #
+    - IS_RSYNC_BIB_000000 #
+    - IS_EXEC_FONC_REP_00 #
+paramControleRepertoire:
+  listControleRepertoire:
+    - starValue
+    - nbSelectionner
+    - nbNonSelectionner
+    - nbphotoapurger
+    - nbelements
+    - limitemaxfolder
+paramElementsRejet:
+  arrayNomSubdirectoryRejet:
+    - rejet
+    - dark
+    - offset
+    - flat
+    - brut
+    - jpg
+  arrayNomFileRejet:
+    - jpg
+    - tif
+    - dng
+    - jpeg
+    - arw
+    - mp4
+    - thm
+    - png
+  arrayNomFileRejetSup:
+    - txt
+    - tmp
+    - pto
+  extFileRejet: rejet
+paramTriNew:
+  repertoire50NEW: "D:\\50_Phototheque\\05-A_Ranger\\@New\\"
+  repertoireBazar: "D:\\50_Phototheque\\05-A_Ranger\\@New\\Bazar\\"
+  repertoireKidz: "D:\\50_Phototheque\\70-Kidz__\\"
+  thresholdNew: 10
+  tempsAdherence: "90 minutes"
+  listeModelKidz:
+    - Kidizoom camera
+    - KidiSecrets Selfie Music
+repFonctionnel:
+  repertoireDestZip: "D:\\95_Boite_a_outils\\LigthroomConfigSauve\\ligthroomSauve-%num%.zip"
+  repertoireRoamingAdobeLightroom: "C:\\Users\\professorX\\AppData\\Roaming\\Adobe\\Lightroom"
+  repertoire50Phototheque: "D:\\50_Phototheque\\"
+  repertoire00NEW: "P:\\00_NEW\\"
+  repertoireCatalog: "D:\\70_Catalogs\\70_Catalog_Phototheque"
+  catalogLrcat: "70_Catalog_Phototheque-2.lrcat"
+  nbRotateRepertoireDestZip: "5"
+  rsyncexclude:
+    - "*\\System Volume Information\\*"
+    - "*\\$RECYCLE.BIN\\*"
+    - "*\\$Recycle.Bin\\*"
+    - "*\\RECYCLER\\*"
+    - "*\\RECYCLED\\*"
+    - "*\\desktop.ini"
+    - "*\\thumbs.db"
+    - "*.lrdata"
+    - "*\\log\\*"
+  repertoiresyncsource:
+    - "D:\\50_Phototheque"
+    - "D:\\70_Catalogs"
+    - "D:\\80_Logiciel_Windows"
+    - "D:\\95_Boite_a_outils"
+  repertoiresyncdest: "\\\\LEGION-2\\20-photo\\"
+  syncdestmouchard: photoOrganizeLastSync.txt
+  syncAmountDaysBetween: 10
+arrayRepertoirePhoto:
+  - repertoire: '01-Cataloque_Photo\\!!Collections\\##Autoconstruction 03-05 j'
+    nomunique: Autoconstruction
+    uniteDeJour: 1
+    nbMaxParUniteDeJour: 5
+    ratioStarMax:
+      - 25
+      - 12
+      - 5
+      - 2
+      - 1
+    zoneValeurAdmise:
+      - '£DATE£'
+      - '@10_Action@'
+      - '@10_Piece@'
+      - '@10_Chantier@'
+    rapprochermentNewOk: false
+  - repertoire: '01-Cataloque_Photo\##Events 10-15 j'
+    nomunique: Events
+    uniteDeJour: 1
+    nbMaxParUniteDeJour: 15
+    ratioStarMax:
+      - 25
+      - 12
+      - 5
+      - 2
+      - 1
+    zoneValeurAdmise:
+      - '£DATE£'
+      - '@00_EVENT@'
+      - '@00_WHERE@'
+      - '@00_WHAT@|@00_WHO@'
+    rapprochermentNewOk: true
+  - repertoire: '01-Cataloque_Photo\##Holidays 20-30 sem'
+    nomunique: Holidays
+    uniteDeJour: 3
+    nbMaxParUniteDeJour: 21
+    ratioStarMax:
+      - 25
+      - 12
+      - 5
+      - 2
+      - 1
+    zoneValeurAdmise:
+      - '£DATE£'
+      - '£DATE£'
+      - '@00_EVENT@'
+      - '@00_WHERE@'
+      - '@00_WHAT@|@00_WHO@'
+    rapprochermentNewOk: true
+  - repertoire: '01-Cataloque_Photo\##Shooting 03-05 j'
+    nomunique: Shooting
+    uniteDeJour: 1
+    nbMaxParUniteDeJour: 2
+    ratioStarMax:
+      - 25
+      - 12
+      - 5
+      - 2
+      - 1
+    zoneValeurAdmise:
+      - '£DATE£'
+      - '@00_PHOTOGRAPHY@'
+      - '@00_WHERE@'
+      - '@00_WHAT@|@00_WHO@'
+    rapprochermentNewOk: true
+  - repertoire: '99-Rejet'
+    nomunique: Rejet
+    uniteDeJour: 1
+    nbMaxParUniteDeJour: 999
+    ratioStarMax:
+      - 0
+      - 0
+      - 0
+      - 0
+      - 0
+    zoneValeurAdmise:
+      - '£DATE£'
+    rapprochermentNewOk: false
+  - repertoire: '01-Cataloque_Photo\!!Collections\##Sauvegarde 999 j'
+    nomunique: Sauvegarde
+    uniteDeJour: 1
+    nbMaxParUniteDeJour: 999
+    ratioStarMax:
+      - 100
+      - 100
+      - 100
+      - 100
+      - 100
+    zoneValeurAdmise:
+      - '£DATE£'
+    rapprochermentNewOk: false

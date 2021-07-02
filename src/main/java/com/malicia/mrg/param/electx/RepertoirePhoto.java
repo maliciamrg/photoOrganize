@@ -1,4 +1,4 @@
-package com.malicia.mrg.param.importjson;
+package com.malicia.mrg.param.electx;
 
 
 import com.malicia.mrg.util.Serialize;
@@ -7,27 +7,18 @@ import com.malicia.mrg.util.Serialize;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RepertoirePhoto extends Serialize {
+public class RepertoirePhoto {
 
-    private boolean rapprochermentNewOk;
-    private String repertoire;
-    private int uniteDeJour;
-    private int nbMaxParUniteDeJour;
-    private List<Integer> ratioStarMax;
-    private List<String> zoneValeurAdmise;
+    public boolean rapprochermentNewOk;
+    public String nomunique;
+    public String repertoire;
+    public int uniteDeJour;
+    public int nbMaxParUniteDeJour;
+    public List<Integer> ratioStarMax;
+    public List<String> zoneValeurAdmise;
     private List<String> nomRepertoire;
-    public RepertoirePhoto() {
-        super();
-    }
 
-    public RepertoirePhoto(String repertoireIn, int uniteDeJourIn, int nbMaxParUniteDeJourIn) {
-        repertoire = repertoireIn;
-        uniteDeJour = uniteDeJourIn;
-        nbMaxParUniteDeJour = nbMaxParUniteDeJourIn;
-        ratioStarMax = new ArrayList<>();
-        zoneValeurAdmise = new ArrayList<>();
-        nomRepertoire = new ArrayList<>();
-        rapprochermentNewOk = false;
+    public RepertoirePhoto() {
     }
 
     public boolean isRapprochermentNewOk() {
@@ -84,6 +75,15 @@ public class RepertoirePhoto extends Serialize {
 
     @Override
     public String toString() {
-        return repertoire;
+        return "RepertoirePhoto{" +
+                "rapprochermentNewOk=" + rapprochermentNewOk +
+                ", nomunique='" + nomunique + '\'' +
+                ", repertoire='" + repertoire + '\'' +
+                ", uniteDeJour=" + uniteDeJour +
+                ", nbMaxParUniteDeJour=" + nbMaxParUniteDeJour +
+                ", ratioStarMax=" + ratioStarMax +
+                ", zoneValeurAdmise=" + zoneValeurAdmise +
+                ", nomRepertoire=" + nomRepertoire +
+                '}';
     }
 }

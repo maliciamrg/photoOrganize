@@ -1,4 +1,4 @@
-package com.malicia.mrg.param.importjson;
+package com.malicia.mrg.param.electx;
 
 import com.malicia.mrg.util.Serialize;
 
@@ -6,12 +6,12 @@ import com.malicia.mrg.util.Serialize;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ElementsRejet extends Serialize {
+public class ElementsRejet {
 
-    private List<String> arrayNomSubdirectoryRejet = new ArrayList<>();
-    private List<String> arrayNomFileRejet = new ArrayList<>();
-    private List<String> arrayNomFileRejetSup = new ArrayList<>();
-    private String extFileRejet;
+    public List<String> arrayNomSubdirectoryRejet = new ArrayList<>();
+    public List<String> arrayNomFileRejet = new ArrayList<>();
+    public List<String> arrayNomFileRejetSup = new ArrayList<>();
+    public String extFileRejet;
 
     public ElementsRejet() {
         // Do nothing because of X and Y
@@ -47,5 +47,15 @@ public class ElementsRejet extends Serialize {
 
     public void setArrayNomFileRejetSup(List<String> arrayNomFileRejetSup) {
         this.arrayNomFileRejetSup = arrayNomFileRejetSup;
+    }
+
+    @Override
+    public String toString() {
+        return "ElementsRejet{" +
+                "arrayNomSubdirectoryRejet=" + arrayNomSubdirectoryRejet +
+                ", arrayNomFileRejet=" + arrayNomFileRejet +
+                ", arrayNomFileRejetSup=" + arrayNomFileRejetSup +
+                ", extFileRejet='" + extFileRejet + '\'' +
+                '}';
     }
 }

@@ -1,10 +1,10 @@
-package com.malicia.mrg.param.importjson;
+package com.malicia.mrg.param.electx;
 
 import com.malicia.mrg.util.Serialize;
 
 import java.util.*;
 
-public class ActionRepertoire extends Serialize {
+public class ActionRepertoire {
 
     private Map<String, String> listeAction = new HashMap<>();
 

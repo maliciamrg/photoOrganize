@@ -1,4 +1,4 @@
-package com.malicia.mrg.param.importjson;
+package com.malicia.mrg.param.electx;
 
 import com.malicia.mrg.util.Serialize;
 
@@ -6,15 +6,15 @@ import com.malicia.mrg.util.Serialize;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TriNew extends Serialize {
+public class TriNew {
 
     public static final String FORMATDATE_YYYY_MM_DD = "yyyy-MM-dd";
-    private String repertoire50NEW;
-    private String repertoireKidz;
-    private String repertoireBazar;
-    private long thresholdNew;
-    private String tempsAdherence;
-    private List<String> listeModelKidz = new ArrayList<>();
+    public String repertoire50NEW;
+    public String repertoireKidz;
+    public String repertoireBazar;
+    public long thresholdNew;
+    public String tempsAdherence;
+    public List<String> listeModelKidz = new ArrayList<>();
 
 
     public TriNew() {
@@ -70,5 +70,16 @@ public class TriNew extends Serialize {
     }
 
 
+    @Override
+    public String toString() {
+        return "TriNew{" +
+                "repertoire50NEW='" + repertoire50NEW + '\'' +
+                ", repertoireKidz='" + repertoireKidz + '\'' +
+                ", repertoireBazar='" + repertoireBazar + '\'' +
+                ", thresholdNew=" + thresholdNew +
+                ", tempsAdherence='" + tempsAdherence + '\'' +
+                ", listeModelKidz=" + listeModelKidz +
+                '}';
+    }
 }
 

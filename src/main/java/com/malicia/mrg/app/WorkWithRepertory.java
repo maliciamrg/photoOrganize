@@ -1,7 +1,7 @@
 package com.malicia.mrg.app;
 
 import com.malicia.mrg.model.Database;
-import com.malicia.mrg.param.importjson.RepertoirePhoto;
+import com.malicia.mrg.param.electx.RepertoirePhoto;
 import com.malicia.mrg.util.SystemFiles;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

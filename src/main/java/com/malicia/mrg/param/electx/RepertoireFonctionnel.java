@@ -1,32 +1,34 @@
-package com.malicia.mrg.param.importjson;
+package com.malicia.mrg.param.electx;
 
 import com.malicia.mrg.util.Serialize;
 
-public class RepertoireFonctionnel extends Serialize {
+import java.util.Arrays;
 
-    private String repertoireDestZip;
-    private String nbRotateRepertoireDestZip;
-    private String repertoireRoamingAdobeLightroom;
-    private String repertoire50Phototheque;
-    private String repertoire50NEW;
-    private String catalogLrcat;
-    private String repertoire00NEW;
-    private String repertoireCatalog;
-    private String[] rsyncinclude;
-    private String[] rsyncexclude;
-    private String[] repertoiresyncsource;
-    private String repertoiresyncdest;
+public class RepertoireFonctionnel {
+
+    public String repertoireDestZip;
+    public String nbRotateRepertoireDestZip;
+    public String repertoireRoamingAdobeLightroom;
+    public String repertoire50Phototheque;
+    public String repertoire50NEW;
+    public String catalogLrcat;
+    public String repertoire00NEW;
+    public String repertoireCatalog;
+    public String[] rsyncinclude;
+    public String[] rsyncexclude;
+    public String[] repertoiresyncsource;
+    public String repertoiresyncdest;
 
     public String getSyncAmountDaysBetween() {
         return syncAmountDaysBetween;
     }
 
-    private String syncAmountDaysBetween;
+    public String syncAmountDaysBetween;
     public String getSyncdestmouchard() {
         return syncdestmouchard;
     }
 
-    private String syncdestmouchard;
+    public String syncdestmouchard;
 
     public RepertoireFonctionnel() {
         // Do nothing because of X and Y
@@ -128,4 +130,23 @@ public class RepertoireFonctionnel extends Serialize {
         this.repertoireCatalog = repertoireCatalog;
     }
 
+    @Override
+    public String toString() {
+        return "RepertoireFonctionnel{" +
+                "repertoireDestZip='" + repertoireDestZip + '\'' +
+                ", nbRotateRepertoireDestZip='" + nbRotateRepertoireDestZip + '\'' +
+                ", repertoireRoamingAdobeLightroom='" + repertoireRoamingAdobeLightroom + '\'' +
+                ", repertoire50Phototheque='" + repertoire50Phototheque + '\'' +
+                ", repertoire50NEW='" + repertoire50NEW + '\'' +
+                ", catalogLrcat='" + catalogLrcat + '\'' +
+                ", repertoire00NEW='" + repertoire00NEW + '\'' +
+                ", repertoireCatalog='" + repertoireCatalog + '\'' +
+                ", rsyncinclude=" + Arrays.toString(rsyncinclude) +
+                ", rsyncexclude=" + Arrays.toString(rsyncexclude) +
+                ", repertoiresyncsource=" + Arrays.toString(repertoiresyncsource) +
+                ", repertoiresyncdest='" + repertoiresyncdest + '\'' +
+                ", syncAmountDaysBetween='" + syncAmountDaysBetween + '\'' +
+                ", syncdestmouchard='" + syncdestmouchard + '\'' +
+                '}';
+    }
 }

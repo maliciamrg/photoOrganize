@@ -1,7 +1,7 @@
 package com.malicia.mrg.model;
 
 import com.malicia.mrg.Context;
-import com.malicia.mrg.param.importjson.ControleRepertoire;
+import com.malicia.mrg.param.electx.ControleRepertoire;
 import com.malicia.mrg.util.SQLiteJDBCDriverConnection;
 import com.malicia.mrg.util.SystemFiles;
 

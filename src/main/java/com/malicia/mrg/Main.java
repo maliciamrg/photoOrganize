@@ -1,6 +1,5 @@
 package com.malicia.mrg;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.github.fracpete.processoutput4j.output.StreamingProcessOutput;
 import com.github.fracpete.rsync4j.RSync;
 import com.malicia.mrg.app.*;
@@ -9,8 +8,8 @@ import com.malicia.mrg.app.rep.BlocRetourRepertoire;
 import com.malicia.mrg.app.rep.EleChamp;
 import com.malicia.mrg.model.Database;
 import com.malicia.mrg.model.ElementFichier;
-import com.malicia.mrg.param.importjson.RepertoirePhoto;
-import com.malicia.mrg.param.importjson.TriNew;
+import com.malicia.mrg.param.electx.RepertoirePhoto;
+import com.malicia.mrg.param.electx.TriNew;
 import com.malicia.mrg.util.Output;
 import com.malicia.mrg.util.SystemFiles;
 import com.malicia.mrg.util.WhereIAm;
@@ -40,25 +39,6 @@ public class Main {
 
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
 
-    private static final Boolean IS_DRY_RUN = Boolean.FALSE;
-
-    private static final Boolean GO = Boolean.TRUE;
-    private static final Boolean IS_MAINT_LR_0000000 = GO;
-    private static final Boolean IS_ACTION_FROM_KEY0 = GO;
-    private static final Boolean IS_PURGE_ACTION_000 = GO;
-    private static final Boolean IS_TAG_DEL_00000000 = GO;
-    private static final Boolean IS_TAG_CR_000000000 = GO;
-    private static final Boolean IS_RETAG_RED_000000 = GO;
-    private static final Boolean IS_WRK_REJET_000000 = GO;
-    private static final Boolean IS_UNZIP_REP_PHOTO0 = GO;
-    private static final Boolean IS_WRK_REP_PHOTO_00 = GO;
-    private static final Boolean IS_RGP_NEW_00000000 = GO;
-    private static final Boolean IS_LST_RAPP_NEW_REP = GO;
-    private static final Boolean IS_TAG_RAPP_NEW_REP = GO;
-    private static final Boolean IS_PURGE_FOLDER_000 = GO;
-    private static final Boolean IS_SVG_LRCONFIG_000 = IS_DRY_RUN;
-    private static final Boolean IS_RSYNC_BIB_000000 = IS_DRY_RUN;
-    private static final Boolean IS_EXEC_FONC_REP_00 = IS_DRY_RUN;
     private static Context ctx;
     private static Database dbLr;
     private static JFrame frame;
@@ -75,80 +55,80 @@ public class Main {
 
             // chargement application
             ctx = Context.chargeParam();
-            dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat(), IS_DRY_RUN);
+            dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat(), ctx.workflow.IS_DRY_RUN);
             AnalyseGlobalRepertoires.init(ctx, dbLr);
 
-            SystemFiles.setIsDryRun(IS_DRY_RUN);
+            SystemFiles.setIsDryRun(ctx.workflow.IS_DRY_RUN);
             ctx.getActionVersRepertoire().populate(dbLr.getFolderCollection(Context.COLLECTIONS, Context.TAG_ORG));
             //*
 
             // chargement parameter
             chargementParametre(ctx, args);
-            //*ç
+            //*
 
             displayBooleen();
 
-            if (Boolean.TRUE.equals(IS_MAINT_LR_0000000)) {
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
                 //Maintenance database lr
                 maintenanceDatabase();
                 //*
             }
 
-            if (Boolean.TRUE.equals(IS_ACTION_FROM_KEY0)) {
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_ACTION_FROM_KEY0"))) {
                 //effectuer les actions demander via le tag Lightroom
                 makeActionFromKeyword();
                 //*
             }
-            if (Boolean.TRUE.equals(IS_PURGE_ACTION_000)) {
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_PURGE_ACTION_000"))) {
                 //purger les action demander via les keywords
                 removeLinkWithActionFromKeyword();
                 //*
             }
 
             //initialization pour nouveau démarrage
-            if (Boolean.TRUE.equals(IS_TAG_DEL_00000000)) {
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_DEL_00000000"))) {
                 List<String> lstIdKey = new ArrayList<>();
-                if (Boolean.TRUE.equals(IS_TAG_CR_000000000)) {
+                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_CR_000000000"))) {
                     lstIdKey = creationDesKeywordProjet();
                 }
                 purgeKeywordProjet(lstIdKey);
-                if (Boolean.TRUE.equals(IS_MAINT_LR_0000000)) {
+                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
                     //Maintenance database lr
                     maintenanceDatabase();
                     //*
                 }
             }
 
-            if (Boolean.TRUE.equals(IS_RETAG_RED_000000)) {
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RETAG_RED_000000"))) {
                 reTAGlesColorTagARED();
             }
             //*
 
-            if (Boolean.TRUE.equals(IS_WRK_REP_PHOTO_00)) {
-                if (Boolean.TRUE.equals(IS_UNZIP_REP_PHOTO0)) {
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
+                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_UNZIP_REP_PHOTO0"))) {
                     unzipAndExtractAllZip();
                 }
             }
 
             //En Fonction De La Strategies De Rangement
-            if (Boolean.TRUE.equals(IS_WRK_REJET_000000)) {
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REJET_000000"))) {
                 //En Fonction De La Strategies De Rangement
                 rangerLesRejets();
                 //*
             }
-            if (Boolean.TRUE.equals(IS_WRK_REP_PHOTO_00)) {
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
                 //En Fonction De La Strategies De Rangement
                 analFonctionRep = analyseFonctionellesDesRepertoires();
                 //*
             }
-            if (Boolean.TRUE.equals(IS_RGP_NEW_00000000)) {
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RGP_NEW_00000000"))) {
                 //regrouper le new
                 regrouperLesNouvellesPhoto();
                 //*
-                if (Boolean.TRUE.equals(IS_LST_RAPP_NEW_REP)) {
+                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_LST_RAPP_NEW_REP"))) {
                     //lister les possible photo oublier
                     List<GrpPhoto> grpPhotosRapprocher = listerLesRapprochermentAvecLesRepertoirePhoto();
-                    if (Boolean.TRUE.equals(IS_TAG_RAPP_NEW_REP) && Boolean.TRUE.equals(IS_TAG_CR_000000000)) {
+                    if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_RAPP_NEW_REP")) && Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_CR_000000000"))) {
                         miseEnPlaceDesTagDeRapprochement(grpPhotosRapprocher);
                     }
                     //*
@@ -157,7 +137,7 @@ public class Main {
             }
             //*
 
-            if (Boolean.TRUE.equals(IS_PURGE_FOLDER_000)) {
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_PURGE_FOLDER_000"))) {
                 //Nettoyage repertoires Local
                 purgeDesRepertoireVide50Phototheque();
                 //*
@@ -166,14 +146,14 @@ public class Main {
                 //*
             }
 
-            if (Boolean.TRUE.equals(IS_MAINT_LR_0000000)) {
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
                 //Maintenance database lr
                 maintenanceDatabase();
                 //*
             }
 
-            if (Boolean.TRUE.equals(IS_WRK_REP_PHOTO_00)) {
-                if (Boolean.TRUE.equals(IS_EXEC_FONC_REP_00)) {
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
+                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_EXEC_FONC_REP_00"))) {
                     //Popup Action sur les erreurs Fonctionelle des repertoires
                     analFonctionRep.action();
                     //*
@@ -242,13 +222,13 @@ public class Main {
             }
 
             if (isItTimeToSave()) {
-                if (Boolean.TRUE.equals(IS_SVG_LRCONFIG_000)) {
+                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_SVG_LRCONFIG_000"))) {
                     //Sauvegarde Lightroom sur Local
                     sauvegardeLightroomConfigSauve();
                     //*
                 }
 
-                if (Boolean.TRUE.equals(IS_RSYNC_BIB_000000)) {
+                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RSYNC_BIB_000000"))) {
                     //sauvegarde Vers Réseaux Pour Cloud
                     sauvegardeStudioPhoto2Reseaux();
                     //*
@@ -376,7 +356,7 @@ public class Main {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         String txt = "\n";
-        if (Boolean.TRUE.equals(IS_DRY_RUN)) {
+        if (Boolean.TRUE.equals(ctx.workflow.IS_DRY_RUN)) {
             txt += "" + "\n";
             txt += "   --DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN--   " + "\n";
             txt += "" + "\n";
@@ -384,62 +364,62 @@ public class Main {
         }
         txt += "   -------------------------------ACTION PREVU--------------------------------------   " + "\n";
         txt += "   -                                                                               -   " + "\n";
-        if (Boolean.TRUE.equals(IS_MAINT_LR_0000000)) {
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
             txt += "   -  " + "maintenanceDatabase()" + "\n";
         }
-        if (Boolean.TRUE.equals(IS_ACTION_FROM_KEY0)) {
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_ACTION_FROM_KEY0"))) {
             txt += "   -  " + "makeActionFromKeyword()" + "\n";
             txt += "   -  " + "removeLinkWithActionFromKeyword()" + "\n";
         }
-        if (Boolean.TRUE.equals(IS_TAG_DEL_00000000)) {
-            if (Boolean.TRUE.equals(IS_TAG_CR_000000000)) {
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_DEL_00000000"))) {
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_CR_000000000"))) {
                 txt += "   -  - " + "creationDesKeywordProjet()" + "\n";
             }
             txt += "   -  " + "purgeKeywordProjet()" + "\n";
-            if (Boolean.TRUE.equals(IS_MAINT_LR_0000000)) {
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
                 txt += "   -  " + "maintenanceDatabase()" + "\n";
             }
         }
-        if (Boolean.TRUE.equals(IS_RETAG_RED_000000)) {
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RETAG_RED_000000"))) {
             txt += "   -  " + "reTAGlesColorTagARED()" + "\n";
         }
-        if (Boolean.TRUE.equals(IS_WRK_REP_PHOTO_00)) {
-            if (Boolean.TRUE.equals(IS_UNZIP_REP_PHOTO0)) {
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_UNZIP_REP_PHOTO0"))) {
                 txt += "   -  - " + "UnzipAndExtractAllZip()" + "\n";
             }
         }
-        if (Boolean.TRUE.equals(IS_WRK_REJET_000000)) {
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REJET_000000"))) {
             txt += "   -  " + "rangerLesRejets()" + "\n";
         }
-        if (Boolean.TRUE.equals(IS_WRK_REP_PHOTO_00)) {
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
             txt += "   -  " + "analyseFonctionellesDesRepertoires()" + "\n";
         }
-        if (Boolean.TRUE.equals(IS_RGP_NEW_00000000)) {
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RGP_NEW_00000000"))) {
             txt += "   -  " + "regrouperLesNouvellesPhoto()" + "\n";
-            if (Boolean.TRUE.equals(IS_LST_RAPP_NEW_REP)) {
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_LST_RAPP_NEW_REP"))) {
                 txt += "   -  - " + "listerLesRapprochermentAvecLesRepertoirePhoto()" + "\n";
-                if (Boolean.TRUE.equals(IS_TAG_RAPP_NEW_REP) && Boolean.TRUE.equals(IS_TAG_CR_000000000)) {
+                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_RAPP_NEW_REP")) && Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_CR_000000000"))) {
                     txt += "   -  -  - " + "miseEnPlaceDesTagDeRapprochement()" + "\n";
                 }
             }
         }
-        if (Boolean.TRUE.equals(IS_PURGE_FOLDER_000)) {
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_PURGE_FOLDER_000"))) {
             txt += "   -  " + "isItTimeToSave()" + "\n";
             txt += "   -  - " + "purgeDesRepertoireVide50Phototheque()" + "\n";
             txt += "   -  - " + "purgeDesRepertoireVide00NEW()" + "\n";
         }
-        if (Boolean.TRUE.equals(IS_MAINT_LR_0000000)) {
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
             txt += "   -  " + "maintenanceDatabase()" + "\n";
         }
-        if (Boolean.TRUE.equals(IS_WRK_REP_PHOTO_00)) {
-            if (Boolean.TRUE.equals(IS_EXEC_FONC_REP_00)) {
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_EXEC_FONC_REP_00"))) {
                 txt += "   -  - " + "analFonctionRep.action()" + "\n";
             }
         }
-        if (Boolean.TRUE.equals(IS_SVG_LRCONFIG_000)) {
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_SVG_LRCONFIG_000"))) {
             txt += "   -  " + "sauvegardeLightroomConfigSauve()" + "\n";
         }
-        if (Boolean.TRUE.equals(IS_RSYNC_BIB_000000)) {
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RSYNC_BIB_000000"))) {
             txt += "   -  " + "sauvegardeStudioPhoto2Reseaux()" + "\n";
         }
 
@@ -600,7 +580,7 @@ public class Main {
                 .destination(ctx.getRepFonctionnel().getRepertoiresyncdest())
                 .recursive(true)
                 .exclude(ctx.getRepFonctionnel().getRsyncexclude())
-                .dryRun(IS_DRY_RUN)
+                .dryRun(ctx.workflow.IS_DRY_RUN)
                 .humanReadable(true)
                 .archive(true)
                 .delete(true)
@@ -628,7 +608,7 @@ public class Main {
                 " ---------------------------------------  \n";
         LOGGER.debug(txt);
 
-        if (!IS_DRY_RUN) {
+        if (!ctx.workflow.IS_DRY_RUN) {
             if (!syncMouchard.exists()) {
                 syncMouchard.createNewFile();
             }

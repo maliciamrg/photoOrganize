@@ -5,8 +5,8 @@ import com.malicia.mrg.app.WorkWithRepertory;
 import com.malicia.mrg.app.rep.EleChamp;
 import com.malicia.mrg.app.rep.BlocRetourRepertoire;
 import com.malicia.mrg.model.Database;
-import com.malicia.mrg.param.importjson.ControleRepertoire;
-import com.malicia.mrg.param.importjson.RepertoirePhoto;
+import com.malicia.mrg.param.electx.ControleRepertoire;
+import com.malicia.mrg.param.electx.RepertoirePhoto;
 
 
 import javax.swing.*;
@@ -21,7 +21,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
 
-import static com.malicia.mrg.param.importjson.ControleRepertoire.*;
+import static com.malicia.mrg.param.electx.ControleRepertoire.*;
 
 public class RenameRepertoire {
     private static Database dbLr;
@@ -64,7 +64,7 @@ public class RenameRepertoire {
         //initializecombobox
         List<RepertoirePhoto> listRepPhoto = ctx.getArrayRepertoirePhoto();
         for (RepertoirePhoto o : listRepPhoto) {
-            comboBox1.addItem(o);
+            comboBox1.addItem(o.repertoire);
         }
 
 

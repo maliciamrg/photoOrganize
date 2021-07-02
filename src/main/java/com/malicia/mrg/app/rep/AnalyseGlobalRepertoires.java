@@ -2,8 +2,8 @@ package com.malicia.mrg.app.rep;
 
 import com.malicia.mrg.Context;
 import com.malicia.mrg.model.Database;
-import com.malicia.mrg.param.importjson.ControleRepertoire;
-import com.malicia.mrg.param.importjson.RepertoirePhoto;
+import com.malicia.mrg.param.electx.ControleRepertoire;
+import com.malicia.mrg.param.electx.RepertoirePhoto;
 import com.malicia.mrg.util.WhereIAm;
 import com.malicia.mrg.view.RenameRepertoire;
 import org.apache.commons.io.FilenameUtils;

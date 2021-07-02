@@ -1,14 +1,11 @@
-package com.malicia.mrg.param.importjson;
-
-import com.malicia.mrg.util.Serialize;
+package com.malicia.mrg.param.electx;
 
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ControleRepertoire extends Serialize {
+public class ControleRepertoire {
 
     public static final String DATE_DATE = "£DATE£";
     public static final String TAG_ACTION = "@10_Action@";
@@ -42,15 +39,15 @@ public class ControleRepertoire extends Serialize {
             TAG_WHO
     };
 
-    private final List<String> listControleRepertoire;
+    public List<String> listControleRepertoire = new ArrayList<>();
 
-    public ControleRepertoire() {
-        listControleRepertoire = new ArrayList<>();
-        listControleRepertoire.add(NB_STAR_VALUE);
-        listControleRepertoire.add(NB_SELECTIONNER);
-        listControleRepertoire.add(NB_PHOTOAPURGER);
-        listControleRepertoire.add(NB_LIMITEMAXFOLDER);
-    }
+
+//    public ControleRepertoire() {
+////        listControleRepertoire.add(NB_STAR_VALUE);
+////        listControleRepertoire.add(NB_SELECTIONNER);
+////        listControleRepertoire.add(NB_PHOTOAPURGER);
+////        listControleRepertoire.add(NB_LIMITEMAXFOLDER);
+//    }
 
     public static String nettoyageTag(String getcChamp) {
         return getcChamp.replace("@", "");
@@ -62,6 +59,13 @@ public class ControleRepertoire extends Serialize {
 
     public List<String> getlistControleRepertoire() {
         return listControleRepertoire;
+    }
+
+    @Override
+    public String toString() {
+        return  "\n" + "ControleRepertoire{" + "\n" +
+                "listControleRepertoire=" + listControleRepertoire + "\n" +
+                '}' + "\n" ;
     }
 }
 
