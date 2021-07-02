@@ -159,66 +159,9 @@ public class Main {
                     //*
                 }
 
-                //todo mise en methode
-                List<BlocRetourRepertoire> retourValRepertoire = analFonctionRep.getListOfretourValRepertoire();
-                HashMap<String, Integer> lstIdKey = new HashMap<>();
-                retourValRepertoire.forEach(
-                        (blocRetourRep) -> {
-                            List<EleChamp> eChamp = blocRetourRep.getListOfControleValRepertoire();
-                            eChamp.forEach(
-                                    (champ) -> {
-                                        if (!champ.isRetourControle()) {
-
-                                            champ.getCompTagRetour().forEach((TagRetour) -> {
-
-//                                            System.out.println(blocRetourRep.getRepertoire() + " -- " + champ.getCompTagRetour());
-                                                LOGGER.debug(blocRetourRep.getRepertoire() + " -- " + TagRetour);
-                                                NumberFormat formatter = new DecimalFormat("0000");
-                                                int nbDiscr = ThreadLocalRandom.current().nextInt(0, 9999);
-                                                String number = formatter.format(nbDiscr);
-//                                            String tag = champ.getCompTagRetour() + "_" + "(" + number +")"  ;
-
-                                                String[] tags = (Context.TAG_REPSWEEP + "_" + TagRetour + " id:" + number + "").replace("[", "").replace("]", "").split("_");
-
-
-                                                String cletrace = tags[1] + ":" + tags[2];
-                                                try {
-                                                    for (int i = 0; i <= tags.length - 1 - 1; i++) {
-                                                        dbLr.sqlcreateKeyword(tags[i], tags[i + 1]);
-                                                    }
-
-                                                    dbLr.AddKeywordToRepNoVideo(blocRetourRep.getRepertoire(), tags[tags.length - 1], tags[tags.length - 1 - 1]);
-
-                                                    int ret = dbLr.topperRepertoireARed(blocRetourRep.getRepertoire());
-                                                    if (ret > 0) {
-                                                        LOGGER.debug("   Tag a RED ");
-                                                    }
-
-                                                    if (lstIdKey.containsKey(cletrace)) {
-                                                        lstIdKey.replace(cletrace, lstIdKey.get(cletrace) + 1);
-                                                    } else {
-                                                        lstIdKey.put(cletrace, 1);
-                                                    }
-
-                                                } catch (SQLException throwables) {
-                                                    throwables.printStackTrace();
-                                                }
-
-                                            });
-                                        }
-                                    }
-                            );
-                        }
-                );
-
-                NumberFormat formatter = new DecimalFormat("00000");
-
-               List<String> lstIdKeyByKey = new ArrayList<>(lstIdKey.keySet());
-                Collections.sort(lstIdKeyByKey);
-                lstIdKeyByKey.forEach((tempKey) -> {
-                    LOGGER.info(getStringLn(tempKey) + " = " + formatter.format(lstIdKey.get(tempKey)));
-                });
-
+                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_CTRL_REP_000"))) {
+                    tagretourValRepertoire(analFonctionRep.getListOfretourValRepertoire());
+                }
             }
 
             if (isItTimeToSave()) {
@@ -246,6 +189,67 @@ public class Main {
             exceptionLog(e, LOGGER);
         }
 
+    }
+
+    private static void tagretourValRepertoire(List<BlocRetourRepertoire> retourValRepertoire) {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        HashMap<String, Integer> lstIdKey = new HashMap<>();
+        retourValRepertoire.forEach(
+                (blocRetourRep) -> {
+                    List<EleChamp> eChamp = blocRetourRep.getListOfControleValRepertoire();
+                    eChamp.forEach(
+                            (champ) -> {
+                                if (!champ.isRetourControle()) {
+
+                                    champ.getCompTagRetour().forEach((TagRetour) -> {
+
+//                                            System.out.println(blocRetourRep.getRepertoire() + " -- " + champ.getCompTagRetour());
+                                        LOGGER.debug(blocRetourRep.getRepertoire() + " -- " + TagRetour);
+                                        NumberFormat formatter = new DecimalFormat("0000");
+                                        int nbDiscr = ThreadLocalRandom.current().nextInt(0, 9999);
+                                        String number = formatter.format(nbDiscr);
+//                                            String tag = champ.getCompTagRetour() + "_" + "(" + number +")"  ;
+
+                                        String[] tags = (Context.TAG_REPSWEEP + "_" + TagRetour + " id:" + number + "").replace("[", "").replace("]", "").split("_");
+
+
+                                        String cletrace = tags[1] + ":" + tags[2];
+                                        try {
+                                            for (int i = 0; i <= tags.length - 1 - 1; i++) {
+                                                dbLr.sqlcreateKeyword(tags[i], tags[i + 1]);
+                                            }
+
+                                            dbLr.AddKeywordToRepNoVideo(blocRetourRep.getRepertoire(), tags[tags.length - 1], tags[tags.length - 1 - 1]);
+
+                                            int ret = dbLr.topperRepertoireARed(blocRetourRep.getRepertoire());
+                                            if (ret > 0) {
+                                                LOGGER.debug("   Tag a RED ");
+                                            }
+
+                                            if (lstIdKey.containsKey(cletrace)) {
+                                                lstIdKey.replace(cletrace, lstIdKey.get(cletrace) + 1);
+                                            } else {
+                                                lstIdKey.put(cletrace, 1);
+                                            }
+
+                                        } catch (SQLException throwables) {
+                                            throwables.printStackTrace();
+                                        }
+
+                                    });
+                                }
+                            }
+                    );
+                }
+        );
+
+        NumberFormat formatter = new DecimalFormat("00000");
+
+        List<String> lstIdKeyByKey = new ArrayList<>(lstIdKey.keySet());
+        Collections.sort(lstIdKeyByKey);
+        lstIdKeyByKey.forEach((tempKey) -> {
+            LOGGER.info(getStringLn(tempKey) + " = " + formatter.format(lstIdKey.get(tempKey)));
+        });
     }
 
     private static void chargementParametre(Context ctx, String[] args) {
@@ -415,7 +419,12 @@ public class Main {
             if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_EXEC_FONC_REP_00"))) {
                 txt += "   -  - " + "analFonctionRep.action()" + "\n";
             }
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_CTRL_REP_000"))) {
+                txt += "   -  - " + "tagretourValRepertoire(analFonctionRep.getListOfretourValRepertoire())" + "\n";
+            }
         }
+
+
         if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_SVG_LRCONFIG_000"))) {
             txt += "   -  " + "sauvegardeLightroomConfigSauve()" + "\n";
         }
