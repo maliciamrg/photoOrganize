@@ -15,10 +15,11 @@ workflow:
     - IS_TAG_RAPP_NEW_REP # grpPhotosRapprocher => mise En Place Des TAG_RAPPROCHEMENT++ possible entre les new et la phototheque
     - IS_PURGE_FOLDER_000 # purgeDesRepertoireVide50Phototheque() (local) et purgeDesRepertoireVide00NEW() (reseau)
     - IS_TAG_CTRL_REP_000 # analFonctionRep => appliquer des tag TAG_REPSWEEP++ sur les photo et mise a 'RED' de repertoire en fonction de analFonctionRep.getListOfretourValRepertoire()
+    - IS_EXEC_FONC_REP_00 # analFonctionRep => Renommage des repertoire via POP UP.
   NOTTODO:
     - IS_SVG_LRCONFIG_000 # sauvegarde du la config LR sur le reseau.
     - IS_RSYNC_BIB_000000 # sauvegarde des photos sur le reseau.
-    - IS_EXEC_FONC_REP_00 # analFonctionRep => Renommage des repertoire via POP UP.
+    - EMPTY
 paramControleRepertoire:
   listControleRepertoire:
     - starValue
@@ -129,7 +130,6 @@ arrayRepertoirePhoto:
       - 2
       - 1
     zoneValeurAdmise:
-      - '£DATE£'
       - '£DATE£'
       - '@00_EVENT@'
       - '@00_WHERE@'

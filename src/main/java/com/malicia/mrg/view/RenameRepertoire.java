@@ -55,7 +55,9 @@ public class RenameRepertoire {
     public RenameRepertoire(List<BlocRetourRepertoire> retourRepertoireOri) {
         this.retourRepertoire = retourRepertoireOri;
         numeroRetRep = 0;
-        bgOk = tree1.getBackground();
+        if (tree1!=null) {
+            bgOk = tree1.getBackground();
+        }
 
         //initialize button
         button1.setText("Validate Name");
