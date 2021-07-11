@@ -17,8 +17,10 @@ public class ActionRepertoire {
     }
 
     public void populate(HashMap<String, String> folderCollection) {
-        listeAction = sort(folderCollection);
-
+        HashMap tmp = new HashMap<>();
+        tmp.putAll(listeAction);
+        tmp.putAll(folderCollection);
+        listeAction= sort(tmp);
     }
 
     private static HashMap sort(HashMap map) {

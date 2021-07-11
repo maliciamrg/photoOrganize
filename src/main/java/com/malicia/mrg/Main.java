@@ -56,10 +56,11 @@ public class Main {
             // chargement application
             ctx = Context.chargeParam();
             dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat(), ctx.workflow.IS_DRY_RUN);
-            AnalyseGlobalRepertoires.init(ctx, dbLr);
+//            AnalyseGlobalRepertoires.init(ctx, dbLr);
 
             SystemFiles.setIsDryRun(ctx.workflow.IS_DRY_RUN);
-            ctx.getActionVersRepertoire().populate(dbLr.getFolderCollection(Context.COLLECTIONS, Context.TAG_ORG));
+            ctx.getActionVersRepertoire().populate(dbLr.getFolderCollection(Context.COLLECTIONS, Context.TAG_ORG, ""));
+            //ctx.getActionVersRepertoire().populate(dbLr.getFolderCollection("01-Cataloque_Photo", Context.TAG_ORG, ""));
             //*
 
             // chargement parameter
@@ -119,6 +120,7 @@ public class Main {
             if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
                 //En Fonction De La Strategies De Rangement
                 analFonctionRep = analyseFonctionellesDesRepertoires();
+//                LOGGER.info(analFonctionRep.toDisplay());
                 //*
             }
             if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RGP_NEW_00000000"))) {
@@ -155,7 +157,7 @@ public class Main {
             if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
                 if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_EXEC_FONC_REP_00"))) {
                     //Popup Action sur les erreurs Fonctionelle des repertoires
-                    analFonctionRep.action();
+                    analFonctionRep.action(ctx,dbLr);
                     //*
                 }
 
@@ -179,10 +181,10 @@ public class Main {
             }
 
             endall();
-
-            if (Boolean.TRUE) {
-                throw new IllegalStateException("Stop Run");
-            }
+//
+//            if (Boolean.TRUE) {
+//                throw new IllegalStateException("Stop Run");
+//            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -193,9 +195,11 @@ public class Main {
 
     private static void tagretourValRepertoire(List<BlocRetourRepertoire> retourValRepertoire) {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        final int[] nbTopRed = {0};
         HashMap<String, Integer> lstIdKey = new HashMap<>();
         retourValRepertoire.forEach(
                 (blocRetourRep) -> {
+                    final boolean[] miseared = {false};
                     List<EleChamp> eChamp = blocRetourRep.getListOfControleValRepertoire();
                     eChamp.forEach(
                             (champ) -> {
@@ -224,6 +228,10 @@ public class Main {
                                             int ret = dbLr.topperRepertoireARed(blocRetourRep.getRepertoire());
                                             if (ret > 0) {
                                                 LOGGER.debug("   Tag a RED ");
+                                                if (!miseared[0]) {
+                                                    nbTopRed[0]++;
+                                                    miseared[0] = true;
+                                                }
                                             }
 
                                             if (lstIdKey.containsKey(cletrace)) {
@@ -239,11 +247,14 @@ public class Main {
                                     });
                                 }
                             }
+
                     );
                 }
         );
 
         NumberFormat formatter = new DecimalFormat("00000");
+
+        loggerInfo("Tag a RED " + String.format("%05d", nbTopRed[0]) + " - repertoire ", nbTopRed[0]);
 
         List<String> lstIdKeyByKey = new ArrayList<>(lstIdKey.keySet());
         Collections.sort(lstIdKeyByKey);
@@ -908,9 +919,9 @@ public class Main {
             while (repertoireIterator.hasNext()) {
                 String repertoire = repertoireIterator.next();
 
-                BlocRetourRepertoire retourRepertoire = AnalyseGlobalRepertoires.calculateLesEleChampsDuRepertoire(repertoire, repPhoto, ctx.getParamControleRepertoire());
+//                BlocRetourRepertoire retourRepertoire = AnalyseGlobalRepertoires.calculateLesEleChampsDuRepertoire(repertoire, repPhoto, ctx.getParamControleRepertoire());
 
-                analyseRepertoires.add(retourRepertoire);
+                analyseRepertoires.add(new BlocRetourRepertoire(repertoire, repPhoto, ctx.getParamControleRepertoire(),ctx,dbLr));
 
 //                File f = new File(repertoire + Context.FOLDERDELIM + "photoOrganizeAnalyse.json");
 //                if (!retourRepertoire.isRepertoireValide()) {

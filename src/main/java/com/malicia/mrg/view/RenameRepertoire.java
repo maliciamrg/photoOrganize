@@ -23,7 +23,7 @@ import java.util.List;
 
 import static com.malicia.mrg.param.electx.ControleRepertoire.*;
 
-public class RenameRepertoire {
+public class RenameRepertoire extends JFrame{
     private static Database dbLr;
     private static Context ctx;
     private static Color bgOk = Color.GRAY;
@@ -53,11 +53,13 @@ public class RenameRepertoire {
     private List<BlocRetourRepertoire> retourRepertoire;
 
     public RenameRepertoire(List<BlocRetourRepertoire> retourRepertoireOri) {
+        super();
+
         this.retourRepertoire = retourRepertoireOri;
         numeroRetRep = 0;
-        if (tree1!=null) {
-            bgOk = tree1.getBackground();
-        }
+
+        bgOk = tree1.getBackground();
+
 
         //initialize button
         button1.setText("Validate Name");
@@ -133,12 +135,12 @@ public class RenameRepertoire {
                 }
             }
         });
-
     }
 
     public static void start(Database dbLr, Context ctx, List<BlocRetourRepertoire> blRetourRepertoire) {
         RenameRepertoire.dbLr = dbLr;
         RenameRepertoire.ctx = ctx;
+
         frame = new JFrame("rename Repertoire");
         frame.setContentPane(new RenameRepertoire(blRetourRepertoire).panel1);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -146,6 +148,7 @@ public class RenameRepertoire {
         frame.setVisible(true);
         frame.revalidate();
         frame.repaint();
+
     }
 
     private static List<String> prefixAllElementsList(String prefix, List<String> valueForKeyword) {

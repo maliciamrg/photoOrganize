@@ -544,9 +544,15 @@ public class Database extends SQLiteJDBCDriverConnection {
                         " from AgLibraryFile a  " +
                         " inner join Adobe_images e " +
                         " on a.id_local = e.rootFile " +
+//                        " " +
+//                        Context.filtreImportScanUn +
+//                        " " +
                         " where " + idLocalRep.get("Folderidlocal") + " = a.folder " +
                         PickCriteria +
                         OptionalNoVideoCriteria +
+//                        "" +
+//                        Context.filtreImportScanDeux +
+//                        "" +
                         ";");
 
         int nbpick = 0;
@@ -1010,11 +1016,11 @@ public class Database extends SQLiteJDBCDriverConnection {
         return executeUpdate(sql);
     }
 
-    public HashMap<String, String> getFolderCollection(String collections, String tagorg) throws SQLException {
+    public HashMap<String, String> getFolderCollection(String collections, String tagorg, String filtreDebutNomRep) throws SQLException {
         HashMap<String, String> ret = new HashMap<>();
         String sql = " select * " +
                 "from AgLibraryFolder " +
-                "where pathFromRoot REGEXP  '\\/" + collections + "\\/[@&#a-zA-Z _0-9-]*\\/$' " +
+                "where pathFromRoot REGEXP  '" + collections + "\\/"+ filtreDebutNomRep+"[@&#a-zA-Z _0-9-]*\\/$' " +
                 ";";
         ResultSet rs = select(sql);
         while (rs.next()) {

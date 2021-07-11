@@ -48,6 +48,12 @@ public class Context {
     public ElementsRejet paramElementsRejet;
     public TriNew paramTriNew;
 
+    public static final String filtreImportScanUn = " left join AgLibraryKeywordImage ki " +
+            " on ki.image = e.id_local " +
+            " left join AgLibraryKeyword k " +
+            " on k.id_local = ki.tag ";
+    public static final String filtreImportScanDeux = " and k.lc_name != 'import_argentique_bf_evolution' ";
+
     @Override
     public String toString() {
         return "Context{" +
