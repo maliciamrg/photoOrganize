@@ -143,7 +143,7 @@ public class RenameRepertoire extends JFrame{
 
         frame = new JFrame("rename Repertoire");
         frame.setContentPane(new RenameRepertoire(blRetourRepertoire).panel1);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
         frame.revalidate();
