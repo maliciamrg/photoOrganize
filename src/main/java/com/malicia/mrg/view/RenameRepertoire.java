@@ -54,12 +54,12 @@ public class RenameRepertoire extends JFrame{
 
     public RenameRepertoire(List<BlocRetourRepertoire> retourRepertoireOri) {
         super();
+        this.pack();
 
         this.retourRepertoire = retourRepertoireOri;
         numeroRetRep = 0;
 
         bgOk = tree1.getBackground();
-
 
         //initialize button
         button1.setText("Validate Name");
@@ -81,8 +81,10 @@ public class RenameRepertoire extends JFrame{
                 if (numeroRetRep >= retourRepertoire.size()) {
 //                    numeroRetRep = retourRepertoire.size() - 1;
                     frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+                    frame.dispose();
+                } else {
+                    majPanel(retourRepertoire);
                 }
-                majPanel(retourRepertoire);
             }
         });
 

@@ -138,7 +138,7 @@ arrayRepertoirePhoto:
   - repertoire: '01-Cataloque_Photo\##Shooting 03-05 j'
     nomunique: Shooting
     uniteDeJour: 1
-    nbMaxParUniteDeJour: 3
+    nbMaxParUniteDeJour: 5
     ratioStarMax:
       - 25
       - 12

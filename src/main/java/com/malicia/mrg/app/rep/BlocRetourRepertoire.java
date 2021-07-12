@@ -22,7 +22,8 @@ public class BlocRetourRepertoire {
     private int nbphotoapurger;
     private int nbNonSelectionner;
     private int nbelements;
-    private int limitemaxfolder;
+    private int limitemaxfolderphoto;
+    private int limitemaxfoldervideo;
     private int nbSelectionner;
 
     private String date;
@@ -44,7 +45,8 @@ public class BlocRetourRepertoire {
                 ", date='" + date + '\''  + "\n"+
                 ", nbelements=" + nbelements  + "\n"+
                 ", nbSelectionner=" + nbSelectionner  + "\n"+
-                ", limitemaxfolder=" + limitemaxfolder  + "\n"+
+                ", limitemaxfolderphoto=" + limitemaxfolderphoto + "\n"+
+                ", limitemaxfoldervideo=" + limitemaxfoldervideo + "\n"+
                 ", nbphotoapurger=" + nbphotoapurger  + "\n"+
                 ", nbNonSelectionner=" + nbNonSelectionner  + "\n"+
 //                ", listOfControleValRepertoire=" + listOfControleValRepertoire.toString()  + "\n"+
@@ -62,12 +64,15 @@ public class BlocRetourRepertoire {
         nomOk = true;
         valOk = true;
 
-        limitemaxfolder = (int) ((Double.valueOf(repPhoto.getNbMaxParUniteDeJour()) * dbLr.nbJourFolderNoVideo(repertoire)) / Double.valueOf(repPhoto.getUniteDeJour()));
+        limitemaxfolderphoto = (int) ((Double.valueOf(repPhoto.getNbMaxParUniteDeJour()) * dbLr.nbJourFolderNoVideo(repertoire)) / Double.valueOf(repPhoto.getUniteDeJour()));
+        //si le reprtoire n'a pas de photo mais que des video , il est legit
+        limitemaxfoldervideo = (int) ((1 * dbLr.nbJourFolderVideo(repertoire)) / 1);
+
         nbSelectionner = dbLr.nbPickNoVideo(repertoire);
         date = dbLr.getDate(repertoire);
         nbelements = getNbelementsPhysiqueNonRejet(repertoire);
         nbNonSelectionner = dbLr.nbNoPickNoVideo(repertoire);
-        nbphotoapurger = nbelements - limitemaxfolder;
+        nbphotoapurger = (nbSelectionner + nbNonSelectionner) - limitemaxfolderphoto;
 
         String ancienNomDuRepertoire = new File(repertoire).getName();
         String[] oldChamp = ancienNomDuRepertoire.split(ControleRepertoire.CARAC_SEPARATEUR);
@@ -211,14 +216,15 @@ public class BlocRetourRepertoire {
             case ControleRepertoire.NB_ELEMENTS:
                 ele.setRetourToTrue();
                 if (nbelements == 0) {
-                    ele.setRetourToFalse(String.valueOf(nbelements), "Phase0-pbrepertoire_zeroelements_" + "(0ele)" + repertoire.replace(repPhoto.getRepertoire() + "\\", "").replace(ctx.getRepertoire50Phototheque(), "").replace("_", " "));
+                    ele.setRetourToFalse(String.valueOf(nbelements), "Phase0-pbrepertoire_zeroelements_" + "(0ele)"
+                            + repertoire.replace(repPhoto.getRepertoire() + "\\", "").replace(ctx.getRepertoire50Phototheque(), "").replace("_", " "));
                 }
                 break;
             case ControleRepertoire.NB_SELECTIONNER:
                 ele.setRetourToTrue();
                 if (nbSelectionner == 0) {
                     ele.setRetourToFalse(String.valueOf(nbSelectionner), "Phase1_1-zeroElePhotoSelectionner_" + "(0select)"
-                            + "/" + String.format("%05d", limitemaxfolder) + " : "
+                            + "/" + String.format("%05d", limitemaxfolderphoto) + " : "
                             + repertoire.replace(repPhoto.getRepertoire() + "\\", "").replace(ctx.getRepertoire50Phototheque(), "").replace("_", " "));
                 }
                 break;
@@ -226,20 +232,21 @@ public class BlocRetourRepertoire {
                 ele.setRetourToTrue();
                 if (nbNonSelectionner != 0) {
                     ele.setRetourToFalse(String.valueOf(nbNonSelectionner), "Phase1_1-nbPhotoNonSelectionner_" + "(nbNselect)"
-                            + String.format("%05d", nbNonSelectionner) + "/" + String.format("%05d", limitemaxfolder));
+                            + String.format("%05d", nbNonSelectionner) + "/" + String.format("%05d", limitemaxfolderphoto));
                 }
                 break;
             case ControleRepertoire.NB_PHOTOAPURGER:
                 ele.setRetourToTrue();
                 if (nbphotoapurger > 0) {
                     ele.setRetourToFalse(String.valueOf(nbphotoapurger), "Phase1_2-nbPhotoAPurge_" + "(nbpurge)"
-                            + String.format("%05d", nbphotoapurger) + "/" + String.format("%05d", limitemaxfolder));
+                            + String.format("%05d", nbphotoapurger) + "/" + String.format("%05d", limitemaxfolderphoto));
                 }
                 break;
             case ControleRepertoire.NB_LIMITEMAXFOLDER:
                 ele.setRetourToTrue();
-                if (limitemaxfolder == 0) {
-                    ele.setRetourToFalse(String.valueOf(limitemaxfolder), "Phase0-pbrepertoire_limitemaxazero_" + "(noLMax)" + repertoire);
+                if (limitemaxfolderphoto == 0 && limitemaxfoldervideo == 0 ) {
+                    ele.setRetourToFalse(String.valueOf(limitemaxfolderphoto), "Phase0-pbrepertoire_limitemaxazero_" + "(noLMax)"
+                            + repertoire.replace(repPhoto.getRepertoire() + "\\", "").replace(ctx.getRepertoire50Phototheque(), "").replace("_", " "));
                 }
                 break;
             default:

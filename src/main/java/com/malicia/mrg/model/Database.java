@@ -505,7 +505,13 @@ public class Database extends SQLiteJDBCDriverConnection {
         return days;
     }
 
+    public double nbJourFolderVideo(String repertoire) throws SQLException {
+        return nbJourFolder( repertoire , " and e.fileFormat = 'VIDEO' ");
+    }
     public double nbJourFolderNoVideo(String repertoire) throws SQLException {
+        return nbJourFolder( repertoire, " and e.fileFormat != 'VIDEO' ");
+    }
+    public double nbJourFolder(String repertoire, String OptionalNoVideoCriteria) throws SQLException {
         Map<String, String> idLocalRep = getIdlocalforRep(repertoire);
         ResultSet rsexist = select(
                 " select " +
@@ -516,7 +522,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                         " on a.id_local = e.rootFile" +
                         " where " + idLocalRep.get("Folderidlocal") + " = a.folder" +
                         " and e.pick >= 0" +
-                        " and e.fileFormat != 'VIDEO' " +
+                        OptionalNoVideoCriteria +
                         " group by strftime('%Y%m%d', e.captureTime)" +
                         " ;");
 

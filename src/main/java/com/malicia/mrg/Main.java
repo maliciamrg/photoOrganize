@@ -182,9 +182,9 @@ public class Main {
 
             endall();
 
-//            if (Boolean.TRUE) {
-//                throw new IllegalStateException("Stop Run");
-//            }
+            if (Boolean.TRUE) {
+                throw new IllegalStateException("Stop Run");
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

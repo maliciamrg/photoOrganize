@@ -101,7 +101,7 @@ public class Context {
         Yaml yaml = new Yaml();
         try( InputStream in = Files.newInputStream( Paths.get( args ) ) ) {
             contexte = yaml.loadAs( in, Context.class );
-            LOGGER.info(contexte.toString() );
+            LOGGER.debug(contexte.toString() );
         }
         return contexte;
     }
