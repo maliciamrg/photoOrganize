@@ -126,18 +126,18 @@ public class BlocRetourRepertoire {
     }
 
     private int getNbelementsPhysiqueNonRejet(String repertoire) {
-        int nbelements;
-        nbelements = 0;
+        int nbelementsin;
+        nbelementsin = 0;
         File[] files = new File(repertoire).listFiles();
         for (File file : files) {
             if (!file.isDirectory()) {
                 String fileExt = FilenameUtils.getExtension(file.getName()).toLowerCase();
                 if (ctx.getParamElementsRejet().getArrayNomFileRejet().contains(fileExt.toLowerCase())) {
-                    nbelements++;
+                    nbelementsin++;
                 }
             }
         }
-        return nbelements;
+        return nbelementsin;
     }
 
     private void controleRepertoireNBSTARVALUE(String repertoire, RepertoirePhoto repPhoto, EleChamp ele) throws SQLException {
@@ -229,18 +229,10 @@ public class BlocRetourRepertoire {
                 }
                 break;
             case ControleRepertoire.NB_NONSELECTIONNER:
-                ele.setRetourToTrue();
-                if (nbNonSelectionner != 0) {
-                    ele.setRetourToFalse(String.valueOf(nbNonSelectionner), "Phase1_1-nbPhotoNonSelectionner_" + "(nbNselect)"
-                            + String.format("%05d", nbNonSelectionner) + "/" + String.format("%05d", limitemaxfolderphoto));
-                }
+                controleMutualise(ele, nbNonSelectionner != 0, nbNonSelectionner, "Phase1_1-nbPhotoNonSelectionner_", "(nbNselect)");
                 break;
             case ControleRepertoire.NB_PHOTOAPURGER:
-                ele.setRetourToTrue();
-                if (nbphotoapurger > 0) {
-                    ele.setRetourToFalse(String.valueOf(nbphotoapurger), "Phase1_2-nbPhotoAPurge_" + "(nbpurge)"
-                            + String.format("%05d", nbphotoapurger) + "/" + String.format("%05d", limitemaxfolderphoto));
-                }
+                controleMutualise(ele, nbphotoapurger > 0, nbphotoapurger, "Phase1_2-nbPhotoAPurge_", "(nbpurge)");
                 break;
             case ControleRepertoire.NB_LIMITEMAXFOLDER:
                 ele.setRetourToTrue();
@@ -253,6 +245,14 @@ public class BlocRetourRepertoire {
                 String txt = "elechamp.elechamp=" + elechamp + " inconnu ";
                 LOGGER.debug(() -> txt);
                 throw new IllegalStateException(txt);
+        }
+    }
+
+    private void controleMutualise(EleChamp ele, boolean b, int nbphotoapurger, String s, String s2) {
+        ele.setRetourToTrue();
+        if (b) {
+            ele.setRetourToFalse(String.valueOf(nbphotoapurger), s + s2
+                    + String.format("%05d", nbphotoapurger) + "/" + String.format("%05d", limitemaxfolderphoto));
         }
     }
 

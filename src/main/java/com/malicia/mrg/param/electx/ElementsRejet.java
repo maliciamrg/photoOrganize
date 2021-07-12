@@ -1,17 +1,14 @@
 package com.malicia.mrg.param.electx;
 
-import com.malicia.mrg.util.Serialize;
-
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class ElementsRejet {
 
-    public List<String> arrayNomSubdirectoryRejet = new ArrayList<>();
-    public List<String> arrayNomFileRejet = new ArrayList<>();
-    public List<String> arrayNomFileRejetSup = new ArrayList<>();
-    public String extFileRejet;
+    private List<String> arrayNomSubdirectoryRejet = new ArrayList<>();
+    private List<String> arrayNomFileRejet = new ArrayList<>();
+    private List<String> arrayNomFileRejetSup = new ArrayList<>();
+    private String extFileRejet;
 
     public ElementsRejet() {
         // Do nothing because of X and Y
