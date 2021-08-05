@@ -62,7 +62,7 @@
         <dependency>
             <groupId>github.maliciamrg</groupId>
             <artifactId>utilitaire</artifactId>
-            <version>1.0.2</version>
+            <version>1.0.4</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
         <dependency>

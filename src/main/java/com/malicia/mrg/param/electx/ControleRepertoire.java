@@ -39,7 +39,7 @@ public class ControleRepertoire {
             TAG_WHO
     };
 
-    private List<String> listControleRepertoire = new ArrayList<>();
+    public List<String> listControleRepertoire = new ArrayList<>();
 
     public static String nettoyageTag(String getcChamp) {
         return getcChamp.replace("@", "");

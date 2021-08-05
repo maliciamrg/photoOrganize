@@ -1,5 +1,7 @@
 package com.malicia.mrg;
 
+import com.github.fracpete.processoutput4j.output.CollectingProcessOutput;
+import com.github.fracpete.processoutput4j.output.ConsoleOutputProcessOutput;
 import com.github.fracpete.processoutput4j.output.StreamingProcessOutput;
 import com.github.fracpete.rsync4j.RSync;
 import com.malicia.mrg.app.*;
@@ -157,7 +159,7 @@ public class Main {
             if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
                 if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_EXEC_FONC_REP_00"))) {
                     //Popup Action sur les erreurs Fonctionelle des repertoires
-                    analFonctionRep.action(ctx,dbLr);
+                    analFonctionRep.action(ctx, dbLr);
                     //*
                 }
 
@@ -166,7 +168,7 @@ public class Main {
                 }
             }
 
-            if (isItTimeToSave()) {
+            if (isItTimeToSave() || Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_FORCE_SVG_000000"))) {
                 if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_SVG_LRCONFIG_000"))) {
                     //Sauvegarde Lightroom sur Local
                     sauvegardeLightroomConfigSauve();
@@ -598,15 +600,31 @@ public class Main {
         RSync rsync = new RSync()
                 .sources(ctx.getRepFonctionnel().getRepertoiresyncsource())
                 .destination(ctx.getRepFonctionnel().getRepertoiresyncdest())
+                //.times(true)
+//                .info("progress2,stats2,misc1,flist0")
+//                .info("PROGRESS2,STATS2,COPY2,DEL2")
+//                .info("FLIST4,PROGRESS4,STATS4")
+                .info("PROGRESS2,STATS2")
+//                .info("ALL4")
+//                .debug("DEL,FLIST")
+//                .debug("ALL4")
+//                .msgs2stderr(true)
+                .outputCommandline(true)
                 .recursive(true)
+//                .ignoreExisting(true)
+//                .sizeOnly(true)
+//                .listOnly(true)
                 .exclude(ctx.getRepFonctionnel().getRsyncexclude())
                 .dryRun(ctx.workflow.IS_DRY_RUN)
+//                .dryRun(true)
+                .stats(true)
+                .progress(true)
+                .itemizeChanges(true)
                 .humanReadable(true)
-                .archive(true)
                 .delete(true)
                 .verbose(true);
 
-        Output output1 = new Output();
+        Output output1 = new Output(new String[]{"total size is","bytes  received","Number of","deleting"},new String[]{"%"});
         StreamingProcessOutput output = new StreamingProcessOutput(output1);
         output.monitor(rsync.builder());
 
@@ -921,7 +939,7 @@ public class Main {
 
 //                BlocRetourRepertoire retourRepertoire = AnalyseGlobalRepertoires.calculateLesEleChampsDuRepertoire(repertoire, repPhoto, ctx.getParamControleRepertoire());
 
-                analyseRepertoires.add(new BlocRetourRepertoire(repertoire, repPhoto, ctx.getParamControleRepertoire(),ctx,dbLr));
+                analyseRepertoires.add(new BlocRetourRepertoire(repertoire, repPhoto, ctx.getParamControleRepertoire(), ctx, dbLr));
 
 //                File f = new File(repertoire + Context.FOLDERDELIM + "photoOrganizeAnalyse.json");
 //                if (!retourRepertoire.isRepertoireValide()) {
