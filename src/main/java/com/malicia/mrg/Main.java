@@ -45,6 +45,7 @@ public class Main {
     private static Database dbLr;
     private static JFrame frame;
     private static AnalyseGlobalRepertoires analFonctionRep;
+    private static JProgressBar progress;
 
     public static void main(String[] args) {
         try {
@@ -526,6 +527,13 @@ public class Main {
         // now add the scrollpane to the jframe's content pane, specifically
         // placing it in the center of the jframe's borderlayout
         frame = new JFrame("PhotoOrganize");
+
+        progress = new JProgressBar();
+        progress.setValue(0);
+        progress.setStringPainted(true);
+        progress.setSize(500,500);
+
+        frame.getContentPane().add(progress, BorderLayout.SOUTH);
         frame.getContentPane().add(jConsoleScroll, BorderLayout.CENTER);
 
         // make it easy to close the application
@@ -600,23 +608,11 @@ public class Main {
         RSync rsync = new RSync()
                 .sources(ctx.getRepFonctionnel().getRepertoiresyncsource())
                 .destination(ctx.getRepFonctionnel().getRepertoiresyncdest())
-                //.times(true)
-//                .info("progress2,stats2,misc1,flist0")
-//                .info("PROGRESS2,STATS2,COPY2,DEL2")
-//                .info("FLIST4,PROGRESS4,STATS4")
                 .info("PROGRESS2,STATS2")
-//                .info("ALL4")
-//                .debug("DEL,FLIST")
-//                .debug("ALL4")
-//                .msgs2stderr(true)
                 .outputCommandline(true)
                 .recursive(true)
-//                .ignoreExisting(true)
-//                .sizeOnly(true)
-//                .listOnly(true)
                 .exclude(ctx.getRepFonctionnel().getRsyncexclude())
                 .dryRun(ctx.workflow.IS_DRY_RUN)
-//                .dryRun(true)
                 .stats(true)
                 .progress(true)
                 .itemizeChanges(true)
@@ -624,7 +620,7 @@ public class Main {
                 .delete(true)
                 .verbose(true);
 
-        Output output1 = new Output(new String[]{"total size is","bytes  received","Number of","deleting"},new String[]{"%"});
+        Output output1 = new Output(new String[]{"total size is","bytes  received","Number of","deleting"},new String[]{"%"},progress);
         StreamingProcessOutput output = new StreamingProcessOutput(output1);
         output.monitor(rsync.builder());
 
