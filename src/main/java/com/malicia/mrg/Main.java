@@ -46,6 +46,7 @@ public class Main {
     private static JFrame frame;
     private static AnalyseGlobalRepertoires analFonctionRep;
     private static JProgressBar progress;
+    private static int unNbMisAREDRep = 0;
 
     public static void main(String[] args) {
         try {
@@ -258,6 +259,7 @@ public class Main {
         NumberFormat formatter = new DecimalFormat("00000");
 
         loggerInfo("Tag a RED " + String.format("%05d", nbTopRed[0]) + " - repertoire ", nbTopRed[0]);
+        loggerInfo("Delta Tag a RED " + String.format("%+05d", nbTopRed[0] - unNbMisAREDRep) + " - repertoire ", nbTopRed[0] - unNbMisAREDRep);
 
         List<String> lstIdKeyByKey = new ArrayList<>(lstIdKey.keySet());
         Collections.sort(lstIdKeyByKey);
@@ -365,7 +367,7 @@ public class Main {
         int nbMisARED = dbLr.topperARed50NEW(ctx.getParamTriNew().getRepertoire50NEW());
         loggerInfo("Tag a RED " + String.format("%05d", nbMisARED) + " - images ", nbMisARED);
 
-        int unNbMisAREDRep = dbLr.deTopperARedOldRepertoire();
+        unNbMisAREDRep = dbLr.deTopperARedOldRepertoire();
         loggerInfo("UnTag a RED " + String.format("%05d", unNbMisAREDRep) + " - repertoire ", unNbMisAREDRep);
 
     }
@@ -498,7 +500,7 @@ public class Main {
     }
 
     private static void loggerInfo(String texte, int size) {
-        if (size > 0) {
+        if (size != 0) {
             LOGGER.info(texte);
         } else {
             LOGGER.debug(texte);
