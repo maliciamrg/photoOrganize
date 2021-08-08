@@ -1,10 +1,6 @@
 workflow:
   IS_DRY_RUN: false  # Est-ce un dry_run (sans mise a jour des bases)
   TODO:
-    - IS_FORCE_SVG_000000 # force time to sauvegarde
-    - IS_RSYNC_BIB_000000 # sauvegarde des photos sur le reseau.
-  NOTTODO:
-    - EMPTY
     - IS_MAINT_LR_0000000 # Maintenance sur la base LR
     - IS_ACTION_FROM_KEY0 # déplacement des photos tagger par TAG_ACTION_GO_RAPPROCHEMENT et Context.COLLECTIONS
     - IS_PURGE_ACTION_000 # remove les tag [action] des photos (TAG_ACTION_GO_RAPPROCHEMENT et Context.COLLECTIONS)
@@ -21,6 +17,10 @@ workflow:
     - IS_TAG_CTRL_REP_000 # analFonctionRep => appliquer des tag TAG_REPSWEEP++ sur les photo et mise a 'RED' de repertoire en fonction de analFonctionRep.getListOfretourValRepertoire()
     - IS_EXEC_FONC_REP_00 # analFonctionRep => Renommage des repertoire via POP UP.
     - IS_SVG_LRCONFIG_000 # sauvegarde du la config LR sur le reseau.
+    - IS_RSYNC_BIB_000000 # sauvegarde des photos sur le reseau.
+  NOTTODO:
+    - EMPTY
+    - IS_FORCE_SVG_000000 # force time to sauvegarde
 paramControleRepertoire:
   listControleRepertoire:
     - starValue
@@ -81,13 +81,11 @@ repFonctionnel:
     - "*.lrcat-*"
     - "*\\log\\*"
   repertoiresyncsource:
-#    - "D:\\50_Phototheque\\01-Cataloque_Photo\\##Holidays 20-30 sem\\2020-02-07_vacances_valfrejus_kevorian"
     - "D:\\50_Phototheque"
     - "D:\\70_Catalogs"
     - "D:\\80_Logiciel_Windows"
     - "D:\\95_Boite_a_outils"
   repertoiresyncdest: "\\\\LEGION-2\\20-photo\\"
-  #  repertoiresyncdest: "\\\\LEGION-2\\20-photo\\50_Phototheque\\01-Cataloque_Photo\\##Holidays 20-30 sem\\2020-02-07_vacances_valfrejus_kevorian"
   syncdestmouchard: photoOrganizeLastSync.txt
   syncAmountDaysBetween: 15
 arrayRepertoirePhoto:
