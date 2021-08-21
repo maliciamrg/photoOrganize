@@ -688,7 +688,7 @@ public class Database extends SQLiteJDBCDriverConnection {
             File filepath = new File(rs.getString("absolutePath") + rs.getString("pathFromRoot") + rs.getString("lc_idx_filename"));
             nb += 1;
             if (!filepath.exists()) {
-                txtret += "ko = " + "file_id_local" + "(" + rs.getString("file_id_local") + ")" + filepath + " "+ "\n";
+                txtret += "(debug) ko = " + "file_id_local" + "(" + rs.getString("file_id_local") + ")" + filepath + " "+ "\n";
                 ko += 1;
                 koCor += sqlDeleteFile(rs.getString("file_id_local"));
             }
@@ -719,7 +719,7 @@ public class Database extends SQLiteJDBCDriverConnection {
             File filepath = new File(rs.getString("absolutePath") + rs.getString("pathFromRoot"));
             nb += 1;
             if (!filepath.exists()) {
-                txtret += "ko = " + "folder_id_local" + "(" + rs.getString("folder_id_local") + ")" + filepath + "\n";
+                txtret += "(debug) ko = " + "folder_id_local" + "(" + rs.getString("folder_id_local") + ")" + filepath + "\n";
                 ko += 1;
                 koCor += sqlDeleteRepertory(rs.getString("folder_id_local"));
             }
@@ -747,7 +747,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         int ko = 0;
         int koCor = 0;
         while (rs.next()) {
-            txtret += "ko = " + "file_id_local" + "(" + rs.getString("file_id_local") + ")" + " lc_idx_filename => " + rs.getString("lc_idx_filename") + "\n";
+            txtret += "(debug) ko = " + "file_id_local" + "(" + rs.getString("file_id_local") + ")" + " lc_idx_filename => " + rs.getString("lc_idx_filename") + "\n";
             ko += 1;
             koCor += sqlDeleteFile(rs.getString("file_id_local"));
         }
@@ -767,7 +767,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         int ko = 0;
         int koCor = 0;
         while (rs.next()) {
-            txtret += "ko = " + "rootFile" + "(" + rs.getString("id_local") + ")" + "\n";
+            txtret += "(debug) ko = " + "rootFile" + "(" + rs.getString("id_local") + ")" + "\n";
             ko += 1;
             koCor += sqlDeleteAdobe_images(rs.getString("id_local"));
         }
@@ -788,7 +788,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         int ko = 0;
         int koCor = 0;
         while (rs.next()) {
-            txtret += "ko = " + "KeywordImage" + "(" + rs.getString("id_local") + ")" + "\n";
+            txtret += "(debug) ko = " + "KeywordImage" + "(" + rs.getString("id_local") + ")" + "\n";
             ko += 1;
             koCor += removeKeywordImages(rs.getString("id_local"));
         }
@@ -813,7 +813,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         int ko = 0;
         int koCor = 0;
         while (rs.next()) {
-            txtret += "ko = " + "folder_id_local" + "(" + rs.getString("folder_id_local") + ")" + " pathFromRoot => " + rs.getString("pathFromRoot") + "\n";
+            txtret += "(debug) ko = " + "folder_id_local" + "(" + rs.getString("folder_id_local") + ")" + " pathFromRoot => " + rs.getString("pathFromRoot") + "\n";
             ko += 1;
             koCor += sqlDeleteRepertory(rs.getString("folder_id_local"));
         }

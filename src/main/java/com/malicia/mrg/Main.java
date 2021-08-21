@@ -169,7 +169,6 @@ public class Main {
                     tagretourValRepertoire(analFonctionRep.getListOfretourValRepertoire());
                 }
             }
-
             if (isItTimeToSave() || Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_FORCE_SVG_000000"))) {
                 if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_SVG_LRCONFIG_000"))) {
                     //Sauvegarde Lightroom sur Local
@@ -573,7 +572,11 @@ public class Main {
         if (txt.length() > 0) {
             String[] atxt = txt.split("\n");
             for (String s : atxt) {
-                LOGGER.info(s);
+                if (s.contains("(debug) ")) {
+                    LOGGER.debug(s);
+                } else {
+                    LOGGER.info(s);
+                }
             }
         }
     }
@@ -621,6 +624,8 @@ public class Main {
                 .humanReadable(true)
                 .delete(true)
                 .verbose(true);
+
+        progress.setMaximum(78286);
 
         Output output1 = new Output(new String[]{"total size is","bytes  received","Number of","deleting"},new String[]{"%"},progress);
         StreamingProcessOutput output = new StreamingProcessOutput(output1);
