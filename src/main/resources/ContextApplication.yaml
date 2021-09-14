@@ -21,6 +21,8 @@ workflow:
   NOTTODO:
     - EMPTY
     - IS_FORCE_SVG_000000 # force time to sauvegarde
+dataApplication:
+  applicationToClose: "taskkill /f /im Lightroom.exe"
 paramControleRepertoire:
   listControleRepertoire:
     - starValue

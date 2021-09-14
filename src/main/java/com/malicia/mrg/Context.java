@@ -9,8 +9,6 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -47,6 +45,7 @@ public class Context {
     public RepertoireFonctionnel repFonctionnel;
     public ElementsRejet paramElementsRejet;
     public TriNew paramTriNew;
+    public DataApplication dataApplication;
 
     public static final String filtreImportScanUn = " left join AgLibraryKeywordImage ki " +
             " on ki.image = e.id_local " +
@@ -99,7 +98,9 @@ public class Context {
 
         Context contexte = new Context();
         Yaml yaml = new Yaml();
-        try( InputStream in = Files.newInputStream( Paths.get( args ) ) ) {
+
+        try( InputStream in = Context.class.getResourceAsStream("/" + args)) {
+//        try( InputStream in = Files.newInputStream( Paths.get( args ) ) ) {
             contexte = yaml.loadAs( in, Context.class );
             LOGGER.debug(contexte.toString() );
         }

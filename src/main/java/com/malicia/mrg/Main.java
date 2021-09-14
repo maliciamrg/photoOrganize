@@ -1,7 +1,5 @@
 package com.malicia.mrg;
 
-import com.github.fracpete.processoutput4j.output.CollectingProcessOutput;
-import com.github.fracpete.processoutput4j.output.ConsoleOutputProcessOutput;
 import com.github.fracpete.processoutput4j.output.StreamingProcessOutput;
 import com.github.fracpete.rsync4j.RSync;
 import com.malicia.mrg.app.*;
@@ -57,8 +55,10 @@ public class Main {
 
             LOGGER.info(InfoVersion.showVersionInfo());
 
+
             // chargement application
             ctx = Context.chargeParam();
+            closelightroom(ctx.dataApplication.getApplicationToClose());
             dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat(), ctx.workflow.IS_DRY_RUN);
 //            AnalyseGlobalRepertoires.init(ctx, dbLr);
 
@@ -277,6 +277,14 @@ public class Main {
                     break;
             }
             LOGGER.info("Parameter : " + i + " = " + args[i]);
+        }
+    }
+
+    private static void closelightroom(String toClose) {
+        try {
+            Runtime.getRuntime().exec(toClose) ;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
