@@ -129,7 +129,8 @@ public class Main {
             }
             if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RGP_NEW_00000000"))) {
                 //regrouper le new
-                regrouperLesNouvellesPhoto();
+                regrouperLesNouvellesPhoto(progress);
+                progress.setString("");
                 //*
                 if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_LST_RAPP_NEW_REP"))) {
                     //lister les possible photo oublier
@@ -567,6 +568,7 @@ public class Main {
         splitLOGGERInfo(isMoreZeroComm(dbLr.folderAbsentPhysique(progress)));
         splitLOGGERInfo(isMoreZeroComm(dbLr.fileWithoutFolder(progress)));
         splitLOGGERInfo(isMoreZeroComm(dbLr.keywordImageWithoutKeyword(progress)));
+        progress.setString("");
     }
 
     private static String isMoreZeroComm(String commentaireAAnalyser) {
@@ -686,7 +688,7 @@ public class Main {
         return isItTimeToSave;
     }
 
-    private static void regrouperLesNouvellesPhoto() throws SQLException, IOException {
+    private static void regrouperLesNouvellesPhoto(JProgressBar progress) throws SQLException, IOException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         //Regroupement
@@ -698,6 +700,9 @@ public class Main {
         List<GrpPhoto> listGrpEletmp = new ArrayList();
         GrpPhoto listEletmp = new GrpPhoto();
 
+        int numRow = 0;
+        String txtPr =  dbLr.retWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName());
+        int numRowMax = dbLr.getQueryRowCount(dbLr.sqlgetListelementnewaclasser(ctx.getParamTriNew().getTempsAdherence(), repertoire50NEW));
 
         List<String> listkidsModel = ctx.getParamTriNew().getListeModelKidz();
         long maxprev = 0;
@@ -735,6 +740,9 @@ public class Main {
                     listEletmp.add(eleFile);
                 }
             }
+
+            dbLr.visuProgress(progress,txtPr,numRow++,numRowMax);
+
         }
         if (listEletmp.size() > ctx.getParamTriNew().getThresholdNew()) {
             listGrpEletmp.add(listEletmp);
@@ -1006,8 +1014,9 @@ public class Main {
         String folderlocation = ctx.getRepertoire50Phototheque();
         boolean isFinished = false;
         do {
-            isFinished = WorkWithRepertory.deleteEmptyRep(folderlocation);
+            isFinished = WorkWithRepertory.deleteEmptyRep(folderlocation, Main.progress);
         } while (!isFinished);
+        Main.progress.setString("");
     }
 
     private static void purgeDesRepertoireVide00NEW() throws IOException {
@@ -1016,8 +1025,9 @@ public class Main {
         String folderlocation = ctx.getRepertoire00NEW();
         boolean isFinished = false;
         do {
-            isFinished = WorkWithRepertory.deleteEmptyRep(folderlocation);
+            isFinished = WorkWithRepertory.deleteEmptyRep(folderlocation, progress);
         } while (!isFinished);
+        progress.setString("");
     }
 
 

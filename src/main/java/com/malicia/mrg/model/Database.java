@@ -716,16 +716,6 @@ public class Database extends SQLiteJDBCDriverConnection {
         return txtret;
     }
 
-    int getQueryRowCount(String query) throws SQLException {
-        ResultSet standardRS = select(query);
-        int size = 0;
-        while (standardRS.next()) {
-            size++;
-        }
-        standardRS.close();
-        return size;
-    }
-
     public String folderAbsentPhysique(JProgressBar progress) throws SQLException {
         String sql = "select " +
                 "c.absolutePath , " +
@@ -1294,13 +1284,13 @@ public class Database extends SQLiteJDBCDriverConnection {
         return listTmp;
     }
 
-    private void visuProgress(JProgressBar progress, String txtPr, int numRow, int numRowMax) {
+    public void visuProgress(JProgressBar progress, String txtPr, int numRow, int numRowMax) {
         progress.setMaximum(numRowMax);
         progress.setValue(numRow);
         progress.setString(txtPr + " - " + new DecimalFormat("#.##").format(numRow*100/numRowMax) + "%");
     }
 
-    private String retWhereIAm(String methodName) {
+    public String retWhereIAm(String methodName) {
         String ret = methodName;
         int length = methodName.length();
         if (length < 130) {
@@ -1309,6 +1299,25 @@ public class Database extends SQLiteJDBCDriverConnection {
             ret = StringUtils.repeat("-", lngMid) + methodName + StringUtils.repeat(" ", lngComp) + StringUtils.repeat("-", lngMid);
         }
         return ret;
+    }
+
+    int getQueryRowCount(String query) throws SQLException {
+        ResultSet standardRS = select(query);
+        int size = 0;
+        while (standardRS.next()) {
+            size++;
+        }
+        standardRS.close();
+        return size;
+    }
+    public int getQueryRowCount(ResultSet standardRS) throws SQLException {
+        //ResultSet standardRS = select(query);
+        int size = 0;
+        while (standardRS.next()) {
+            size++;
+        }
+        standardRS.first();
+        return size;
     }
 }
 

@@ -6,6 +6,7 @@ import com.malicia.mrg.util.SystemFiles;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,7 +22,7 @@ public class WorkWithRepertory {
         throw new IllegalStateException("Utility class");
     }
 
-    public static boolean deleteEmptyRep(String fileLocation) throws IOException {
+    public static boolean deleteEmptyRep(String fileLocation, JProgressBar progress) throws IOException {
         boolean isFinished = true;
         File folder = new File(fileLocation);
         File[] listFiles = folder.listFiles();
@@ -33,7 +34,8 @@ public class WorkWithRepertory {
             for (int j = 0; j < listFiles.length; j++) {
                 File file = listFiles[j];
                 if (file.isDirectory()) {
-                    isFinished = isFinished && deleteEmptyRep(file.getAbsolutePath());
+                    progress.setString(file.getAbsolutePath());
+                    isFinished = isFinished && deleteEmptyRep(file.getAbsolutePath(), progress);
                 }
             }
         }
