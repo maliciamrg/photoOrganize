@@ -68,7 +68,7 @@ repFonctionnel:
   repertoireRoamingAdobeLightroom: "C:\\Users\\cleme\\AppData\\Roaming\\Adobe\\Lightroom"
   repertoire50Phototheque: "Y:\\50-Phototheque\\"
   repertoire00NEW: "Y:\\00-CheckIn\\"
-  repertoireCatalog: "Y:\\70_Catalogs\\70_Catalog_Phototheque"
+  repertoireCatalog: "C:\\Users\\cleme\\Desktop\\Lightroom - 70_Catalog_Phototheque"
   catalogLrcat: "70_Catalog_Phototheque-2.lrcat"
   nbRotateRepertoireDestZip: "5"
   rsyncexclude:
