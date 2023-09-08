@@ -55,20 +55,20 @@ paramElementsRejet:
     - pto
   extFileRejet: rejet
 paramTriNew:
-  repertoire50NEW: "D:\\50_Phototheque\\05-A_Ranger\\@New\\"
-  repertoireBazar: "D:\\50_Phototheque\\05-A_Ranger\\@New\\Bazar\\"
-  repertoireKidz: "D:\\50_Phototheque\\70-Kidz__\\"
+  repertoire50NEW: "Y:\\50-Phototheque\\05-A_Ranger\\@New\\"
+  repertoireBazar: "Y:\\50-Phototheque\\05-A_Ranger\\@New\\Bazar\\"
+  repertoireKidz: "Y:\\50-Phototheque\\70-Kidz__\\"
   thresholdNew: 10
   tempsAdherence: "90 minutes"
   listeModelKidz:
     - Kidizoom camera
     - KidiSecrets Selfie Music
 repFonctionnel:
-  repertoireDestZip: "D:\\95_Boite_a_outils\\LigthroomConfigSauve\\ligthroomSauve-%num%.zip"
-  repertoireRoamingAdobeLightroom: "C:\\Users\\professorX\\AppData\\Roaming\\Adobe\\Lightroom"
-  repertoire50Phototheque: "D:\\50_Phototheque\\"
-  repertoire00NEW: "P:\\00_NEW\\"
-  repertoireCatalog: "D:\\70_Catalogs\\70_Catalog_Phototheque"
+  repertoireDestZip: "Y:\\95_Boite_a_outils\\LigthroomConfigSauve\\ligthroomSauve-%num%.zip"
+  repertoireRoamingAdobeLightroom: "C:\\Users\\cleme\\AppData\\Roaming\\Adobe\\Lightroom"
+  repertoire50Phototheque: "Y:\\50-Phototheque\\"
+  repertoire00NEW: "Y:\\00-CheckIn\\"
+  repertoireCatalog: "Y:\\70_Catalogs\\70_Catalog_Phototheque"
   catalogLrcat: "70_Catalog_Phototheque-2.lrcat"
   nbRotateRepertoireDestZip: "5"
   rsyncexclude:
@@ -83,11 +83,11 @@ repFonctionnel:
     - "*.lrcat-*"
     - "*\\log\\*"
   repertoiresyncsource:
-    - "D:\\50_Phototheque"
-    - "D:\\70_Catalogs"
-    - "D:\\80_Logiciel_Windows"
-    - "D:\\95_Boite_a_outils"
-  repertoiresyncdest: "\\\\LEGION-2\\20-photo\\"
+    - "Y:\\50-Phototheque"
+    - "Y:\\70_Catalogs"
+    - "Y:\\80_Logiciel_Windows"
+    - "Y:\\95_Boite_a_outils"
+  repertoiresyncdest: "Y:\\99_Sauvegarde\\"
   syncdestmouchard: photoOrganizeLastSync.txt
   syncAmountDaysBetween: 15
 arrayRepertoirePhoto:
