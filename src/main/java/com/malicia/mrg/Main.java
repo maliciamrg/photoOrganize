@@ -560,13 +560,13 @@ public class Main {
 
     private static void maintenanceDatabase() throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        splitLOGGERInfo(isMoreZeroComm(dbLr.pathAbsentPhysique()));
-        splitLOGGERInfo(isMoreZeroComm(dbLr.AdobeImagesWithoutLibraryFile()));
-        splitLOGGERInfo(isMoreZeroComm(dbLr.KeywordImageWithoutImages()));
-        splitLOGGERInfo(isMoreZeroComm(dbLr.folderWithoutRoot()));
-        splitLOGGERInfo(isMoreZeroComm(dbLr.folderAbsentPhysique()));
-        splitLOGGERInfo(isMoreZeroComm(dbLr.fileWithoutFolder()));
-        splitLOGGERInfo(isMoreZeroComm(dbLr.keywordImageWithoutKeyword()));
+        splitLOGGERInfo(isMoreZeroComm(dbLr.pathAbsentPhysique(progress)));
+        splitLOGGERInfo(isMoreZeroComm(dbLr.AdobeImagesWithoutLibraryFile(progress)));
+        splitLOGGERInfo(isMoreZeroComm(dbLr.KeywordImageWithoutImages(progress)));
+        splitLOGGERInfo(isMoreZeroComm(dbLr.folderWithoutRoot(progress)));
+        splitLOGGERInfo(isMoreZeroComm(dbLr.folderAbsentPhysique(progress)));
+        splitLOGGERInfo(isMoreZeroComm(dbLr.fileWithoutFolder(progress)));
+        splitLOGGERInfo(isMoreZeroComm(dbLr.keywordImageWithoutKeyword(progress)));
     }
 
     private static String isMoreZeroComm(String commentaireAAnalyser) {

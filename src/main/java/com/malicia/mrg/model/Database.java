@@ -7,15 +7,18 @@ import com.malicia.mrg.util.SystemFiles;
 
 import com.malicia.mrg.util.WhereIAm;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
@@ -93,10 +96,12 @@ public class Database extends SQLiteJDBCDriverConnection {
     public int AddKeywordToRep(String repertoire, String tag, String TagMaitre) throws SQLException {
         return AddKeywordToRep(repertoire, tag, TagMaitre, "");
     }
+
     public int AddKeywordToRepNoVideo(String repertoire, String tag, String TagMaitre) throws SQLException {
         return AddKeywordToRep(repertoire, tag, TagMaitre, " and e.fileFormat != 'VIDEO' ");
     }
-    private int AddKeywordToRep(String repertoire, String tag, String TagMaitre ,String OptionalNoVideoCriteria ) throws SQLException {
+
+    private int AddKeywordToRep(String repertoire, String tag, String TagMaitre, String OptionalNoVideoCriteria) throws SQLException {
 
         Map<String, String> idLocalRep = getIdlocalforRep(repertoire);
         String idlocaltag = sqlcreateKeyword(TagMaitre, tag).get("keyWordIdlocal");
@@ -448,12 +453,14 @@ public class Database extends SQLiteJDBCDriverConnection {
     }
 
     public Map<String, Integer> getStarValue(String repertoire) throws SQLException {
-        return getStarValue( repertoire , "");
+        return getStarValue(repertoire, "");
     }
+
     public Map<String, Integer> getStarValueNoVideo(String repertoire) throws SQLException {
-        return getStarValue( repertoire, " and e.fileFormat != 'VIDEO' ");
+        return getStarValue(repertoire, " and e.fileFormat != 'VIDEO' ");
     }
-    private Map<String, Integer> getStarValue(String repertoire,String OptionalNoVideoCriteria) throws SQLException {
+
+    private Map<String, Integer> getStarValue(String repertoire, String OptionalNoVideoCriteria) throws SQLException {
         Map<String, String> idLocalRep = getIdlocalforRep(repertoire);
         Map<String, Integer> idlocal = new HashMap<>();
         idlocal.put("0", 0);
@@ -506,11 +513,13 @@ public class Database extends SQLiteJDBCDriverConnection {
     }
 
     public double nbJourFolderVideo(String repertoire) throws SQLException {
-        return nbJourFolder( repertoire , " and e.fileFormat = 'VIDEO' ");
+        return nbJourFolder(repertoire, " and e.fileFormat = 'VIDEO' ");
     }
+
     public double nbJourFolderNoVideo(String repertoire) throws SQLException {
-        return nbJourFolder( repertoire, " and e.fileFormat != 'VIDEO' ");
+        return nbJourFolder(repertoire, " and e.fileFormat != 'VIDEO' ");
     }
+
     public double nbJourFolder(String repertoire, String OptionalNoVideoCriteria) throws SQLException {
         Map<String, String> idLocalRep = getIdlocalforRep(repertoire);
         ResultSet rsexist = select(
@@ -534,16 +543,19 @@ public class Database extends SQLiteJDBCDriverConnection {
         return days;
     }
 
-    public int nbPickAllEle(String repertoire)  throws SQLException {
-        return nbPick( repertoire ," and e.pick > 0 " ,"");
+    public int nbPickAllEle(String repertoire) throws SQLException {
+        return nbPick(repertoire, " and e.pick > 0 ", "");
     }
-    public int nbPickNoVideo(String repertoire)  throws SQLException {
-        return nbPick( repertoire, " and e.pick > 0 "," and e.fileFormat != 'VIDEO' ");
+
+    public int nbPickNoVideo(String repertoire) throws SQLException {
+        return nbPick(repertoire, " and e.pick > 0 ", " and e.fileFormat != 'VIDEO' ");
     }
-    public int nbNoPickNoVideo(String repertoire)  throws SQLException {
-        return nbPick( repertoire, " and e.pick = 0 "," and e.fileFormat != 'VIDEO' ");
+
+    public int nbNoPickNoVideo(String repertoire) throws SQLException {
+        return nbPick(repertoire, " and e.pick = 0 ", " and e.fileFormat != 'VIDEO' ");
     }
-    private int nbPick(String repertoire,String PickCriteria,String OptionalNoVideoCriteria) throws SQLException {
+
+    private int nbPick(String repertoire, String PickCriteria, String OptionalNoVideoCriteria) throws SQLException {
         Map<String, String> idLocalRep = getIdlocalforRep(repertoire);
         ResultSet rsexist = select(
                 " select  count(*) as result" +
@@ -664,7 +676,7 @@ public class Database extends SQLiteJDBCDriverConnection {
     }
 
 
-    public String pathAbsentPhysique() throws SQLException {
+    public String pathAbsentPhysique(JProgressBar progress) throws SQLException {
         String sql = "select " +
                 "c.absolutePath , " +
                 "b.pathFromRoot , " +
@@ -684,22 +696,37 @@ public class Database extends SQLiteJDBCDriverConnection {
         int nb = 0;
         int ko = 0;
         int koCor = 0;
+
+        int numRow = 0;
+        String txtPr = retWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName());
+        int numRowMax = getQueryRowCount(sql);
+
         while (rs.next()) {
             File filepath = new File(rs.getString("absolutePath") + rs.getString("pathFromRoot") + rs.getString("lc_idx_filename"));
             nb += 1;
             if (!filepath.exists()) {
-                txtret += "(debug) ko = " + "file_id_local" + "(" + rs.getString("file_id_local") + ")" + filepath + " "+ "\n";
+                txtret += "(debug) ko = " + "file_id_local" + "(" + rs.getString("file_id_local") + ")" + filepath + " " + "\n";
                 ko += 1;
                 koCor += sqlDeleteFile(rs.getString("file_id_local"));
             }
-
+            visuProgress(progress,txtPr,numRow++,numRowMax);
         }
         txtret += " nb path logique = " + nb + " : absent physique = " + ko + "\n";
         txtret += "    --- corrige         = " + koCor + "\n";
         return txtret;
     }
 
-    public String folderAbsentPhysique() throws SQLException {
+    int getQueryRowCount(String query) throws SQLException {
+        ResultSet standardRS = select(query);
+        int size = 0;
+        while (standardRS.next()) {
+            size++;
+        }
+        standardRS.close();
+        return size;
+    }
+
+    public String folderAbsentPhysique(JProgressBar progress) throws SQLException {
         String sql = "select " +
                 "c.absolutePath , " +
                 "b.pathFromRoot , " +
@@ -715,6 +742,11 @@ public class Database extends SQLiteJDBCDriverConnection {
         int nb = 0;
         int ko = 0;
         int koCor = 0;
+
+        int numRow = 0;
+        String txtPr = retWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName());
+        int numRowMax = getQueryRowCount(sql);
+
         while (rs.next()) {
             File filepath = new File(rs.getString("absolutePath") + rs.getString("pathFromRoot"));
             nb += 1;
@@ -723,14 +755,14 @@ public class Database extends SQLiteJDBCDriverConnection {
                 ko += 1;
                 koCor += sqlDeleteRepertory(rs.getString("folder_id_local"));
             }
-
+            visuProgress(progress,txtPr,numRow++,numRowMax);
         }
         txtret += " nb folder logique = " + nb + " : absent physique = " + ko + "\n";
         txtret += "    --- corrige         = " + koCor + "\n";
         return txtret;
     }
 
-    public String fileWithoutFolder() throws SQLException {
+    public String fileWithoutFolder(JProgressBar progress) throws SQLException {
         String sql = "select " +
                 " b.pathFromRoot , " +
                 " a.lc_idx_filename as lc_idx_filename , " +
@@ -746,17 +778,23 @@ public class Database extends SQLiteJDBCDriverConnection {
         String txtret = "";
         int ko = 0;
         int koCor = 0;
+
+        int numRow = 0;
+        String txtPr = retWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName());
+        int numRowMax = getQueryRowCount(sql);
+
         while (rs.next()) {
             txtret += "(debug) ko = " + "file_id_local" + "(" + rs.getString("file_id_local") + ")" + " lc_idx_filename => " + rs.getString("lc_idx_filename") + "\n";
             ko += 1;
             koCor += sqlDeleteFile(rs.getString("file_id_local"));
+            visuProgress(progress,txtPr,numRow++,numRowMax);
         }
         txtret += " nb file without Folder = " + ko + "\n";
         txtret += "    --- corrige         = " + koCor + "\n";
         return txtret;
     }
 
-    public String AdobeImagesWithoutLibraryFile() throws SQLException {
+    public String AdobeImagesWithoutLibraryFile(JProgressBar progress) throws SQLException {
         String sql = "SELECT e.id_local  from Adobe_images e " +
                 "left join AgLibraryFile f " +
                 "on f.id_local = e.rootFile " +
@@ -766,17 +804,23 @@ public class Database extends SQLiteJDBCDriverConnection {
         String txtret = "";
         int ko = 0;
         int koCor = 0;
+
+        int numRow = 0;
+        String txtPr = retWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName());
+        int numRowMax = getQueryRowCount(sql);
+
         while (rs.next()) {
             txtret += "(debug) ko = " + "rootFile" + "(" + rs.getString("id_local") + ")" + "\n";
             ko += 1;
             koCor += sqlDeleteAdobe_images(rs.getString("id_local"));
+            visuProgress(progress,txtPr,numRow++,numRowMax);
         }
         txtret += " nb Images Without File = " + ko + "\n";
         txtret += "    --- corrige         = " + koCor + "\n";
         return txtret;
     }
 
-    public String KeywordImageWithoutImages() throws SQLException {
+    public String KeywordImageWithoutImages(JProgressBar progress) throws SQLException {
         String sql = "SELECT ki.id_local as id_local " +
                 "from AgLibraryKeywordImage ki " +
                 "left join Adobe_images i " +
@@ -787,17 +831,23 @@ public class Database extends SQLiteJDBCDriverConnection {
         String txtret = "";
         int ko = 0;
         int koCor = 0;
+
+        int numRow = 0;
+        String txtPr = retWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName());
+        int numRowMax = getQueryRowCount(sql);
+
         while (rs.next()) {
             txtret += "(debug) ko = " + "KeywordImage" + "(" + rs.getString("id_local") + ")" + "\n";
             ko += 1;
             koCor += removeKeywordImages(rs.getString("id_local"));
+            visuProgress(progress,txtPr,numRow++,numRowMax);
         }
         txtret += " nb KeyImg Without Img  = " + ko + "\n";
         txtret += "    --- corrige         = " + koCor + "\n";
         return txtret;
     }
 
-    public String folderWithoutRoot() throws SQLException {
+    public String folderWithoutRoot(JProgressBar progress) throws SQLException {
         String sql = "select c.absolutePath , " +
                 "b.pathFromRoot , " +
                 "c.id_local as path_id_local , " +
@@ -812,10 +862,16 @@ public class Database extends SQLiteJDBCDriverConnection {
         String txtret = "";
         int ko = 0;
         int koCor = 0;
+
+        int numRow = 0;
+        String txtPr = retWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName());
+        int numRowMax = getQueryRowCount(sql);
+
         while (rs.next()) {
             txtret += "(debug) ko = " + "folder_id_local" + "(" + rs.getString("folder_id_local") + ")" + " pathFromRoot => " + rs.getString("pathFromRoot") + "\n";
             ko += 1;
             koCor += sqlDeleteRepertory(rs.getString("folder_id_local"));
+            visuProgress(progress,txtPr,numRow++,numRowMax);
         }
         txtret += " nb folder without Root = " + ko + "\n";
         txtret += "    --- corrige         = " + koCor + "\n";
@@ -986,7 +1042,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         return executeUpdate(sql);
     }
 
-    public String keywordImageWithoutKeyword() throws SQLException {
+    public String keywordImageWithoutKeyword(JProgressBar progress) throws SQLException {
         String sql = " select k.id_local " +
                 "from AgLibraryKeywordImage k " +
                 "left join AgLibraryKeyword i " +
@@ -1026,7 +1082,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         HashMap<String, String> ret = new HashMap<>();
         String sql = " select * " +
                 "from AgLibraryFolder " +
-                "where pathFromRoot REGEXP  '" + collections + "\\/"+ filtreDebutNomRep+"[@&#a-zA-Z _0-9-]*\\/$' " +
+                "where pathFromRoot REGEXP  '" + collections + "\\/" + filtreDebutNomRep + "[@&#a-zA-Z _0-9-]*\\/$' " +
                 ";";
         ResultSet rs = select(sql);
         while (rs.next()) {
@@ -1218,7 +1274,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         return listTmp;
     }
 
-    public List<String>  getlistPhotoFlagRejeter() throws SQLException {
+    public List<String> getlistPhotoFlagRejeter() throws SQLException {
         List<String> listTmp = new ArrayList<>();
 
         String sql = "select p.absolutePath || b.pathFromRoot || a.lc_idx_filename as filepath" +
@@ -1236,6 +1292,23 @@ public class Database extends SQLiteJDBCDriverConnection {
             listTmp.add(normalizePath(rs.getString("filepath")));
         }
         return listTmp;
+    }
+
+    private void visuProgress(JProgressBar progress, String txtPr, int numRow, int numRowMax) {
+        progress.setMaximum(numRowMax);
+        progress.setValue(numRow);
+        progress.setString(txtPr + " - " + new DecimalFormat("#.##").format(numRow*100/numRowMax) + "%");
+    }
+
+    private String retWhereIAm(String methodName) {
+        String ret = methodName;
+        int length = methodName.length();
+        if (length < 130) {
+            int lngMid = (130 - length) / 2;
+            int lngComp = 130 - (length + lngMid + lngMid);
+            ret = StringUtils.repeat("-", lngMid) + methodName + StringUtils.repeat(" ", lngComp) + StringUtils.repeat("-", lngMid);
+        }
+        return ret;
     }
 }
 
