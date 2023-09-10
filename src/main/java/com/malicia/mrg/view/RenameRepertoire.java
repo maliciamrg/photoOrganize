@@ -153,6 +153,19 @@ public class RenameRepertoire extends JFrame{
 
     }
 
+    public static void start2(Database dbLr, Context ctx, List<BlocRetourRepertoire> blRetourRepertoire) {
+        RenameRepertoire.dbLr = dbLr;
+        RenameRepertoire.ctx = ctx;
+
+        frame = new JFrame("rename Repertoire");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.pack();
+        frame.setContentPane(new RenameRepertoire(blRetourRepertoire).panel1);
+        frame.setVisible(true);
+        frame.revalidate();
+        frame.repaint();
+
+    }
     private static List<String> prefixAllElementsList(String prefix, List<String> valueForKeyword) {
         List<String> listRetour = new ArrayList<>();
 

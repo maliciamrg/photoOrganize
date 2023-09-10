@@ -101,7 +101,8 @@ public class AnalyseGlobalRepertoires {
     public void action(Context ctx, Database dbLr) {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         if (!listOfretourNomRepertoire.isEmpty()) {
-            RenameRepertoire.start(dbLr, ctx, listOfretourNomRepertoire);
+            RenameRepertoire.start2(dbLr, ctx, listOfretourNomRepertoire);
+//            RenameRepertoire.start(dbLr, ctx, listOfretourNomRepertoire);
         }
     }
 

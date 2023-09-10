@@ -145,10 +145,13 @@ public class Main {
             //*
 
             if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_PURGE_FOLDER_000"))) {
-                //Nettoyage repertoires Local
+                //Nettoyage repertoires phototheque
                 purgeDesRepertoireVide50Phototheque();
                 //*
-                //Nettoyage repertoires réseaux
+                //Nettoyage repertoires a trier
+                purgeDesRepertoireVide50New();
+                //*
+                //Nettoyage repertoires check in
                 purgeDesRepertoireVide00NEW();
                 //*
             }
@@ -741,7 +744,7 @@ public class Main {
                 }
             }
 
-            dbLr.visuProgress(progress,txtPr,numRow++,numRowMax);
+            visuProgress(progress,txtPr,numRow++,numRowMax);
 
         }
         if (listEletmp.size() > ctx.getParamTriNew().getThresholdNew()) {
@@ -938,6 +941,7 @@ public class Main {
             }
 
         }
+        progress.setString("");
     }
 
     private static AnalyseGlobalRepertoires analyseFonctionellesDesRepertoires() throws IOException, SQLException {
@@ -1017,9 +1021,19 @@ public class Main {
         String folderlocation = ctx.getRepertoire50Phototheque();
         boolean isFinished = false;
         do {
-            isFinished = WorkWithRepertory.deleteEmptyRep(folderlocation, Main.progress);
+            isFinished = WorkWithRepertory.deleteEmptyRep(folderlocation, progress);
         } while (!isFinished);
-        Main.progress.setString("");
+        progress.setString("");
+    }
+    private static void purgeDesRepertoireVide50New() throws IOException {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+
+        String folderlocation = ctx.getParamTriNew().getRepertoire50NEW() ;
+        boolean isFinished = false;
+        do {
+            isFinished = WorkWithRepertory.deleteEmptyRep(folderlocation, progress);
+        } while (!isFinished);
+        progress.setString("");
     }
 
     private static void purgeDesRepertoireVide00NEW() throws IOException {
@@ -1151,8 +1165,8 @@ public class Main {
     }
 
     public static void visuProgress(JProgressBar progress, String txtPr, int numRow, int numRowMax) {
-        progress.setMaximum(numRowMax);
         progress.setValue(numRow);
+        progress.setMaximum(numRowMax);
         progress.setString(txtPr + " - " + new DecimalFormat("#.##").format(numRow*100/numRowMax) + "%");
     }
 }

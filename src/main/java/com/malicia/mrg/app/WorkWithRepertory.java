@@ -1,5 +1,6 @@
 package com.malicia.mrg.app;
 
+import com.malicia.mrg.Main;
 import com.malicia.mrg.model.Database;
 import com.malicia.mrg.param.electx.RepertoirePhoto;
 import com.malicia.mrg.util.SystemFiles;
@@ -8,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.sql.SQLException;
@@ -23,6 +25,16 @@ public class WorkWithRepertory {
     }
 
     public static boolean deleteEmptyRep(String fileLocation, JProgressBar progress) throws IOException {
+        FileFilter fileFilter = new FileFilter(){
+            public boolean accept(File dir) {
+                if (dir.isDirectory()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
+
         boolean isFinished = true;
         File folder = new File(fileLocation);
         File[] listFiles = folder.listFiles();
@@ -31,13 +43,15 @@ public class WorkWithRepertory {
             Files.delete(folder.toPath());
             isFinished = false;
         } else {
+            listFiles = folder.listFiles(fileFilter);
             for (int j = 0; j < listFiles.length; j++) {
                 File file = listFiles[j];
+                Main.visuProgress(progress,fileLocation,j,listFiles.length);
                 if (file.isDirectory()) {
-                    progress.setString(file.getAbsolutePath());
-                    isFinished = isFinished && deleteEmptyRep(file.getAbsolutePath(), progress);
+                    isFinished = isFinished & deleteEmptyRep(file.getAbsolutePath(), progress);
                 }
             }
+
         }
         return isFinished;
     }

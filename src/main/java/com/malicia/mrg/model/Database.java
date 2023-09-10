@@ -1,6 +1,7 @@
 package com.malicia.mrg.model;
 
 import com.malicia.mrg.Context;
+import com.malicia.mrg.Main;
 import com.malicia.mrg.param.electx.ControleRepertoire;
 import com.malicia.mrg.util.SQLiteJDBCDriverConnection;
 import com.malicia.mrg.util.SystemFiles;
@@ -698,7 +699,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         int koCor = 0;
 
         int numRow = 0;
-        String txtPr = retWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName());
+        String txtPr = retWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(),40);
         int numRowMax = getQueryRowCount(sql);
 
         while (rs.next()) {
@@ -709,7 +710,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                 ko += 1;
                 koCor += sqlDeleteFile(rs.getString("file_id_local"));
             }
-            visuProgress(progress,txtPr,numRow++,numRowMax);
+            Main.visuProgress(progress,txtPr + " - " + filepath.getParent(),numRow++,numRowMax);
         }
         txtret += " nb path logique = " + nb + " : absent physique = " + ko + "\n";
         txtret += "    --- corrige         = " + koCor + "\n";
@@ -745,7 +746,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                 ko += 1;
                 koCor += sqlDeleteRepertory(rs.getString("folder_id_local"));
             }
-            visuProgress(progress,txtPr,numRow++,numRowMax);
+            Main.visuProgress(progress,txtPr,numRow++,numRowMax);
         }
         txtret += " nb folder logique = " + nb + " : absent physique = " + ko + "\n";
         txtret += "    --- corrige         = " + koCor + "\n";
@@ -777,7 +778,7 @@ public class Database extends SQLiteJDBCDriverConnection {
             txtret += "(debug) ko = " + "file_id_local" + "(" + rs.getString("file_id_local") + ")" + " lc_idx_filename => " + rs.getString("lc_idx_filename") + "\n";
             ko += 1;
             koCor += sqlDeleteFile(rs.getString("file_id_local"));
-            visuProgress(progress,txtPr,numRow++,numRowMax);
+            Main.visuProgress(progress,txtPr,numRow++,numRowMax);
         }
         txtret += " nb file without Folder = " + ko + "\n";
         txtret += "    --- corrige         = " + koCor + "\n";
@@ -803,7 +804,7 @@ public class Database extends SQLiteJDBCDriverConnection {
             txtret += "(debug) ko = " + "rootFile" + "(" + rs.getString("id_local") + ")" + "\n";
             ko += 1;
             koCor += sqlDeleteAdobe_images(rs.getString("id_local"));
-            visuProgress(progress,txtPr,numRow++,numRowMax);
+            Main.visuProgress(progress,txtPr,numRow++,numRowMax);
         }
         txtret += " nb Images Without File = " + ko + "\n";
         txtret += "    --- corrige         = " + koCor + "\n";
@@ -830,7 +831,7 @@ public class Database extends SQLiteJDBCDriverConnection {
             txtret += "(debug) ko = " + "KeywordImage" + "(" + rs.getString("id_local") + ")" + "\n";
             ko += 1;
             koCor += removeKeywordImages(rs.getString("id_local"));
-            visuProgress(progress,txtPr,numRow++,numRowMax);
+            Main.visuProgress(progress,txtPr,numRow++,numRowMax);
         }
         txtret += " nb KeyImg Without Img  = " + ko + "\n";
         txtret += "    --- corrige         = " + koCor + "\n";
@@ -861,7 +862,7 @@ public class Database extends SQLiteJDBCDriverConnection {
             txtret += "(debug) ko = " + "folder_id_local" + "(" + rs.getString("folder_id_local") + ")" + " pathFromRoot => " + rs.getString("pathFromRoot") + "\n";
             ko += 1;
             koCor += sqlDeleteRepertory(rs.getString("folder_id_local"));
-            visuProgress(progress,txtPr,numRow++,numRowMax);
+            Main.visuProgress(progress,txtPr,numRow++,numRowMax);
         }
         txtret += " nb folder without Root = " + ko + "\n";
         txtret += "    --- corrige         = " + koCor + "\n";
@@ -1284,18 +1285,13 @@ public class Database extends SQLiteJDBCDriverConnection {
         return listTmp;
     }
 
-    public void visuProgress(JProgressBar progress, String txtPr, int numRow, int numRowMax) {
-        progress.setMaximum(numRowMax);
-        progress.setValue(numRow);
-        progress.setString(txtPr + " - " + new DecimalFormat("#.##").format(numRow*100/numRowMax) + "%");
-    }
-
-    public String retWhereIAm(String methodName) {
+    public String retWhereIAm(String methodName,int... len) {
         String ret = methodName;
+        int lenD = len.length > 0 ? len[0] : 130;;
         int length = methodName.length();
-        if (length < 130) {
-            int lngMid = (130 - length) / 2;
-            int lngComp = 130 - (length + lngMid + lngMid);
+        if (length < lenD) {
+            int lngMid = (lenD - length) / 2;
+            int lngComp = lenD - (length + lngMid + lngMid);
             ret = StringUtils.repeat("-", lngMid) + methodName + StringUtils.repeat(" ", lngComp) + StringUtils.repeat("-", lngMid);
         }
         return ret;

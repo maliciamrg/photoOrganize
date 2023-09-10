@@ -17,9 +17,9 @@ workflow:
     - IS_TAG_CTRL_REP_000 # analFonctionRep => appliquer des tag TAG_REPSWEEP++ sur les photo et mise a 'RED' de repertoire en fonction de analFonctionRep.getListOfretourValRepertoire()
     - IS_EXEC_FONC_REP_00 # analFonctionRep => Renommage des repertoire via POP UP.
     - IS_SVG_LRCONFIG_000 # sauvegarde du la config LR sur le reseau.
-    - IS_RSYNC_BIB_000000 # sauvegarde des photos sur le reseau.
   NOTTODO:
     - EMPTY
+    - IS_RSYNC_BIB_000000 # sauvegarde des photos sur le reseau.
     - IS_FORCE_SVG_000000 # force time to sauvegarde
 dataApplication:
   applicationToClose: "taskkill /f /im Lightroom.exe"
@@ -55,8 +55,8 @@ paramElementsRejet:
     - pto
   extFileRejet: rejet
 paramTriNew:
-  repertoire50NEW: "D:\\50-Phototheque\\05-A_Ranger\\@New\\"
-  repertoireBazar: "D:\\50-Phototheque\\05-A_Ranger\\@New\\Bazar\\"
+  repertoire50NEW: "E:\\50-Phototheque\\05-A_Ranger\\@New\\"
+  repertoireBazar: "E:\\50-Phototheque\\05-A_Ranger\\@New\\Bazar\\"
   repertoireKidz: "Y:\\50-Phototheque\\70-Kidz__\\"
   thresholdNew: 10
   tempsAdherence: "90 minutes"
