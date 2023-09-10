@@ -68,7 +68,7 @@ repFonctionnel:
   repertoireRoamingAdobeLightroom: "C:\\Users\\cleme\\AppData\\Roaming\\Adobe\\Lightroom"
   repertoire50Phototheque: "Y:\\50-Phototheque\\"
   repertoire00NEW: "Y:\\00-CheckIn\\"
-  repertoireCatalog: "E:\\50-Phototheque\\70_Catalog_Phototheque"
+  repertoireCatalog: "C:\\Users\\cleme\\Desktop\\50-Phototheque\\70_Catalog_Phototheque"
   catalogLrcat: "70_Catalog_Phototheque-2.lrcat"
   nbRotateRepertoireDestZip: "5"
   rsyncexclude:
@@ -84,7 +84,7 @@ repFonctionnel:
     - "*\\log\\*"
   repertoiresyncsource:
     - "E:\\50-Phototheque\\05-A_Ranger"
-    - "E:\\50-Phototheque\\70_Catalog_Phototheque"
+    - "C:\\Users\\cleme\\Desktop\\50-Phototheque\\70_Catalog_Phototheque"
   repertoiresyncdest: "Y:\\99_Sauvegarde\\"
   syncdestmouchard: photoOrganizeLastSync.txt
   syncAmountDaysBetween: 15
