@@ -187,7 +187,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <format>{0,date,yyyyMMdd.HHmmss}</format>
+                    <format>{0,date,yyyyMMdd.9HHmmss}</format>
                     <items>
                         <item>timestamp</item>
                     </items>
