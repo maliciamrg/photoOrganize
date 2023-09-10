@@ -1316,7 +1316,6 @@ public class Database extends SQLiteJDBCDriverConnection {
         while (standardRS.next()) {
             size++;
         }
-        standardRS.first();
         return size;
     }
 }
