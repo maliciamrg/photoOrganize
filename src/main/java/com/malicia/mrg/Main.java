@@ -926,12 +926,15 @@ public class Main {
             LOGGER.debug("UnzipAndExtractAllZip = > " + ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire());
             List<String> listRep = WorkWithRepertory.listRepertoireEligible(ctx.getRepertoire50Phototheque(), repPhoto);
 
+            int i = 0;
+
             ListIterator<String> repertoireIterator = listRep.listIterator();
             while (repertoireIterator.hasNext()) {
+
+                visuProgress(progress,repPhoto.repertoire,i++,listRep.size());
+
                 String repertoire = repertoireIterator.next();
-
                 findZipAndExtractToRejet(repertoire);
-
             }
 
         }
@@ -1147,5 +1150,9 @@ public class Main {
         loggerOrigine.fatal("theException = " + "\n" + stringWriter);
     }
 
-
+    public static void visuProgress(JProgressBar progress, String txtPr, int numRow, int numRowMax) {
+        progress.setMaximum(numRowMax);
+        progress.setValue(numRow);
+        progress.setString(txtPr + " - " + new DecimalFormat("#.##").format(numRow*100/numRowMax) + "%");
+    }
 }
