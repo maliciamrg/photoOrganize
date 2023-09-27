@@ -371,11 +371,11 @@ public class Main {
     private static void reTAGlesColorTagARED() throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
-        int unNbMisARED = dbLr.deTopperARedOld50NEW(ctx.getParamTriNew().getRepertoire50NEW());
+        int unNbMisARED = dbLr.deTopperARedOld50NEW(new String[] {ctx.getParamTriNew().getRepertoire50NEW(),ctx.getRepertoire00NEW()});
         loggerInfo("UnTag a RED " + String.format("%05d", unNbMisARED) + " - images ", unNbMisARED);
 
         dbLr.MiseAzeroDesColorLabels("rouge");
-        int nbMisARED = dbLr.topperARed50NEW(ctx.getParamTriNew().getRepertoire50NEW());
+        int nbMisARED = dbLr.topperARed50NEW(new String[] {ctx.getParamTriNew().getRepertoire50NEW(),ctx.getRepertoire00NEW()});
         loggerInfo("Tag a RED " + String.format("%05d", nbMisARED) + " - images ", nbMisARED);
 
         unNbMisAREDRep = dbLr.deTopperARedOldRepertoire();
@@ -695,7 +695,7 @@ public class Main {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         //Regroupement
-        String repertoire50NEW = ctx.getParamTriNew().getRepertoire50NEW();
+        String[] repertoire50NEW = new String[]{ctx.getParamTriNew().getRepertoire50NEW(),ctx.getRepertoire00NEW()};
         ResultSet rsele = dbLr.sqlgetListelementnewaclasser(ctx.getParamTriNew().getTempsAdherence(), repertoire50NEW);
 
         GrpPhoto listFileBazar = new GrpPhoto();
@@ -763,7 +763,7 @@ public class Main {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         //Regroupement
-        ResultSet rsele = dbLr.sqlgetListelementnewaclasser(ctx.getParamTriNew().getTempsAdherence(), "");
+        ResultSet rsele = dbLr.sqlgetListelementnewaclasser(ctx.getParamTriNew().getTempsAdherence(), new String[]{});
 
         List<GrpPhoto> listGrpEletmp = new ArrayList();
         GrpPhoto listEletmp = new GrpPhoto();
@@ -891,7 +891,7 @@ public class Main {
                 String nomRep = repDateFormat.format(new Date(listEle.getFirstDate() * 1000)) + "_(" + String.format("%05d", listEle.lstEleFile.size()) + ")";
                 for (ElementFichier eleGrp : listEle.lstEleFile) {
 
-                    String newName = ctx.getParamTriNew().getRepertoire50NEW() + nomRep + File.separator + eleGrp.getLcIdxFilename();
+                    String newName = ctx.getParamTriNew().getRepertoire50NEW() + nomRep + File.separator + addSourceToNameFor(SystemFiles.normalizePath(eleGrp.getAbsolutePath()).compareTo(SystemFiles.normalizePath(ctx.getRepertoire00NEW()))==0,eleGrp.getPathFromRoot(),eleGrp.getLcIdxFilename());
                     WorkWithFiles.moveFileintoFolder(eleGrp, newName, dbLr);
 
                 }
@@ -915,6 +915,14 @@ public class Main {
                 String newName = ctx.getParamTriNew().getRepertoireBazar() + File.separator + eleGrp.getLcIdxFilename();
                 WorkWithFiles.moveFileintoFolder(eleGrp, newName, dbLr);
             }
+        }
+    }
+
+    private static String addSourceToNameFor(boolean toDo, String path, String lcIdxFilename) {
+        if (toDo){
+            return path.replaceAll("[@\\/\\'()]","_") + lcIdxFilename;
+        }else{
+            return lcIdxFilename;
         }
     }
 

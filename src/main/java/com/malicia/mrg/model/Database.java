@@ -141,7 +141,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         return nb;
     }
 
-    public int topperARed50NEW(String repertoire50NEW) throws SQLException {
+    public int topperARed50NEW(String[] repertoire50NEW) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         String sql;
         sql = "update Adobe_images " +
@@ -190,16 +190,27 @@ public class Database extends SQLiteJDBCDriverConnection {
     }
 
 
-    private String getStringAllIdLocalFromNew(String repertoire50NEW) {
+    private String getStringAllIdLocalFromNew(String[] repertoire50NEW) {
         return " select a.id_local as file_id_local " +
                 "from AgLibraryFile a  " +
                 "inner join AgLibraryFolder b   " +
                 " on a.folder = b.id_local  " +
                 "inner join AgLibraryRootFolder p   " +
                 " on b.rootFolder = p.id_local  " +
-                "where '" + SystemFiles.normalizePath(repertoire50NEW) + "' like p.absolutePath || '%'  " +
-                "and p.absolutePath || b.pathFromRoot like '" + SystemFiles.normalizePath(repertoire50NEW) + "' || '%' "
+                "where " + getTextualConditionForNew(repertoire50NEW)
                 ;
+    }
+
+    private String getTextualConditionForNew(String[] repertoire50NEW) {
+        return "(" +
+                "'" + SystemFiles.normalizePath(repertoire50NEW[0]) + "' like p.absolutePath || '%'  " +
+                "and p.absolutePath || b.pathFromRoot like '" + SystemFiles.normalizePath(repertoire50NEW[0]) + "' || '%' " +
+                ")" +
+                " or " +
+                "(" +
+                "'" + SystemFiles.normalizePath(repertoire50NEW[1]) + "' like p.absolutePath || '%'  " +
+                "and p.absolutePath || b.pathFromRoot like '" + SystemFiles.normalizePath(repertoire50NEW[1]) + "' || '%' " +
+                ")";
     }
 
     public void MiseAzeroDesColorLabels(String colortag) throws SQLException {
@@ -219,7 +230,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         return executeUpdate(sql);
     }
 
-    public int deTopperARedOld50NEW(String repertoire50NEW) throws SQLException {
+    public int deTopperARedOld50NEW(String[] repertoire50NEW) throws SQLException {
         String sql;
         sql = "update Adobe_images " +
                 "set colorLabels = '' " +
@@ -630,12 +641,11 @@ public class Database extends SQLiteJDBCDriverConnection {
      * @return the result set
      * @throws SQLException the sql exception
      */
-    public ResultSet sqlgetListelementnewaclasser(String tempsAdherence, String repertoire50NEW) throws SQLException {
+    public ResultSet sqlgetListelementnewaclasser(String tempsAdherence, String[] repertoire50NEW) throws SQLException {
         String CLAUSEWHERE = "";
 
-        if (repertoire50NEW.compareTo("") != 0) {
-            CLAUSEWHERE = "where '" + SystemFiles.normalizePath(repertoire50NEW) + "' like p.absolutePath || '%'  " +
-                    "and p.absolutePath || b.pathFromRoot like '" + SystemFiles.normalizePath(repertoire50NEW) + "' || '%' ";
+        if (repertoire50NEW.length != 0) {
+            CLAUSEWHERE = "where " + getTextualConditionForNew(repertoire50NEW) + "";
         }
 
         return select(
@@ -654,8 +664,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                         "e.fileformat , " +
                         "e.orientation , " +
                         "strftime('%s', e.captureTime) as captureTime , " +
-                        " ( '" + SystemFiles.normalizePath(repertoire50NEW) + "' like p.absolutePath || '%'  " +
-                        "and p.absolutePath || b.pathFromRoot like '" + SystemFiles.normalizePath(repertoire50NEW) + "' || '%' ) as isNew " +
+                        " ( " + getTextualConditionForNew(repertoire50NEW) + ") as isNew " +
                         "from Adobe_images e  " +
                         "inner join AgLibraryFile a  " +
                         " on a.id_local = e.rootFile    " +

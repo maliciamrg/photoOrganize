@@ -55,8 +55,8 @@ paramElementsRejet:
     - pto
   extFileRejet: rejet
 paramTriNew:
-  repertoire50NEW: "E:\\50-Phototheque\\05-A_Ranger\\@New\\"
-  repertoireBazar: "E:\\50-Phototheque\\05-A_Ranger\\@New\\Bazar\\"
+  repertoire50NEW: "C:\\Users\\cleme\\Desktop\\@New\\"
+  repertoireBazar: "C:\\Users\\cleme\\Desktop\\@New\\Bazar\\"
   repertoireKidz: "Y:\\50-Phototheque\\70-Kidz__\\"
   thresholdNew: 10
   tempsAdherence: "90 minutes"
@@ -83,7 +83,7 @@ repFonctionnel:
     - "*.lrcat-*"
     - "*\\log\\*"
   repertoiresyncsource:
-    - "E:\\50-Phototheque\\05-A_Ranger"
+    - "D:\\50-Phototheque\\05-A_Ranger"
     - "C:\\Users\\cleme\\Desktop\\50-Phototheque\\70_Catalog_Phototheque"
   repertoiresyncdest: "Y:\\99_Sauvegarde\\"
   syncdestmouchard: photoOrganizeLastSync.txt

@@ -9,7 +9,6 @@ public class ElementFichier {
     private long captureTime;
     private long mint;
     private long maxt;
-
     public ElementFichier(String absolutePath, String pathFromRoot, String lcIdxFilename, String fileIdLocal) {
         this.absolutePath = absolutePath;
         this.pathFromRoot = pathFromRoot;
@@ -24,6 +23,10 @@ public class ElementFichier {
         this.lcIdxFilename = lcIdxFilename;
         this.fileIdLocal = fileIdLocal;
         this.numRep = numRep;
+    }
+
+    public String getAbsolutePath() {
+        return absolutePath;
     }
 
     public String getPathFromRoot() {
@@ -61,7 +64,7 @@ public class ElementFichier {
     @Override
     public String toString() {
         return "ElementFichier{" +
-                "mint=" + String.format("%012d", mint)  +
+                "mint=" + String.format("%012d", mint) +
                 ", " +
                 "captureTime=" + String.format("%012d", captureTime) +
                 ", " +
