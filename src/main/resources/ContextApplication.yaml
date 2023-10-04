@@ -23,6 +23,8 @@ workflow:
     - IS_FORCE_SVG_000000 # force time to sauvegarde
 dataApplication:
   applicationToClose: "taskkill /f /im Lightroom.exe"
+#    - "taskkill /f /im dynamiclinkmediaserver.exe"
+#    - "rmdir /s /q C:\Users\cleme\AppData\Local\Adobe\Lightroom\Caches\Video"
 paramControleRepertoire:
   listControleRepertoire:
     - starValue
@@ -69,7 +71,7 @@ repFonctionnel:
   repertoire50Phototheque: "Y:\\50-Phototheque\\"
   repertoire00NEW: "Y:\\00-CheckIn\\"
   repertoireCatalog: "C:\\Users\\cleme\\Desktop\\50-Phototheque\\70_Catalog_Phototheque"
-  catalogLrcat: "70_Catalog_Phototheque-2.lrcat"
+  catalogLrcat: "70_Catalog_Phototheque-2-v12.lrcat"
   nbRotateRepertoireDestZip: "5"
   rsyncexclude:
     - "*\\System Volume Information\\*"

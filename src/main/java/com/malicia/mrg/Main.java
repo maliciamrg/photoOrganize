@@ -889,9 +889,11 @@ public class Main {
                 nbtot += listEle.lstEleFile.size();
                 SimpleDateFormat repDateFormat = new SimpleDateFormat(TriNew.FORMATDATE_YYYY_MM_DD);
                 String nomRep = repDateFormat.format(new Date(listEle.getFirstDate() * 1000)) + "_(" + String.format("%05d", listEle.lstEleFile.size()) + ")";
-                for (ElementFichier eleGrp : listEle.lstEleFile) {
+                listEle.deBounce();
+                for (ElementFichier eleGrp : listEle.lstEleFileWithoutDuplicates) {
 
                     String newName = ctx.getParamTriNew().getRepertoire50NEW() + nomRep + File.separator + addSourceToNameFor(SystemFiles.normalizePath(eleGrp.getAbsolutePath()).compareTo(SystemFiles.normalizePath(ctx.getRepertoire00NEW()))==0,eleGrp.getPathFromRoot(),eleGrp.getLcIdxFilename());
+//                    LOGGER.info("move from {} to {} " , eleGrp.getPath(), newName );
                     WorkWithFiles.moveFileintoFolder(eleGrp, newName, dbLr);
 
                 }

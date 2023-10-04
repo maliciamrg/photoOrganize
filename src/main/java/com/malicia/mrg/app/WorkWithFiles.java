@@ -80,12 +80,19 @@ public class WorkWithFiles {
     public static void moveFileintoFolder(ElementFichier oldEle, String newPath, Database dbLr) throws IOException, SQLException {
         if (normalizePath(oldEle.getPath()).compareTo(normalizePath(newPath)) != 0) {
 
-            WorkWithRepertory.sqlMkdirRepertory(new File(newPath).getParent() + File.separator, dbLr);
+            File fsrc = new File(oldEle.getPath());
+            if (fsrc.exists()) {
+                File fdest = new File(newPath);
+                if (fdest.exists()) {
+                    newPath = fdest.getParent() + "\\" + Math.floor(Math.random() * (100 - 0 + 1) + 0) + fdest.getName();
+                }
 
-            SystemFiles.moveFile(oldEle.getPath(), newPath);
+                WorkWithRepertory.sqlMkdirRepertory(new File(newPath).getParent() + File.separator, dbLr);
 
-            dbLr.sqlmovefile(oldEle, newPath);
+                SystemFiles.moveFile(oldEle.getPath(), newPath);
 
+                dbLr.sqlmovefile(oldEle, newPath);
+            }
         }
     }
 

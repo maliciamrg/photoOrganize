@@ -1,18 +1,31 @@
 package com.malicia.mrg;
 
 import com.malicia.mrg.model.ElementFichier;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class GrpPhoto {
-    private long firstDate;
+    private static final Logger LOGGER = LogManager.getLogger(Main.class);
     List<ElementFichier> lstEleFile = new ArrayList<>();
-    private int[] arrayRep = new int[Context.IREP_NEW+1];
+    List<ElementFichier> lstEleFileWithoutDuplicates = new ArrayList<>();
+    private long firstDate;
+    private final int[] arrayRep = new int[Context.IREP_NEW + 1];
 
     public GrpPhoto() {
         // Do nothing
+    }
+
+    public List<ElementFichier> getLstEleFileWithoutDuplicates() {
+        return lstEleFileWithoutDuplicates;
+    }
+
+    public void setLstEleFileWithoutDuplicates(List<ElementFichier> lstEleFileWithoutDuplicates) {
+        this.lstEleFileWithoutDuplicates = lstEleFileWithoutDuplicates;
     }
 
     public int getArrayRep(int i) {
@@ -52,4 +65,13 @@ public class GrpPhoto {
         lstEleFile.addAll(listEletmp.lstEleFile);
     }
 
+    public void deBounce() {
+        lstEleFileWithoutDuplicates = lstEleFile.stream()
+                .collect(Collectors.toSet())
+                .stream()
+                .collect(Collectors.toList());
+        if (lstEleFile.size() != lstEleFileWithoutDuplicates.size()) {
+            LOGGER.info("lstEleFile debounce de " + lstEleFile.size() + " pour " + lstEleFileWithoutDuplicates.size() + " elements ");
+        }
+    }
 }

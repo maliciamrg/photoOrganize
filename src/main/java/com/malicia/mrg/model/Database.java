@@ -300,9 +300,9 @@ public class Database extends SQLiteJDBCDriverConnection {
         sql = "" +
                 "update AgLibraryFile " +
                 "set folder =  " + dst.get("Folderidlocal") + " ," +
-                " baseName =  '" + FilenameUtils.getBaseName(destination) + "' , " +
-                " idx_filename =  '" + fdest.getName() + "' , " +
-                " lc_idx_filename =  '" + fdest.getName().toLowerCase() + "'  " +
+                " baseName =  \"" + FilenameUtils.getBaseName(destination) + "\" , " +
+                " idx_filename =  \"" + fdest.getName() + "\" , " +
+                " lc_idx_filename =  \"" + fdest.getName().toLowerCase() + "\"  " +
                 "where id_local =  " + source.getFileIdLocal() + " " +
                 ";";
         executeUpdate(sql);
@@ -449,7 +449,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                 "select p.absolutePath ,  p.id_local , fo.rootFolder , fo.pathFromRoot , fo.id_local as result  " +
                         "from AgLibraryRootFolder as p , " +
                         "AgLibraryFolder as fo " +
-                        "where '" + SystemFiles.normalizePath(repertoire) + "' like p.absolutePath || '%'  " +
+                        "where '" + SystemFiles.normalizePath(repertoire + File.separator) + "' like p.absolutePath || '%'  " +
                         "and fo.rootFolder = p.id_local " +
                         "and '" + SystemFiles.normalizePath(repertoire + File.separator) + "' = p.absolutePath || fo.pathFromRoot  " +
                         ";");
@@ -643,9 +643,11 @@ public class Database extends SQLiteJDBCDriverConnection {
      */
     public ResultSet sqlgetListelementnewaclasser(String tempsAdherence, String[] repertoire50NEW) throws SQLException {
         String CLAUSEWHERE = "";
-
+        String[] repertoire50NEWMod = repertoire50NEW;
         if (repertoire50NEW.length != 0) {
             CLAUSEWHERE = "where " + getTextualConditionForNew(repertoire50NEW) + "";
+        } else {
+            repertoire50NEWMod = new String[]{"",""};
         }
 
         return select(
@@ -664,7 +666,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                         "e.fileformat , " +
                         "e.orientation , " +
                         "strftime('%s', e.captureTime) as captureTime , " +
-                        " ( " + getTextualConditionForNew(repertoire50NEW) + ") as isNew " +
+                        " ( " + getTextualConditionForNew(repertoire50NEWMod) + ") as isNew " +
                         "from Adobe_images e  " +
                         "inner join AgLibraryFile a  " +
                         " on a.id_local = e.rootFile    " +
