@@ -38,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 public class Main {
 
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
+    private static final Logger LOGGER2 = LogManager.getLogger("logger2info");
 
     private static Context ctx;
     private static Database dbLr;
@@ -670,9 +671,10 @@ public class Main {
         }
     }
 
-    private static boolean isItTimeToSave() {
+    private static boolean isItTimeToSave() throws IOException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         File syncMouchard = new File(ctx.getRepFonctionnel().getRepertoiresyncdest() + ctx.getRepFonctionnel().getSyncdestmouchard());
+        if (!syncMouchard.exists()){syncMouchard.createNewFile();}
         Calendar cal = Calendar.getInstance();
         long lastModified = syncMouchard.lastModified();
         cal.setTime(new Date(lastModified));
@@ -684,7 +686,7 @@ public class Main {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         LOGGER.info("Today                                   : " + sdf.format(calt.getTimeInMillis()));
         LOGGER.info("Dernier Modification du fichier mouchard: " + sdf.format(lastModified));
-        LOGGER.info("Prochain TmeToSave                      : " + sdf.format(cal.getTimeInMillis()));
+        LOGGER.info("Prochain TimeToSave                     : " + sdf.format(cal.getTimeInMillis()));
 
         boolean isItTimeToSave = calt.compareTo(cal) > 0;
         LOGGER.info("isItTimeToSave                          : " + isItTimeToSave);
@@ -856,27 +858,60 @@ public class Main {
 
     private static void miseEnPlaceDesTagDeRapprochement(List<GrpPhoto> listGrpEletmp) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER2);
 
         for (GrpPhoto listEle : listGrpEletmp) {
+            Map< String , Map<String , Integer>> listeAction = new HashMap<>();
             if (listEle.size() > 1 && listEle.getArrayRep(Context.IREP_NEW) > 0 && listEle.size() > listEle.getArrayRep(Context.IREP_NEW)) {
                 Context.nbDiscretionnaire++;
                 String nbDiscr = String.format("%1$03X", Context.nbDiscretionnaire);
                 String tag = Context.TAG_RAPPROCHEMENT + "_" + nbDiscr + "_" + Context.POSSIBLE_NEW_GROUP;
                 LOGGER.info("tag : " + tag + " ==> ");
+                LOGGER2.info("tag : " + tag + " ==> ");
                 for (ElementFichier eleFile : listEle.lstEleFile) {
                     dbLr.AddKeywordToFile(eleFile.getFileIdLocal(), tag, Context.TAG_RAPPROCHEMENT);
                     LOGGER.debug(" --- " + eleFile.getPathFromRoot() + File.separator + eleFile.getLcIdxFilename());
+                    LOGGER2.debug(" --- " + eleFile.getPathFromRoot() + File.separator + eleFile.getLcIdxFilename());
                 }
                 //display info
                 int i;
-                for (i = 0; i < ctx.getArrayRepertoirePhoto().size(); i++) {
-                    if (listEle.getArrayRep(i) > 0) {
-                        LOGGER.info("    " + String.format("%05d", listEle.getArrayRep(i)) + " - " + ctx.getArrayRepertoirePhoto().get(i).getRepertoire());
+                List<ElementFichier> lstEleFile = listEle.getLstEleFile();
+                for (i = 0; i < lstEleFile.size(); i++) {
+                    String masterKey = lstEleFile.get(i).getAbsolutePath();
+                    if (listeAction.containsKey(masterKey)){
+
+                        Map<String, Integer> listeValueAction = listeAction.get(masterKey);
+                        String valueKey = lstEleFile.get(i).getPathFromRoot();
+                        if (listeValueAction.containsKey(valueKey)){
+                            listeValueAction.replace(valueKey, listeValueAction.get(valueKey) + 1);
+                        } else {
+                            listeValueAction.put(valueKey, 1);
+                        }
+
+                        listeAction.replace(masterKey, listeValueAction);
+
+                    } else {
+                        Map< String , Integer> value = new HashMap<>();
+                        value.put(lstEleFile.get(i).getPathFromRoot(),1);
+                        listeAction.put(masterKey, value);
                     }
                 }
-                LOGGER.info("    " + String.format("%05d", listEle.getArrayRep(Context.IREP_NEW)) + " - " + ctx.getParamTriNew().getRepertoire50NEW());
-
-
+                for (String masterKey : listeAction.keySet()) {
+                    Map<String, Integer> listeValueAction = listeAction.get(masterKey);
+                    LOGGER.info("    " + masterKey);
+                    LOGGER2.info("    " + masterKey);
+                    for (String valueKey : listeValueAction.keySet()) {
+                        LOGGER.info("        " + String.format("%05d", listeValueAction.get(valueKey)) + " - " + valueKey);
+                        LOGGER2.info("        " + String.format("%05d", listeValueAction.get(valueKey)) + " - " + valueKey);
+                    }
+                }
+//                LOGGER.info("    " + "---------------------------");
+//                for (i = 0; i < ctx.getArrayRepertoirePhoto().size(); i++) {
+//                    if (listEle.getArrayRep(i) > 0) {
+//                        LOGGER.info("    " + String.format("%05d", listEle.getArrayRep(i)) + " - " + ctx.getArrayRepertoirePhoto().get(i).getRepertoire());
+//                    }
+//                }
+//                LOGGER.info("    " + String.format("%05d", listEle.getArrayRep(Context.IREP_NEW)) + " - " + ctx.getParamTriNew().getRepertoire50NEW());
             }
         }
     }
