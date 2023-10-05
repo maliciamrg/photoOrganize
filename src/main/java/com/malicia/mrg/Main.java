@@ -98,11 +98,14 @@ public class Main {
                     lstIdKey = creationDesKeywordProjet();
                 }
                 purgeKeywordProjet(lstIdKey);
-                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
-                    //Maintenance database lr
-                    maintenanceDatabase();
-                    //*
-                }
+                splitLOGGERInfo(isMoreZeroComm(dbLr.KeywordImageWithoutImages(progress)));
+                splitLOGGERInfo(isMoreZeroComm(dbLr.keywordImageWithoutKeyword(progress)));
+                progress.setString("");
+//                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
+//                    //Maintenance database lr
+//                    maintenanceDatabase();
+//                    //*
+//                }
             }
 
             if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RETAG_RED_000000"))) {
@@ -487,10 +490,12 @@ public class Main {
                 nb++;
                 String source = fileToGo.get(key).get("oldPath");
                 String newPath = forGoTag.get("newPath");
-                LOGGER.debug("---move " + Context.TAG_ACTION_GO_RAPPROCHEMENT + " : " + source + " -> " + newPath);
-                SystemFiles.moveFile(source, newPath);
-                dbLr.sqlmovefile(key, newPath);
-                dbLr.removeKeywordImages(forGoTag.get("kiIdLocal"));
+                if(new File(source).exists() && !new File(newPath).exists()) {
+                    LOGGER.debug("---move " + Context.TAG_ACTION_GO_RAPPROCHEMENT + " : " + source + " -> " + newPath);
+                    SystemFiles.moveFile(source, newPath);
+                    dbLr.sqlmovefile(key, newPath);
+                    dbLr.removeKeywordImages(forGoTag.get("kiIdLocal"));
+                }
             }
         }
         loggerInfo("move " + String.format("%05d", nb) + " - " + Context.TAG_ACTION_GO_RAPPROCHEMENT, nb);
@@ -498,15 +503,17 @@ public class Main {
         //action collection
         Map<String, String> listeAction = ctx.getActionVersRepertoire().getListeAction();
         for (String key : listeAction.keySet()) {
-            Map<String, Map<String, String>> fileToTag = dbLr.sqllistAllFileWithTagtoRep(key, ctx.getRepertoire50Phototheque() + listeAction.get(key));
+            Map<String, Map<String, String>> fileToTag = dbLr.sqllistAllFileWithTagtoRep(key, listeAction.get(key));
             loggerInfo("move " + String.format("%05d", fileToTag.size()) + " - " + key, fileToTag.size());
             for (String keyt : fileToTag.keySet()) {
                 String oldPath = fileToTag.get(keyt).get("oldPath");
                 String newPath = fileToTag.get(keyt).get("newPath");
-                LOGGER.debug("---move " + key + " : " + oldPath + " -> " + newPath);
-                SystemFiles.moveFile(oldPath, newPath);
-                dbLr.sqlmovefile(keyt, newPath);
-                dbLr.removeKeywordImages(fileToTag.get(keyt).get("kiIdLocal"));
+                if(new File(oldPath).exists() && !new File(newPath).exists()) {
+                    LOGGER.debug("---move " + key + " : " + oldPath + " -> " + newPath);
+                    SystemFiles.moveFile(oldPath, newPath);
+                    dbLr.sqlmovefile(keyt, newPath);
+                    dbLr.removeKeywordImages(fileToTag.get(keyt).get("kiIdLocal"));
+                }
             }
         }
     }

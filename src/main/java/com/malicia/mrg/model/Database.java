@@ -1083,15 +1083,18 @@ public class Database extends SQLiteJDBCDriverConnection {
     public HashMap<String, String> getFolderCollection(String collections, String tagorg, String filtreDebutNomRep) throws SQLException {
         HashMap<String, String> ret = new HashMap<>();
         String sql = " select * " +
-                "from AgLibraryFolder " +
-                "where pathFromRoot REGEXP  '" + collections + "\\/" + filtreDebutNomRep + "[@&#a-zA-Z _0-9-]*\\/$' " +
+                "from AgLibraryFolder b  , " +
+                "AgLibraryRootFolder p " +
+                "where b.pathFromRoot REGEXP  '" + collections + "\\/" + filtreDebutNomRep + "[@&#a-zA-Z _0-9-]*\\/$' " +
+                "and b.rootFolder = p.id_local  " +
                 ";";
         ResultSet rs = select(sql);
         while (rs.next()) {
+            String absolutePath = rs.getString("absolutePath");
             String pathFromRoot = rs.getString("pathFromRoot");
             String[] split = pathFromRoot.split("/");
             String tag = split[split.length - 1] + tagorg;
-            ret.put(tag, pathFromRoot);
+            ret.put(tag, normalizePath(absolutePath + pathFromRoot ));
         }
         return ret;
     }
