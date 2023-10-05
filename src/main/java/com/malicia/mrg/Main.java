@@ -867,6 +867,7 @@ public class Main {
                 String nbDiscr = String.format("%1$03X", Context.nbDiscretionnaire);
                 String tag = Context.TAG_RAPPROCHEMENT + "_" + nbDiscr + "_" + Context.POSSIBLE_NEW_GROUP;
                 LOGGER.info("tag : " + tag + " ==> ");
+                LOGGER2.info("    ");
                 LOGGER2.info("tag : " + tag + " ==> ");
                 for (ElementFichier eleFile : listEle.lstEleFile) {
                     dbLr.AddKeywordToFile(eleFile.getFileIdLocal(), tag, Context.TAG_RAPPROCHEMENT);
