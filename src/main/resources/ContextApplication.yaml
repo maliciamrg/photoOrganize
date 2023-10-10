@@ -4,6 +4,7 @@ workflow:
     - IS_SYNCR_LR_0000000 # Synchronise les repertoire et fichiers physique avec la base LR
     - IS_MAINT_LR_0000000 # Maintenance sur la base LR
     - IS_PURGE_FOLDER_000 # purgeDesRepertoireVide50Phototheque() (local) et purgeDesRepertoireVide00NEW() (reseau)
+    - IS_WRK_REJET_000000 # ranger [les repertoire rejet et les les photo tagger rejeter] dans les repertoires rejet ou le 99-rejet (pour suppression)
     - IS_ACTION_FROM_KEY0 # (raprochement) déplacement des photos tagger par TAG_ACTION_GO_RAPPROCHEMENT et Context.COLLECTIONS
     - IS_PURGE_ACTION_000 # (raprochement) remove les tag [action] des photos (TAG_ACTION_GO_RAPPROCHEMENT et Context.COLLECTIONS)
     - IS_TAG_DEL_00000000 # (raprochement) purge des tag liée au [Maitre] diffrent des tag crée par IS_TAG_CR_000000000 (par ex les TAG_REPSWEEP++ et TAG_RAPPROCHEMENT++)
@@ -17,7 +18,6 @@ workflow:
     - IS_TAG_CTRL_REP_000 # (analFonctionRep) => appliquer des tag TAG_REPSWEEP++ sur les photo et mise a 'RED' de repertoire en fonction de analFonctionRep.getListOfretourValRepertoire()
     - IS_EXEC_FONC_REP_00 # (analFonctionRep) => Renommage des repertoire via POP UP.
   NOTTODO:
-    - IS_WRK_REJET_000000 # ranger [les repertoire rejet et les les photo tagger rejeter] dans les repertoires rejet ou le 99-rejet (pour suppression)
     - IS_UNZIP_REP_PHOTO0 # extraire les ZIP dans les repertoire rejet
     - IS_SVG_LRCONFIG_000 # sauvegarde du la config LR sur le reseau.
     - EMPTY
