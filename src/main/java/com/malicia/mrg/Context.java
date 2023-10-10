@@ -20,6 +20,7 @@ public class Context {
     public static final int IREP_NEW = 10;
 
     public static final String RED = "Red";
+    public static final String GREEN = "Green";
     public static final String TAG_ORG = "#ORG#";
     public static final String TAG_RAPPROCHEMENT = TAG_ORG + "RAPPROCHEMENT";
     public static final String TAG_REPSWEEP = TAG_ORG + "REPSWEEP";

@@ -90,8 +90,9 @@ public class WorkWithFiles {
                 WorkWithRepertory.sqlMkdirRepertory(new File(newPath).getParent() + File.separator, dbLr);
 
                 SystemFiles.moveFile(oldEle.getPath(), newPath);
-
-                dbLr.sqlmovefile(oldEle, newPath);
+                if (dbLr == null) {
+                    dbLr.sqlmovefile(oldEle, newPath);
+                }
             }
         }
     }

@@ -39,6 +39,8 @@ public class Main {
 
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
     private static final Logger LOGGER2 = LogManager.getLogger("logger2info");
+    public static final String colorTagNew = Context.RED;
+    public static final String colorTagWhatsApp = Context.GREEN;
 
     private static Context ctx;
     private static Database dbLr;
@@ -74,6 +76,12 @@ public class Main {
 
             displayBooleen();
 
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_SYNCR_LR_0000000"))) {
+                //Synchro fichier physique avec database lr
+                synchroDatabase();
+                //*
+            }
+
             if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
                 //Maintenance database lr
                 maintenanceDatabase();
@@ -98,9 +106,6 @@ public class Main {
                     lstIdKey = creationDesKeywordProjet();
                 }
                 purgeKeywordProjet(lstIdKey);
-                splitLOGGERInfo(isMoreZeroComm(dbLr.KeywordImageWithoutImages(progress)));
-                splitLOGGERInfo(isMoreZeroComm(dbLr.keywordImageWithoutKeyword(progress)));
-                progress.setString("");
 //                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
 //                    //Maintenance database lr
 //                    maintenanceDatabase();
@@ -109,7 +114,12 @@ public class Main {
             }
 
             if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RETAG_RED_000000"))) {
-                reTAGlesColorTagARED();
+                reTAGlesColorTagARED(colorTagNew);
+            }
+            //*
+
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RETAG_GREEN_0000"))) {
+                reTAGlesColorTagAGREEN(colorTagWhatsApp);
             }
             //*
 
@@ -174,7 +184,7 @@ public class Main {
                 }
 
                 if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_CTRL_REP_000"))) {
-                    tagretourValRepertoire(analFonctionRep.getListOfretourValRepertoire());
+                    tagretourValRepertoire(analFonctionRep.getListOfretourValRepertoire(), colorTagNew);
                 }
             }
             if (isItTimeToSave() || Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_FORCE_SVG_000000"))) {
@@ -204,7 +214,7 @@ public class Main {
 
     }
 
-    private static void tagretourValRepertoire(List<BlocRetourRepertoire> retourValRepertoire) {
+    private static void tagretourValRepertoire(List<BlocRetourRepertoire> retourValRepertoire, String color) {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         final int[] nbTopRed = {0};
         HashMap<String, Integer> lstIdKey = new HashMap<>();
@@ -236,7 +246,7 @@ public class Main {
 
                                             dbLr.AddKeywordToRepNoVideo(blocRetourRep.getRepertoire(), tags[tags.length - 1], tags[tags.length - 1 - 1]);
 
-                                            int ret = dbLr.topperRepertoireARed(blocRetourRep.getRepertoire());
+                                            int ret = dbLr.topperRepertoireARed(blocRetourRep.getRepertoire(), color);
                                             if (ret > 0) {
                                                 LOGGER.debug("   Tag a RED ");
                                                 if (!miseared[0]) {
@@ -322,6 +332,12 @@ public class Main {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         int nbPurge = dbLr.purgeGroupeKeyword(Context.TAG_ORG, lstIdKey);
         loggerInfo("purge " + String.format("%05d", nbPurge) + " - keywords ", nbPurge);
+
+        splitLOGGERInfo(isMoreZeroComm(dbLr.KeywordImageWithoutImages(progress)));
+
+        splitLOGGERInfo(isMoreZeroComm(dbLr.keywordImageWithoutKeyword(progress)));
+
+        progress.setString("");
     }
 
     private static List<String> creationDesKeywordProjet() throws SQLException {
@@ -372,18 +388,33 @@ public class Main {
         return String.format("%-60s", s);
     }
 
-    private static void reTAGlesColorTagARED() throws SQLException {
+    private static void reTAGlesColorTagARED(String color) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
-        int unNbMisARED = dbLr.deTopperARedOld50NEW(new String[] {ctx.getParamTriNew().getRepertoire50NEW(),ctx.getRepertoire00NEW()});
+        int unNbMisARED = dbLr.deTopperAColorOld50NEW(new String[] {ctx.getParamTriNew().getRepertoire50NEW(),ctx.getRepertoire00NEW()}, color);
         loggerInfo("UnTag a RED " + String.format("%05d", unNbMisARED) + " - images ", unNbMisARED);
 
         dbLr.MiseAzeroDesColorLabels("rouge");
-        int nbMisARED = dbLr.topperARed50NEW(new String[] {ctx.getParamTriNew().getRepertoire50NEW(),ctx.getRepertoire00NEW()});
+        int nbMisARED = dbLr.topperARed50NEW(new String[] {ctx.getParamTriNew().getRepertoire50NEW(),ctx.getRepertoire00NEW()}, color);
         loggerInfo("Tag a RED " + String.format("%05d", nbMisARED) + " - images ", nbMisARED);
 
-        unNbMisAREDRep = dbLr.deTopperARedOldRepertoire();
+        unNbMisAREDRep = dbLr.deTopperARedOldRepertoire(color.toLowerCase(Locale.ROOT));
         loggerInfo("UnTag a RED " + String.format("%05d", unNbMisAREDRep) + " - repertoire ", unNbMisAREDRep);
+
+    }
+
+    private static void reTAGlesColorTagAGREEN(String color) throws SQLException {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+
+        int unNbMisAGREEN = dbLr.deTopperAColorOld50NEW(new String[] {ctx.getParamTriNew().getRepertoire50NEW(),ctx.getRepertoire00NEW()}, color);
+        loggerInfo("UnTag a GREEN " + String.format("%05d", unNbMisAGREEN) + " - images ", unNbMisAGREEN);
+
+//        dbLr.MiseAzeroDesColorLabels("green");
+        int nbMisAGREEN = dbLr.topperAGreen50NEW(new String[] {ctx.getParamTriNew().getRepertoire50NEW(),ctx.getRepertoire00NEW()}, color);
+        loggerInfo("Tag a GREEN " + String.format("%05d", nbMisAGREEN) + " - images ", nbMisAGREEN);
+
+//        unNbMisAGREENRep = dbLr.deTopperARedOldRepertoire(color.toLowerCase(Locale.ROOT));
+//        loggerInfo("UnTag a GREEN " + String.format("%05d", unNbMisAGREENRep) + " - repertoire ", unNbMisAREDRep);
 
     }
 
@@ -399,6 +430,9 @@ public class Main {
         }
         txt += "   -------------------------------ACTION PREVU--------------------------------------   " + "\n";
         txt += "   -                                                                               -   " + "\n";
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_SYNCR_LR_0000000"))) {
+            txt += "   -  " + "synchroDatabase()" + "\n";
+        }
         if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
             txt += "   -  " + "maintenanceDatabase()" + "\n";
         }
@@ -417,6 +451,9 @@ public class Main {
         }
         if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RETAG_RED_000000"))) {
             txt += "   -  " + "reTAGlesColorTagARED()" + "\n";
+        }
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RETAG_GREEN_0000"))) {
+            txt += "   -  " + "reTAGlesColorTagAGREEN()" + "\n";
         }
         if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
             if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_UNZIP_REP_PHOTO0"))) {
@@ -572,13 +609,17 @@ public class Main {
 
     private static void maintenanceDatabase() throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        splitLOGGERInfo(isMoreZeroComm(dbLr.pathAbsentPhysique(progress)));
         splitLOGGERInfo(isMoreZeroComm(dbLr.AdobeImagesWithoutLibraryFile(progress)));
-        splitLOGGERInfo(isMoreZeroComm(dbLr.KeywordImageWithoutImages(progress)));
         splitLOGGERInfo(isMoreZeroComm(dbLr.folderWithoutRoot(progress)));
-        splitLOGGERInfo(isMoreZeroComm(dbLr.folderAbsentPhysique(progress)));
         splitLOGGERInfo(isMoreZeroComm(dbLr.fileWithoutFolder(progress)));
+        splitLOGGERInfo(isMoreZeroComm(dbLr.KeywordImageWithoutImages(progress)));
         splitLOGGERInfo(isMoreZeroComm(dbLr.keywordImageWithoutKeyword(progress)));
+        progress.setString("");
+    }
+    private static void synchroDatabase() throws SQLException {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        splitLOGGERInfo(isMoreZeroComm(dbLr.pathAbsentPhysique(progress)));
+        splitLOGGERInfo(isMoreZeroComm(dbLr.folderAbsentPhysique(progress)));
         progress.setString("");
     }
 
@@ -949,7 +990,7 @@ public class Main {
             LOGGER.info("Repertoire New - vers Kidz : " + String.format("%05d", listElekidz.lstEleFile.size()));
             for (ElementFichier eleGrp : listElekidz.lstEleFile) {
                 String newName = ctx.getParamTriNew().getRepertoireKidz() + File.separator + eleGrp.getLcIdxFilename();
-                WorkWithFiles.moveFileintoFolder(eleGrp, newName, dbLr);
+                WorkWithFiles.moveFileintoFolder(eleGrp, newName, null);
             }
         }
 

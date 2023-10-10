@@ -97,7 +97,9 @@ public class WorkWithRepertory {
         File fdirectoryName = new File(directoryName);
         if (!fdirectoryName.exists()) {
             SystemFiles.mkdir(directoryName);
-            dbLr.makeRepertory(directoryName);
+            if (dbLr == null) {
+                dbLr.makeRepertory(directoryName);
+            }
         }
     }
 

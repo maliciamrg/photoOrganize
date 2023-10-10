@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
@@ -141,21 +140,34 @@ public class Database extends SQLiteJDBCDriverConnection {
         return nb;
     }
 
-    public int topperARed50NEW(String[] repertoire50NEW) throws SQLException {
+    public int topperARed50NEW(String[] repertoire50NEW, String color) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         String sql;
         sql = "update Adobe_images " +
-                "set colorLabels = '" + Context.RED + "' " +
-                " where colorLabels <> '" + Context.RED + "' " +
+                "set colorLabels = '" + color + "' " +
+                " where colorLabels <> '" + color + "' " +
                 " and rootFile in ( " +
-                getStringAllIdLocalFromNew(repertoire50NEW) +
+                getStringAllIdLocalFromNew(repertoire50NEW, "") +
                 " ) " +
                 ";";
         return executeUpdate(sql);
 
     }
 
-    public int topperRepertoireARed(String repertoire) throws SQLException {
+    public int topperAGreen50NEW(String[] repertoire50NEW, String color) throws SQLException {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        String sql;
+        sql = "update Adobe_images " +
+                "set colorLabels = '" + color + "' " +
+                " where colorLabels <> '" + color + "' " +
+                " and rootFile in ( " +
+                getStringAllIdLocalFromNew(repertoire50NEW, " and a.lc_idx_filename like '%whatsapp%' ") +
+                " ) " +
+                ";";
+        return executeUpdate(sql);
+
+    }
+    public int topperRepertoireARed(String repertoire, String color) throws SQLException {
 //        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         Map<String, String> idlocalforRep = getIdlocalforRep(repertoire);
@@ -181,7 +193,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                     "('" + newIdlocalforFolderLabel + "', " +
                     "'" + UUID.randomUUID().toString().toUpperCase() + "', " +
                     "'" + Folderidlocal + "', " +
-                    "'" + Context.RED.toLowerCase(Locale.ROOT) + "' ," +
+                    "'" + color.toLowerCase(Locale.ROOT) + "' ," +
                     "'Color')" +
                     ";";
             return executeUpdate(sql);
@@ -190,14 +202,14 @@ public class Database extends SQLiteJDBCDriverConnection {
     }
 
 
-    private String getStringAllIdLocalFromNew(String[] repertoire50NEW) {
+    private String getStringAllIdLocalFromNew(String[] repertoire50NEW, String conditionAmendment) {
         return " select a.id_local as file_id_local " +
                 "from AgLibraryFile a  " +
                 "inner join AgLibraryFolder b   " +
                 " on a.folder = b.id_local  " +
                 "inner join AgLibraryRootFolder p   " +
                 " on b.rootFolder = p.id_local  " +
-                "where " + getTextualConditionForNew(repertoire50NEW)
+                "where ( " + getTextualConditionForNew(repertoire50NEW) + " ) "  + conditionAmendment
                 ;
     }
 
@@ -222,21 +234,21 @@ public class Database extends SQLiteJDBCDriverConnection {
         executeUpdate(sql);
     }
 
-    public int deTopperARedOldRepertoire() throws SQLException {
+    public int deTopperARedOldRepertoire(String color) throws SQLException {
         String sql;
         sql = "delete from AgLibraryFolderLabel " +
-                " where label = '" + Context.RED.toLowerCase(Locale.ROOT) + "' " +
+                " where label = '" + color + "' " +
                 ";";
         return executeUpdate(sql);
     }
 
-    public int deTopperARedOld50NEW(String[] repertoire50NEW) throws SQLException {
+    public int deTopperAColorOld50NEW(String[] repertoire50NEW, String color) throws SQLException {
         String sql;
         sql = "update Adobe_images " +
                 "set colorLabels = '' " +
-                " where colorLabels = '" + Context.RED + "' " +
+                " where colorLabels = '" + color + "' " +
                 " and rootFile not in ( " +
-                getStringAllIdLocalFromNew(repertoire50NEW) +
+                getStringAllIdLocalFromNew(repertoire50NEW, "") +
                 " ) " +
                 ";";
         return executeUpdate(sql);
