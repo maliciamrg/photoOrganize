@@ -6,20 +6,11 @@ import java.util.List;
 public class ElementsRejet {
 
     private List<String> arrayNomSubdirectoryRejet = new ArrayList<>();
-    private List<String> arrayNomFileRejet = new ArrayList<>();
-    private List<String> arrayNomFileRejetSup = new ArrayList<>();
+    private List<String> arrayExtensionFileRejetSup = new ArrayList<>();
     private String extFileRejet;
 
     public ElementsRejet() {
         // Do nothing because of X and Y
-    }
-
-    public List<String> getArrayNomFileRejet() {
-        return arrayNomFileRejet;
-    }
-
-    public void setArrayNomFileRejet(List<String> arrayNomFileRejet) {
-        this.arrayNomFileRejet = arrayNomFileRejet;
     }
 
     public String getExtFileRejet() {
@@ -38,20 +29,19 @@ public class ElementsRejet {
         this.arrayNomSubdirectoryRejet = arrayNomSubdirectoryRejet;
     }
 
-    public List<String> getArrayNomFileRejetSup() {
-        return arrayNomFileRejetSup;
+    public List<String> getarrayExtensionFileRejetSup() {
+        return arrayExtensionFileRejetSup;
     }
 
-    public void setArrayNomFileRejetSup(List<String> arrayNomFileRejetSup) {
-        this.arrayNomFileRejetSup = arrayNomFileRejetSup;
+    public void setarrayExtensionFileRejetSup(List<String> arrayExtensionFileRejetSup) {
+        this.arrayExtensionFileRejetSup = arrayExtensionFileRejetSup;
     }
 
     @Override
     public String toString() {
         return "ElementsRejet{" +
                 "arrayNomSubdirectoryRejet=" + arrayNomSubdirectoryRejet +
-                ", arrayNomFileRejet=" + arrayNomFileRejet +
-                ", arrayNomFileRejetSup=" + arrayNomFileRejetSup +
+                ", arrayExtensionFileRejetSup=" + arrayExtensionFileRejetSup +
                 ", extFileRejet='" + extFileRejet + '\'' +
                 '}';
     }

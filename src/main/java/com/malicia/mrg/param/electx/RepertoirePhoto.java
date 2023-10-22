@@ -1,10 +1,6 @@
 package com.malicia.mrg.param.electx;
 
 
-import com.malicia.mrg.util.Serialize;
-
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class RepertoirePhoto {
@@ -17,8 +13,11 @@ public class RepertoirePhoto {
     public List<Integer> ratioStarMax;
     public List<String> zoneValeurAdmise;
     private List<String> nomRepertoire;
-
     public RepertoirePhoto() {
+    }
+
+    public String getNomunique() {
+        return nomunique;
     }
 
     public boolean isRapprochermentNewOk() {

@@ -5,7 +5,6 @@ import com.malicia.mrg.Main;
 import com.malicia.mrg.param.electx.ControleRepertoire;
 import com.malicia.mrg.util.SQLiteJDBCDriverConnection;
 import com.malicia.mrg.util.SystemFiles;
-
 import com.malicia.mrg.util.WhereIAm;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -21,7 +20,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static com.malicia.mrg.util.SystemFiles.normalizePath;
@@ -167,6 +165,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         return executeUpdate(sql);
 
     }
+
     public int topperRepertoireARed(String repertoire, String color) throws SQLException {
 //        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
@@ -209,7 +208,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                 " on a.folder = b.id_local  " +
                 "inner join AgLibraryRootFolder p   " +
                 " on b.rootFolder = p.id_local  " +
-                "where ( " + getTextualConditionForNew(repertoire50NEW) + " ) "  + conditionAmendment
+                "where ( " + getTextualConditionForNew(repertoire50NEW) + " ) " + conditionAmendment
                 ;
     }
 
@@ -270,14 +269,11 @@ public class Database extends SQLiteJDBCDriverConnection {
 
     public void makeRepertory(String directoryName) throws SQLException {
 
-        Map<String, String> idlocalforRep = getIdlocalforRep(new File(directoryName).getParent());
-        String rootFolder = idlocalforRep.get("rootFolder");
-
-        String pathFromRoot = normalizePath(normalizePath(directoryName).replace(normalizePath(idlocalforRep.get("absolutePath")), ""));
-
         Map<String, String> idlocalforNewRep = getIdlocalforRep(directoryName);
-
         if (idlocalforNewRep.get("Folderidlocal").compareTo("0") == 0) {
+
+            Map<String, String> idlocalforRep = getIdlocalforRep(new File(directoryName).getParent());
+            String pathFromRoot = normalizePath(normalizePath(directoryName).replace(normalizePath(idlocalforRep.get("absolutePath")), ""));
 
             long newIdlocalforNewRep = sqlGetPrevIdlocalforFolder();
 
@@ -295,47 +291,31 @@ public class Database extends SQLiteJDBCDriverConnection {
                     "('" + newIdlocalforNewRep + "', " +
                     "'" + UUID.randomUUID().toString().toUpperCase() + "', " +
                     "'" + pathFromRoot + "', " +
-                    "'" + rootFolder + "')" +
+                    "'" + idlocalforRep.get("rootFolder") + "')" +
                     ";";
             executeUpdate(sql);
         }
 
     }
 
-    public void sqlmovefile(ElementFichier source, String destination) throws IOException, SQLException {
+    public int sqlmovefile(long scrFileIdLocal, String destination) throws IOException, SQLException {
 
         File fdest = new File(destination);
-
         Map<String, String> dst = getIdlocalforRep(fdest.getParent());
-
-        String sql;
-        sql = "" +
-                "update AgLibraryFile " +
-                "set folder =  " + dst.get("Folderidlocal") + " ," +
-                " baseName =  \"" + FilenameUtils.getBaseName(destination) + "\" , " +
-                " idx_filename =  \"" + fdest.getName() + "\" , " +
-                " lc_idx_filename =  \"" + fdest.getName().toLowerCase() + "\"  " +
-                "where id_local =  " + source.getFileIdLocal() + " " +
-                ";";
-        executeUpdate(sql);
-
-
-    }
-
-    public void sqlmovefile(String fileIdLocal, String destination) throws IOException, SQLException {
-
-        File fdest = new File(destination);
-
-        Map<String, String> dst = getIdlocalforRep(fdest.getParent());
-
-        String sql;
-        sql = "" +
-                "update AgLibraryFile " +
-                "set folder =  " + dst.get("Folderidlocal") + " " +
-                "where id_local =  " + fileIdLocal + " " +
-                ";";
-        executeUpdate(sql);
-
+        if (dst.get("Folderidlocal").compareTo("0") != 0) {
+            String sql;
+            sql = "update AgLibraryFile " +
+                    "set folder =  " + dst.get("Folderidlocal") + " ," +
+                    " baseName =  \"" + FilenameUtils.getBaseName(destination) + "\" , " +
+                    " idx_filename =  \"" + fdest.getName() + "\" , " +
+                    " lc_idx_filename =  \"" + fdest.getName().toLowerCase() + "\" , " +
+                    " extension =  \"" + FilenameUtils.getExtension(destination) + "\" , " +
+                    " lc_idx_filenameExtension =  \"" + FilenameUtils.getExtension(destination).toLowerCase() + "\" " +
+                    "where id_local =  " + scrFileIdLocal + " " +
+                    ";";
+            return executeUpdate(sql);
+        }
+        return 0;
     }
 
     private void sqlDeleteIdlocalforFolderLabel(String folderIdLocal) throws SQLException {
@@ -405,30 +385,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         return idLocalCalcul;
     }
 
-    public void renameFileLogique(String oldName, String newName) throws SQLException {
-        long idlocal = getIdlocalforFilePath(oldName).get("idlocal");
-        long idfoldernew = Long.parseLong(getIdlocalforRep(newName).get("Folderidlocal"));
-        if (idlocal > 0 && idfoldernew > 0) {
-            File fdest = new File(newName);
-            String sql;
-            String baseName = FilenameUtils.getBaseName(newName);
-            String ext = FilenameUtils.getExtension(newName);
-            sql = "" +
-                    "update AgLibraryFile " +
-                    "set " +
-                    " baseName =  '" + baseName + "' , " +
-                    " idx_filename =  '" + fdest.getName() + "' , " +
-                    " extension =  '" + ext + "' , " +
-                    " lc_idx_filename =  '" + fdest.getName().toLowerCase() + "' , " +
-                    " lc_idx_filenameExtension =  '" + ext.toLowerCase() + "' , " +
-                    " folder =  " + idfoldernew + " " +
-                    "where id_local =  " + idlocal + " " +
-                    ";";
-            executeUpdate(sql);
-        }
-    }
-
-    private Map<String, Long> getIdlocalforFilePath(String path) throws SQLException {
+    public Map<String, Long> getIdlocalforFilePath(String path) throws SQLException {
         File fpath = new File(path);
         String baseName = FilenameUtils.getBaseName(path);
         String ext = FilenameUtils.getExtension(path);
@@ -441,13 +398,14 @@ public class Database extends SQLiteJDBCDriverConnection {
                         "and fo.rootFolder = p.id_local " +
                         "and '" + SystemFiles.normalizePath(fpath.getParent() + File.separator) + "' = p.absolutePath || fo.pathFromRoot  " +
                         "and fi.folder = fo.id_local " +
-                        "and fi.baseName =  '" + baseName + "' " +
-                        "and fi.extension =  '" + ext + "'   " +
+                        "and ( ( fi.idx_filename =  '" + baseName + "." + ext + "' ) " +
+                        "or ( fi.baseName =  '" + baseName + "' " +
+                        "and fi.extension =  '" + ext + "'  ) ) " +
                         ";");
 
         Map<String, Long> ret = new HashMap<>();
-        ret.put("idlocal", 0l);
-        ret.put("rootFolder", 0l);
+        ret.put("idlocal", 0L);
+        ret.put("rootFolder", 0L);
         while (rsexist.next()) {
             ret.replace("idlocal", rsexist.getLong("result"));
             ret.replace("rootFolder", rsexist.getLong("rootFolder"));
@@ -657,9 +615,9 @@ public class Database extends SQLiteJDBCDriverConnection {
         String CLAUSEWHERE = "";
         String[] repertoire50NEWMod = repertoire50NEW;
         if (repertoire50NEW.length != 0) {
-            CLAUSEWHERE = "where " + getTextualConditionForNew(repertoire50NEW) + "";
+            CLAUSEWHERE = "where " + getTextualConditionForNew(repertoire50NEW);
         } else {
-            repertoire50NEWMod = new String[]{"",""};
+            repertoire50NEWMod = new String[]{"", ""};
         }
 
         return select(
@@ -692,7 +650,6 @@ public class Database extends SQLiteJDBCDriverConnection {
                         "ON ahem.cameraModelRef = aiecm.id_local " +
                         CLAUSEWHERE +
                         "order by julianday(e.captureTime) asc " +
-                        "" +
 //                        "limit 10 " +
                         ";");
 
@@ -722,7 +679,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         int koCor = 0;
 
         int numRow = 0;
-        String txtPr = retWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(),40);
+        String txtPr = retWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), 40);
         int numRowMax = getQueryRowCount(sql);
 
         while (rs.next()) {
@@ -733,11 +690,27 @@ public class Database extends SQLiteJDBCDriverConnection {
                 ko += 1;
                 koCor += sqlDeleteFile(rs.getString("file_id_local"));
             }
-            Main.visuProgress(progress,txtPr + " - " + filepath.getParent(),numRow++,numRowMax);
+            Main.visuProgress(progress, txtPr + " - " + filepath.getParent(), numRow++, numRowMax);
         }
         txtret += " nb path logique = " + nb + " : absent physique = " + ko + "\n";
         txtret += "    --- corrige         = " + koCor + "\n";
         return txtret;
+    }
+
+    public List<String> getAllAbsolutePath() throws SQLException {
+        List<String> result = new ArrayList<>();
+        String sql = "select " +
+                "absolutePath " +
+                "from AgLibraryRootFolder " +
+                ";";
+        ResultSet rs = select(sql);
+        String txtret = "";
+
+        while (rs.next()) {
+
+            result.add(rs.getString("absolutePath"));
+        }
+        return result;
     }
 
     public String folderAbsentPhysique(JProgressBar progress) throws SQLException {
@@ -769,7 +742,7 @@ public class Database extends SQLiteJDBCDriverConnection {
                 ko += 1;
                 koCor += sqlDeleteRepertory(rs.getString("folder_id_local"));
             }
-            Main.visuProgress(progress,txtPr,numRow++,numRowMax);
+            Main.visuProgress(progress, txtPr, numRow++, numRowMax);
         }
         txtret += " nb folder logique = " + nb + " : absent physique = " + ko + "\n";
         txtret += "    --- corrige         = " + koCor + "\n";
@@ -801,7 +774,7 @@ public class Database extends SQLiteJDBCDriverConnection {
             txtret += "(debug) ko = " + "file_id_local" + "(" + rs.getString("file_id_local") + ")" + " lc_idx_filename => " + rs.getString("lc_idx_filename") + "\n";
             ko += 1;
             koCor += sqlDeleteFile(rs.getString("file_id_local"));
-            Main.visuProgress(progress,txtPr,numRow++,numRowMax);
+            Main.visuProgress(progress, txtPr, numRow++, numRowMax);
         }
         txtret += " nb file without Folder = " + ko + "\n";
         txtret += "    --- corrige         = " + koCor + "\n";
@@ -827,7 +800,7 @@ public class Database extends SQLiteJDBCDriverConnection {
             txtret += "(debug) ko = " + "rootFile" + "(" + rs.getString("id_local") + ")" + "\n";
             ko += 1;
             koCor += sqlDeleteAdobe_images(rs.getString("id_local"));
-            Main.visuProgress(progress,txtPr,numRow++,numRowMax);
+            Main.visuProgress(progress, txtPr, numRow++, numRowMax);
         }
         txtret += " nb Images Without File = " + ko + "\n";
         txtret += "    --- corrige         = " + koCor + "\n";
@@ -854,7 +827,7 @@ public class Database extends SQLiteJDBCDriverConnection {
             txtret += "(debug) ko = " + "KeywordImage" + "(" + rs.getString("id_local") + ")" + "\n";
             ko += 1;
             koCor += removeKeywordImages(rs.getString("id_local"));
-            Main.visuProgress(progress,txtPr,numRow++,numRowMax);
+            Main.visuProgress(progress, txtPr, numRow++, numRowMax);
         }
         txtret += " nb KeyImg Without Img  = " + ko + "\n";
         txtret += "    --- corrige         = " + koCor + "\n";
@@ -885,7 +858,7 @@ public class Database extends SQLiteJDBCDriverConnection {
             txtret += "(debug) ko = " + "folder_id_local" + "(" + rs.getString("folder_id_local") + ")" + " pathFromRoot => " + rs.getString("pathFromRoot") + "\n";
             ko += 1;
             koCor += sqlDeleteRepertory(rs.getString("folder_id_local"));
-            Main.visuProgress(progress,txtPr,numRow++,numRowMax);
+            Main.visuProgress(progress, txtPr, numRow++, numRowMax);
         }
         txtret += " nb folder without Root = " + ko + "\n";
         txtret += "    --- corrige         = " + koCor + "\n";
@@ -919,8 +892,7 @@ public class Database extends SQLiteJDBCDriverConnection {
             String sql = "INSERT INTO AgLibraryKeyword (id_local, id_global, dateCreated, " +
                     "genealogy, imageCountCache, includeOnExport, includeParents, includeSynonyms, " +
                     "keywordType, lastApplied, lc_name, name, parent) " +
-                    "VALUES (" +
-                    "" + idlocal + " , " +
+                    "VALUES (" + idlocal + " , " +
                     "'" + UUID.randomUUID() + "', " +
                     "'608509497.846982', " +
                     "'" + idforKeywordMaitre.get("genealogy") + "/8" + idlocal + "', " +
@@ -1106,7 +1078,7 @@ public class Database extends SQLiteJDBCDriverConnection {
             String pathFromRoot = rs.getString("pathFromRoot");
             String[] split = pathFromRoot.split("/");
             String tag = split[split.length - 1] + tagorg;
-            ret.put(tag, normalizePath(absolutePath + pathFromRoot ));
+            ret.put(tag, normalizePath(absolutePath + pathFromRoot));
         }
         return ret;
     }
@@ -1231,8 +1203,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         String dest = normalizePath(normalizePath(destination + File.separator).replace(normalizePath(src.get("absolutePath")), ""));
 
         String sql;
-        sql = "" +
-                "update AgLibraryFolder " +
+        sql = "update AgLibraryFolder " +
                 "set pathFromRoot = " +
                 "replace( pathFromRoot, '" + src.get("pathFromRoot") + "' , '" + dest + "' ) " +
                 "where id_local = '" + src.get("Folderidlocal") + "' " +
@@ -1311,9 +1282,9 @@ public class Database extends SQLiteJDBCDriverConnection {
         return listTmp;
     }
 
-    public String retWhereIAm(String methodName,int... len) {
+    public String retWhereIAm(String methodName, int... len) {
         String ret = methodName;
-        int lenD = len.length > 0 ? len[0] : 130;;
+        int lenD = len.length > 0 ? len[0] : 130;
         int length = methodName.length();
         if (length < lenD) {
             int lngMid = (lenD - length) / 2;
@@ -1332,6 +1303,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         standardRS.close();
         return size;
     }
+
     public int getQueryRowCount(ResultSet standardRS) throws SQLException {
         //ResultSet standardRS = select(query);
         int size = 0;
@@ -1339,6 +1311,95 @@ public class Database extends SQLiteJDBCDriverConnection {
             size++;
         }
         return size;
+    }
+
+    public List<String> getAllFilesLogiques() throws SQLException {
+        String sql = "select " +
+                "c.absolutePath , " +
+                "b.pathFromRoot , " +
+                "a.baseName as baseName , " +
+                "a.extension as extension , " +
+                "a.originalFilename as originalFilename , " +
+                "a.sidecarExtensions as sidecarExtensions , " +
+                "a.idx_filename as idx_filename , " +
+                "a.lc_idx_filename as lc_idx_filename , " +
+                "c.id_local as path_id_local , " +
+                "b.id_local as folder_id_local , " +
+                "a.id_local as file_id_local  , " +
+                "b.rootFolder " +
+                "from AgLibraryFile a  " +
+                "inner join AgLibraryFolder b   " +
+                " on a.folder = b.id_local  " +
+                "inner join AgLibraryRootFolder c   " +
+                " on b.rootFolder = c.id_local  " +
+//                "order by c.absolutePath ,  b.pathFromRoot , a.lc_idx_filename " +
+                ";";
+        ResultSet rs = select(sql);
+        List<String> listFilesLogique = new ArrayList<>();
+        while (rs.next()) {
+//            listFilesLogique.add(normalizePath(rs.getString("absolutePath") + rs.getString("pathFromRoot") + rs.getString("idx_filename")));
+//            listFilesLogique.add(normalizePath(rs.getString("absolutePath") + rs.getString("pathFromRoot") + rs.getString("baseName") + "." + rs.getString("extension")));
+//            listFilesLogique.add(normalizePath(rs.getString("absolutePath") + rs.getString("pathFromRoot") + rs.getString("lc_idx_filename")).toLowerCase());
+//            listFilesLogique.add(normalizePath(rs.getString("absolutePath") + rs.getString("pathFromRoot") + rs.getString("baseName") + "." + rs.getString("extension")).toLowerCase());
+//[INFO ] 2023-10-16 03:06:41.002 [main] Main:684 -  nb path logique  = 68705 : absent logique in physique = 173
+//[INFO ] 2023-10-16 03:06:41.003 [main] Main:685 -  nb path physique = 68791 : absent physique in logique = 259
+//            listFilesLogique.add(normalizePath(rs.getString("absolutePath") + rs.getString("pathFromRoot") + rs.getString("baseName") + "." + rs.getString("extension")));
+//[INFO ] 2023-10-16 08:19:37.806 [main] Main:684 -  nb path logique  = 68705 : absent logique in physique = 1224
+//[INFO ] 2023-10-16 08:19:37.807 [main] Main:685 -  nb path physique = 68791 : absent physique in logique = 1310
+            listFilesLogique.add(normalizePath(rs.getString("absolutePath") + rs.getString("pathFromRoot") + rs.getString("idx_filename")));
+//[INFO ] 2023-10-16 08:24:14.405 [main] Main:684 -  nb path logique  = 68705 : absent logique in physique = 200
+//[INFO ] 2023-10-16 08:24:14.405 [main] Main:685 -  nb path physique = 68791 : absent physique in logique = 286
+//[INFO ] 2023-10-18 02:13:14.005 [main] Main:684 -  nb path logique  = 68684 : absent logique in physique = 29
+//[INFO ] 2023-10-18 02:13:14.006 [main] Main:685 -  nb path physique = 69001 : absent physique in logique = 346
+//[INFO ] 2023-10-18 23:49:26.826 [main] Main:748 -  nb path logique  = 68713 : absent logique in physique = 57
+//[INFO ] 2023-10-18 23:49:26.826 [main] Main:749 -  nb path physique = 69001 : absent physique in logique = 345
+//            listFilesLogique.add(normalizePath(rs.getString("absolutePath") + rs.getString("pathFromRoot")
+//                    + rs.getString("baseName") + rs.getString("originalFilename").substring(rs.getString("originalFilename").lastIndexOf("."))));
+//[INFO ] 2023-10-18 23:59:52.464 [main] Main:748 -  nb path logique  = 68713 : absent logique in physique = 1054
+//[INFO ] 2023-10-18 23:59:52.464 [main] Main:749 -  nb path physique = 69001 : absent physique in logique = 1342
+
+            String[] elements = rs.getString("sidecarExtensions").split(",");
+            // Iterate over the elements using a for-each loop
+            for (String element : elements) {
+                if (element.compareTo("") != 0) {
+                    if (element.compareTo("lrbak") == 0) {
+                        listFilesLogique.add(normalizePath(rs.getString("absolutePath") + rs.getString("pathFromRoot") + rs.getString("idx_filename") + "." + element));
+                    } else {
+                        listFilesLogique.add(normalizePath(rs.getString("absolutePath") + rs.getString("pathFromRoot") + rs.getString("baseName") + "." + element));
+                    }
+                }
+            }
+        }
+
+        Collections.sort(listFilesLogique);
+        return listFilesLogique;
+
+    }
+
+    public String sqlGetSidecarExtensions(long scrFileIdLocal) throws SQLException {
+        String sql = "select " +
+                "a.sidecarExtensions as sidecarExtensions " +
+                "from AgLibraryFile a  " +
+                "where a.id_local =  " + scrFileIdLocal + " " +
+                ";";
+        ResultSet rs = select(sql);
+        while (rs.next()) {
+            return rs.getString("sidecarExtensions");
+        }
+        return "";
+    }
+
+    public String getFileByHash(String hash) throws SQLException {
+        String sql = "select " +
+                "a.id_local as id_local " +
+                "from AgLibraryFile a  " +
+                "where a.importHash like '" + hash + "' " +
+                ";";
+        ResultSet rs = select(sql);
+        while (rs.next()) {
+            return rs.getString("id_local");
+        }
+        return "";
     }
 }
 

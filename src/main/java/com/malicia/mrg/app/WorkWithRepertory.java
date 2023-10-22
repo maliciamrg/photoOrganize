@@ -24,7 +24,42 @@ public class WorkWithRepertory {
         throw new IllegalStateException("Utility class");
     }
 
-    public static boolean deleteEmptyRep(String fileLocation, JProgressBar progress) throws IOException {
+    public static boolean deleteEmptyRep(File directory, JProgressBar progress) throws IOException {
+        FileFilter fileFilter = new FileFilter(){
+            public boolean accept(File dir) {
+                if (dir.isDirectory()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
+
+        // Check if the directory is empty
+        if (directory.isDirectory() && directory.list().length == 0) {
+            LOGGER.debug("Deleting empty directory: " + directory.getAbsolutePath());
+            if (directory.delete()) {
+                LOGGER.debug("Directory deleted successfully.");
+            } else {
+                LOGGER.debug("Failed to delete the directory.");
+            }
+        } else {
+            // If not empty, iterate over its contents
+            File[] subDirectories = directory.listFiles(fileFilter);
+
+            if (subDirectories != null) {
+                int j = 0;
+                for (File subDirectory : subDirectories) {
+                    j++;
+                    Main.visuProgress(progress,directory.toString(),j,subDirectories.length);
+                    // Recursive call for subdirectories
+                    deleteEmptyRep(subDirectory,progress);
+                }
+            }
+        }
+        return true;
+    }
+    public static boolean deleteEmptyRep_old(String fileLocation, JProgressBar progress) throws IOException {
         FileFilter fileFilter = new FileFilter(){
             public boolean accept(File dir) {
                 if (dir.isDirectory()) {
@@ -48,7 +83,7 @@ public class WorkWithRepertory {
                 File file = listFiles[j];
                 Main.visuProgress(progress,fileLocation,j,listFiles.length);
                 if (file.isDirectory()) {
-                    isFinished = isFinished & deleteEmptyRep(file.getAbsolutePath(), progress);
+                    isFinished = isFinished & deleteEmptyRep_old(file.getAbsolutePath(), progress);
                 }
             }
 
@@ -91,16 +126,5 @@ public class WorkWithRepertory {
         }
     }
 
-
-    public static void sqlMkdirRepertory(String directoryName, Database dbLr) throws SQLException {
-
-        File fdirectoryName = new File(directoryName);
-        if (!fdirectoryName.exists()) {
-            SystemFiles.mkdir(directoryName);
-            if (dbLr == null) {
-                dbLr.makeRepertory(directoryName);
-            }
-        }
-    }
 
 }

@@ -6,7 +6,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
@@ -23,50 +25,35 @@ public class Context {
     public static final String GREEN = "Green";
     public static final String TAG_ORG = "#ORG#";
     public static final String TAG_RAPPROCHEMENT = TAG_ORG + "RAPPROCHEMENT";
-    public static final String TAG_REPSWEEP = TAG_ORG + "REPSWEEP";
     public static final String TAG_ACTION_GO = "GO" + "->";
     public static final String TAG_ACTION_GO_RAPPROCHEMENT = TAG_ACTION_GO + Context.TAG_RAPPROCHEMENT;
+    public static final String TAG_REPSWEEP = TAG_ORG + "REPSWEEP";
     public static final String COLLECTIONS = "!!Collections";
     public static final String POSSIBLE_NEW_GROUP = "possibleRegroupement";
     public static final String PREFIX = " --- ";
     public static final int INT_WIDTH = 120;
-    private static final String JSON = ".json";
-    private static final Logger LOGGER = LogManager.getLogger(Context.class);
     public static final String ERR_404_JPG = "D:\\JavaProjet\\photoOrganize\\src\\main\\resources\\err404.jpg";
     public static final String JPG = "jpg";
-    public static int nbDiscretionnaire = 0;
-    public static String localVoidPhotoUrl;
-    public static String localErr404PhotoUrl;
-    public static String localErrPhotoUrl;
-
-    public Workflow workflow;
-    public final ActionRepertoire actionVersRepertoire;
-    public final List<RepertoirePhoto> arrayRepertoirePhoto = new ArrayList<>();
-    public ControleRepertoire paramControleRepertoire;
-    public RepertoireFonctionnel repFonctionnel;
-    public ElementsRejet paramElementsRejet;
-    public TriNew paramTriNew;
-    public DataApplication dataApplication;
-
     public static final String filtreImportScanUn = " left join AgLibraryKeywordImage ki " +
             " on ki.image = e.id_local " +
             " left join AgLibraryKeyword k " +
             " on k.id_local = ki.tag ";
     public static final String filtreImportScanDeux = " and k.lc_name != 'import_argentique_bf_evolution' ";
-
-    @Override
-    public String toString() {
-        return "Context{" +
-                "workflow=" + workflow +
-                ", actionVersRepertoire=" + actionVersRepertoire +
-                ", arrayRepertoirePhoto=" + arrayRepertoirePhoto +
-                ", paramControleRepertoire=" + paramControleRepertoire +
-                ", repFonctionnel=" + repFonctionnel +
-                ", paramElementsRejet=" + paramElementsRejet +
-                ", paramTriNew=" + paramTriNew +
-                '}';
-    }
-
+    private static final String JSON = ".json";
+    private static final Logger LOGGER = LogManager.getLogger(Context.class);
+    public static int nbDiscretionnaire = 0;
+    public static String localVoidPhotoUrl;
+    public static String localErr404PhotoUrl;
+    public static String localErrPhotoUrl;
+    public final ActionRepertoire actionVersRepertoire;
+    public final List<RepertoirePhoto> arrayRepertoirePhoto = new ArrayList<>();
+    public Workflow workflow;
+    public ControleRepertoire paramControleRepertoire;
+    public RepertoireFonctionnel repFonctionnel;
+    public ElementsRejet paramElementsRejet;
+    public List<String> extensionsUseFile;
+    public TriNew paramTriNew;
+    public DataApplication dataApplication;
     public Context() throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, URISyntaxException {
 
 
@@ -78,7 +65,7 @@ public class Context {
 //        arrayRepertoirePhoto.add((RepertoirePhoto) RepertoirePhoto.readJSON(RepertoirePhoto.class, getResourceAsStream("repertoirePhoto-Sauvegarde.json")));
 //        arrayRepertoirePhoto.add((RepertoirePhoto) RepertoirePhoto.readJSON(RepertoirePhoto.class, getResourceAsStream("repertoirePhoto-Shooting.json")));
 //        repFonctionnel = (RepertoireFonctionnel) RepertoireFonctionnel.readJSON(RepertoireFonctionnel.class, getResourceAsStream("RepertoireFonctionnel.json"));
- //       paramControleRepertoire = (ControleRepertoire) ControleRepertoire.readJSON(ControleRepertoire.class, getResourceAsStream("ControleRepertoire.json"));
+        //       paramControleRepertoire = (ControleRepertoire) ControleRepertoire.readJSON(ControleRepertoire.class, getResourceAsStream("ControleRepertoire.json"));
 //        paramTriNew = (TriNew) TriNew.readJSON(TriNew.class, getResourceAsStream("TriNew.json"));
 
         actionVersRepertoire = new ActionRepertoire();
@@ -91,19 +78,19 @@ public class Context {
 
     }
 
-    public static Context YamlConfigRunner (String args) throws IOException, URISyntaxException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        if( args.compareTo("") == 1 ) {
-            System.out.println( "Usage: <file.yml>" );
+    public static Context YamlConfigRunner(String args) throws IOException, URISyntaxException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        if (args.compareTo("") == 1) {
+            System.out.println("Usage: <file.yml>");
             return null;
         }
 
         Context contexte = new Context();
         Yaml yaml = new Yaml();
 
-        try( InputStream in = Context.class.getResourceAsStream("/" + args)) {
+        try (InputStream in = Context.class.getResourceAsStream("/" + args)) {
 //        try( InputStream in = Files.newInputStream( Paths.get( args ) ) ) {
-            contexte = yaml.loadAs( in, Context.class );
-            LOGGER.debug(contexte.toString() );
+            contexte = yaml.loadAs(in, Context.class);
+            LOGGER.debug(contexte.toString());
         }
         return contexte;
     }
@@ -112,6 +99,27 @@ public class Context {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         return YamlConfigRunner("ContextApplication.yaml");
+    }
+
+    public List<String> getExtensionsUseFile() {
+        return extensionsUseFile;
+    }
+
+    public void setExtensionsUseFile(List<String> extensionsUseFile) {
+        this.extensionsUseFile = extensionsUseFile;
+    }
+
+    @Override
+    public String toString() {
+        return "Context{" +
+                "workflow=" + workflow +
+                ", actionVersRepertoire=" + actionVersRepertoire +
+                ", arrayRepertoirePhoto=" + arrayRepertoirePhoto +
+                ", paramControleRepertoire=" + paramControleRepertoire +
+                ", repFonctionnel=" + repFonctionnel +
+                ", paramElementsRejet=" + paramElementsRejet +
+                ", paramTriNew=" + paramTriNew +
+                '}';
     }
 
     public ActionRepertoire getActionVersRepertoire() {

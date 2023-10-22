@@ -2,7 +2,8 @@ package com.malicia.mrg;
 
 import com.github.fracpete.processoutput4j.output.StreamingProcessOutput;
 import com.github.fracpete.rsync4j.RSync;
-import com.malicia.mrg.app.*;
+import com.malicia.mrg.app.WorkWithFiles;
+import com.malicia.mrg.app.WorkWithRepertory;
 import com.malicia.mrg.app.rep.AnalyseGlobalRepertoires;
 import com.malicia.mrg.app.rep.BlocRetourRepertoire;
 import com.malicia.mrg.app.rep.EleChamp;
@@ -22,32 +23,40 @@ import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileTime;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
 
-    private static final Logger LOGGER = LogManager.getLogger(Main.class);
-    private static final Logger LOGGER2 = LogManager.getLogger("logger2info");
     public static final String colorTagNew = Context.RED;
     public static final String colorTagWhatsApp = Context.GREEN;
-
+    private static final Logger LOGGER = LogManager.getLogger(Main.class);
+    private static final Logger LOGGER2 = LogManager.getLogger("logger2info");
+    public static final long GMT01JAN200112AM = 978307200;
     private static Context ctx;
     private static Database dbLr;
     private static JFrame frame;
     private static AnalyseGlobalRepertoires analFonctionRep;
     private static JProgressBar progress;
     private static int unNbMisAREDRep = 0;
+    private static String repertoirerejet;
 
     public static void main(String[] args) {
         try {
@@ -61,6 +70,8 @@ public class Main {
 
             // chargement application
             ctx = Context.chargeParam();
+            loadCustomContext();
+
             closelightroom(ctx.dataApplication.getApplicationToClose());
             dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat(), ctx.workflow.IS_DRY_RUN);
 //            AnalyseGlobalRepertoires.init(ctx, dbLr);
@@ -214,6 +225,18 @@ public class Main {
 
     }
 
+    private static void loadCustomContext() throws IllegalStateException {
+        int i;
+        for (i = 0; i < ctx.arrayRepertoirePhoto.size(); i++) {
+            if (ctx.arrayRepertoirePhoto.get(i).getNomunique().contains("Rejet")) {
+                repertoirerejet =ctx.arrayRepertoirePhoto.get(i).getRepertoire();
+            }
+        }
+        if (repertoirerejet.length()<3){
+            throw new IllegalStateException("repertoirerejet = '" + repertoirerejet + "' : length < 3 ");
+        }
+    }
+
     private static void tagretourValRepertoire(List<BlocRetourRepertoire> retourValRepertoire, String color) {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         final int[] nbTopRed = {0};
@@ -235,7 +258,7 @@ public class Main {
                                         String number = formatter.format(nbDiscr);
 //                                            String tag = champ.getCompTagRetour() + "_" + "(" + number +")"  ;
 
-                                        String[] tags = (Context.TAG_REPSWEEP + "_" + TagRetour + " id:" + number + "").replace("[", "").replace("]", "").split("_");
+                                        String[] tags = (Context.TAG_REPSWEEP + "_" + TagRetour + " id:" + number).replace("[", "").replace("]", "").split("_");
 
 
                                         String cletrace = tags[1] + ":" + tags[2];
@@ -300,7 +323,7 @@ public class Main {
 
     private static void closelightroom(String toClose) {
         try {
-            Runtime.getRuntime().exec(toClose) ;
+            Runtime.getRuntime().exec(toClose);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -391,11 +414,11 @@ public class Main {
     private static void reTAGlesColorTagARED(String color) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
-        int unNbMisARED = dbLr.deTopperAColorOld50NEW(new String[] {ctx.getParamTriNew().getRepertoire50NEW(),ctx.getRepertoire00NEW()}, color);
+        int unNbMisARED = dbLr.deTopperAColorOld50NEW(new String[]{ctx.getParamTriNew().getRepertoire50NEW(), ctx.getRepertoire00NEW()}, color);
         loggerInfo("UnTag a RED " + String.format("%05d", unNbMisARED) + " - images ", unNbMisARED);
 
         dbLr.MiseAzeroDesColorLabels("rouge");
-        int nbMisARED = dbLr.topperARed50NEW(new String[] {ctx.getParamTriNew().getRepertoire50NEW(),ctx.getRepertoire00NEW()}, color);
+        int nbMisARED = dbLr.topperARed50NEW(new String[]{ctx.getParamTriNew().getRepertoire50NEW(), ctx.getRepertoire00NEW()}, color);
         loggerInfo("Tag a RED " + String.format("%05d", nbMisARED) + " - images ", nbMisARED);
 
         unNbMisAREDRep = dbLr.deTopperARedOldRepertoire(color.toLowerCase(Locale.ROOT));
@@ -406,11 +429,11 @@ public class Main {
     private static void reTAGlesColorTagAGREEN(String color) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
-        int unNbMisAGREEN = dbLr.deTopperAColorOld50NEW(new String[] {ctx.getParamTriNew().getRepertoire50NEW(),ctx.getRepertoire00NEW()}, color);
+        int unNbMisAGREEN = dbLr.deTopperAColorOld50NEW(new String[]{ctx.getParamTriNew().getRepertoire50NEW(), ctx.getRepertoire00NEW()}, color);
         loggerInfo("UnTag a GREEN " + String.format("%05d", unNbMisAGREEN) + " - images ", unNbMisAGREEN);
 
 //        dbLr.MiseAzeroDesColorLabels("green");
-        int nbMisAGREEN = dbLr.topperAGreen50NEW(new String[] {ctx.getParamTriNew().getRepertoire50NEW(),ctx.getRepertoire00NEW()}, color);
+        int nbMisAGREEN = dbLr.topperAGreen50NEW(new String[]{ctx.getParamTriNew().getRepertoire50NEW(), ctx.getRepertoire00NEW()}, color);
         loggerInfo("Tag a GREEN " + String.format("%05d", nbMisAGREEN) + " - images ", nbMisAGREEN);
 
 //        unNbMisAGREENRep = dbLr.deTopperARedOldRepertoire(color.toLowerCase(Locale.ROOT));
@@ -423,9 +446,9 @@ public class Main {
 
         String txt = "\n";
         if (Boolean.TRUE.equals(ctx.workflow.IS_DRY_RUN)) {
-            txt += "" + "\n";
+            txt += "\n";
             txt += "   --DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN--   " + "\n";
-            txt += "" + "\n";
+            txt += "\n";
 
         }
         txt += "   -------------------------------ACTION PREVU--------------------------------------   " + "\n";
@@ -519,18 +542,17 @@ public class Main {
 
         //Action GO
         Map<String, Map<String, String>> fileToGo = dbLr.getFileForGoTag(Context.TAG_ACTION_GO_RAPPROCHEMENT);
-        loggerInfo("nb de fichier tagger : " + Context.TAG_ACTION_GO_RAPPROCHEMENT + " => " + String.format("%05d", fileToGo.size()) + "", fileToGo.size());
+        loggerInfo("nb de fichier tagger : " + Context.TAG_ACTION_GO_RAPPROCHEMENT + " => " + String.format("%05d", fileToGo.size()), fileToGo.size());
         int nb = 0;
-        for (String key : fileToGo.keySet()) {
-            Map<String, String> forGoTag = dbLr.getNewPathForGoTagandFileIdlocal(Context.TAG_ORG, key);
+        for (String scrFileIdLocal : fileToGo.keySet()) {
+            Map<String, String> forGoTag = dbLr.getNewPathForGoTagandFileIdlocal(Context.TAG_ORG, scrFileIdLocal);
             if (forGoTag.size() > 0) {
                 nb++;
-                String source = fileToGo.get(key).get("oldPath");
+                String source = fileToGo.get(scrFileIdLocal).get("oldPath");
                 String newPath = forGoTag.get("newPath");
-                if(new File(source).exists() && !new File(newPath).exists()) {
+                if (new File(source).exists() && !new File(newPath).exists()) {
                     LOGGER.debug("---move " + Context.TAG_ACTION_GO_RAPPROCHEMENT + " : " + source + " -> " + newPath);
-                    SystemFiles.moveFile(source, newPath);
-                    dbLr.sqlmovefile(key, newPath);
+                    Function.moveFile(source, newPath, dbLr);
                     dbLr.removeKeywordImages(forGoTag.get("kiIdLocal"));
                 }
             }
@@ -542,14 +564,13 @@ public class Main {
         for (String key : listeAction.keySet()) {
             Map<String, Map<String, String>> fileToTag = dbLr.sqllistAllFileWithTagtoRep(key, listeAction.get(key));
             loggerInfo("move " + String.format("%05d", fileToTag.size()) + " - " + key, fileToTag.size());
-            for (String keyt : fileToTag.keySet()) {
-                String oldPath = fileToTag.get(keyt).get("oldPath");
-                String newPath = fileToTag.get(keyt).get("newPath");
-                if(new File(oldPath).exists() && !new File(newPath).exists()) {
+            for (String scrFileIdLocal : fileToTag.keySet()) {
+                String oldPath = fileToTag.get(scrFileIdLocal).get("oldPath");
+                String newPath = fileToTag.get(scrFileIdLocal).get("newPath");
+                if (new File(oldPath).exists() && !new File(newPath).exists()) {
                     LOGGER.debug("---move " + key + " : " + oldPath + " -> " + newPath);
-                    SystemFiles.moveFile(oldPath, newPath);
-                    dbLr.sqlmovefile(keyt, newPath);
-                    dbLr.removeKeywordImages(fileToTag.get(keyt).get("kiIdLocal"));
+                    Function.moveFile(oldPath, newPath, dbLr);
+                    dbLr.removeKeywordImages(fileToTag.get(scrFileIdLocal).get("kiIdLocal"));
                 }
             }
         }
@@ -589,7 +610,7 @@ public class Main {
         progress = new JProgressBar();
         progress.setValue(0);
         progress.setStringPainted(true);
-        progress.setSize(500,500);
+        progress.setSize(500, 500);
 
         frame.getContentPane().add(progress, BorderLayout.SOUTH);
         frame.getContentPane().add(jConsoleScroll, BorderLayout.CENTER);
@@ -616,11 +637,304 @@ public class Main {
         splitLOGGERInfo(isMoreZeroComm(dbLr.keywordImageWithoutKeyword(progress)));
         progress.setString("");
     }
-    private static void synchroDatabase() throws SQLException {
+
+    private static void synchroDatabase() throws SQLException, IOException, ParseException, InterruptedException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        splitLOGGERInfo(isMoreZeroComm(dbLr.pathAbsentPhysique(progress)));
-        splitLOGGERInfo(isMoreZeroComm(dbLr.folderAbsentPhysique(progress)));
+
+
+
+//        List<String> listFilesPh = WorkWithFiles.getAllFiles(dbLr.getAllAbsolutePath(), ctx.paramElementsRejet.getArrayNomFileRejet(), ctx.getArrayNomSubdirectoryRejet(), progress);
+        List<String> extensionsUseFile = new ArrayList<>() ;
+        extensionsUseFile.addAll(ctx.getExtensionsUseFile());
+        extensionsUseFile.addAll(ctx.getParamElementsRejet().getarrayExtensionFileRejetSup());
+
+        List<String> nomSubdirectoryRejet = new ArrayList<>() ;
+        nomSubdirectoryRejet.addAll(ctx.getArrayNomSubdirectoryRejet());
+        nomSubdirectoryRejet.addAll(ctx.getParamElementsRejet().getArrayNomSubdirectoryRejet());
+        nomSubdirectoryRejet.add(repertoirerejet);
+
+        List<String> listFilesPh = WorkWithFiles.getAllFiles2(dbLr.getAllAbsolutePath(), extensionsUseFile, nomSubdirectoryRejet, progress);
+        List<String> listFilesLog = dbLr.getAllFilesLogiques();
+
+        analyseFilePhysiqueAndLogiques(listFilesPh, listFilesLog);
+
+//        splitLOGGERInfo(isMoreZeroComm(dbLr.pathAbsentPhysique(progress)));
+//        splitLOGGERInfo(isMoreZeroComm(dbLr.folderAbsentPhysique(progress)));
         progress.setString("");
+    }
+
+    private static void analyseFilePhysiqueAndLogiques(List<String> listFilesPh, List<String> listFilesLog) throws SQLException, IOException, ParseException, InterruptedException {
+        List<String> listFilesNotInLog = new ArrayList<>();
+        int koPhy = 0;
+        int koLog = 0;
+
+//        int posLog = 0;
+        int nbLog = listFilesLog.size();
+
+//        int posPhy = 0;
+        int nbPhy = listFilesPh.size();
+
+        System.out.println("Differences between listFilesPh and listFilesLog:");
+
+        Iterator<String> iterPh = listFilesPh.listIterator();
+        Iterator<String> iterLo = listFilesLog.listIterator();
+
+        String elemPh = iterPh.hasNext() ? iterPh.next() : null;
+        String elemLo = iterLo.hasNext() ? iterLo.next() : null;
+
+        while (elemPh != null || elemLo != null) {
+            int compareResult;
+
+//            if(elemLo.toLowerCase().endsWith("2337.mov") || elemPh.toLowerCase().endsWith("2337.mov")){
+//                int stop = 1;
+//            }
+
+            if (elemPh == null) {
+                compareResult = 1; // listFilesPh is exhausted
+            } else if (elemLo == null) {
+                compareResult = -1; // listFilesLog is exhausted
+            } else {
+                compareResult = elemPh.compareTo(elemLo);
+            }
+
+            if (compareResult < 0) {
+                System.out.println("not in listFilesLog - " + elemPh + "");
+                listFilesNotInLog.add(elemPh);
+                koPhy++;
+                elemPh = iterPh.hasNext() ? iterPh.next() : null;
+            } else if (compareResult > 0) {
+                System.out.println("not in listFilesPh  - " + elemLo + " ");
+                koLog++;
+                elemLo = iterLo.hasNext() ? iterLo.next() : null;
+            } else {
+                // Elements are equal, move both iterators forward
+                elemPh = iterPh.hasNext() ? iterPh.next() : null;
+                elemLo = iterLo.hasNext() ? iterLo.next() : null;
+            }
+        }
+
+        //------------------------------------------------
+        //correct physique file in double in lowercase (db can handler only one unique folder+lc_idx_filename)
+        List<String> listFilesToRename = new ArrayList<>();
+
+        Collections.sort(listFilesNotInLog);
+
+        Iterator<String> iterPhDup = listFilesPh.listIterator();
+        Iterator<String> iterPhNotLo = listFilesNotInLog.listIterator();
+
+        String elemPhDup = iterPhDup.hasNext() ? iterPhDup.next() : null;
+        String elemPhNotLo = iterPhNotLo.hasNext() ? iterPhNotLo.next() : null;
+
+        while (elemPhDup != null || elemPhNotLo != null) {
+            int compareResult;
+
+            if (elemPhDup == null) {
+                compareResult = 1; // listFilesPh is exhausted
+            } else if (elemPhNotLo == null) {
+                compareResult = -1; // listFilesLog is exhausted
+            } else {
+                compareResult = elemPhDup.toLowerCase().compareTo(elemPhNotLo.toLowerCase());
+            }
+
+            if (compareResult < 0) {
+                elemPhDup = iterPhDup.hasNext() ? iterPhDup.next() : null;
+            } else if (compareResult > 0) {
+                elemPhNotLo = iterPhNotLo.hasNext() ? iterPhNotLo.next() : null;
+            } else {
+                // Elements are equal, move both iterators forward
+                elemPhDup = iterPhDup.hasNext() ? iterPhDup.next() : null;
+                while (elemPhDup != null && elemPhDup.toLowerCase().compareTo(elemPhNotLo.toLowerCase()) == 0 ) {
+                    listFilesToRename.add(elemPhDup);
+                    elemPhDup = iterPhDup.hasNext() ? iterPhDup.next() : null;
+                }
+                elemPhNotLo = iterPhNotLo.hasNext() ? iterPhNotLo.next() : null;
+            }
+        }
+
+        Iterator<String> iterPhRen = listFilesToRename.listIterator();
+        String elemPhRep = iterPhRen.hasNext() ? iterPhRen.next() : null;
+        int koRenameDo = 0;
+        while (elemPhRep != null ) {
+
+            String generatedString = new Random().ints(48, 122 + 1)
+                    .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
+                    .limit(5)
+                    .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                    .toString();
+
+            //rename to rejet dans meme repertoire
+            String oldName = elemPhRep;
+            String newName = elemPhRep.substring(0,elemPhRep.lastIndexOf(".")) + "_" + generatedString + elemPhRep.substring(elemPhRep.lastIndexOf("."));
+//            File fsource = new File(oldName);
+//            File fdest = new File(newName);
+//            if (fsource.exists() && fsource.isFile() && !fdest.exists()) {
+//                Function.renameFile(oldName, newName, dbLr);
+//                koRenameDo++;
+//            }
+            koRenameDo = koRenameDo + Function.moveFile(oldName, newName, dbLr);
+            elemPhRep = iterPhRen.hasNext() ? iterPhRen.next() : null;
+        }
+
+        //------------------------------------------------
+
+
+        //------------------------------------------------
+        //correct logique extension lowercase/uppercase
+        //correct logique filename lowercase/uppercase
+        List<List<String>> listLoIdxFilenameToUpdate = new ArrayList<>();
+
+        Collections.sort(listFilesNotInLog);
+
+        Iterator<String> iterLoRe = listFilesLog.listIterator();
+        Iterator<String> iterPhNotLog = listFilesNotInLog.listIterator();
+
+        String elemLoRe = iterLoRe.hasNext() ? iterLoRe.next() : null;
+        String elemPhNotLog = iterPhNotLog.hasNext() ? iterPhNotLog.next() : null;
+
+        while (elemLoRe != null || elemPhNotLog != null) {
+            int compareResult;
+
+            if (elemLoRe == null) {
+                compareResult = 1; // listFilesPh is exhausted
+            } else if (elemPhNotLog == null) {
+                compareResult = -1; // listFilesLog is exhausted
+            } else {
+                compareResult = elemLoRe.toLowerCase().compareTo(elemPhNotLog.toLowerCase());
+            }
+
+            if (compareResult < 0) {
+                elemLoRe = iterLoRe.hasNext() ? iterLoRe.next() : null;
+            } else if (compareResult > 0) {
+                elemPhNotLog = iterPhNotLog.hasNext() ? iterPhNotLog.next() : null;
+            } else {
+                // Elements are equal, move both iterators forward
+                if (elemLoRe.compareTo(elemPhNotLog)!=0){
+                    listLoIdxFilenameToUpdate.add(Arrays.asList(elemLoRe,elemPhNotLog));
+                }
+                elemLoRe = iterLoRe.hasNext() ? iterLoRe.next() : null;
+                elemPhNotLog = iterPhNotLog.hasNext() ? iterPhNotLog.next() : null;
+            }
+        }
+
+        Iterator<List<String>> iterLoIdxUp = listLoIdxFilenameToUpdate.listIterator();
+        List<String> elemLoIdxUp = iterLoIdxUp.hasNext() ? iterLoIdxUp.next() : null;
+        int koLoExtUpdateDo = 0;
+        while (elemLoIdxUp != null ) {
+            int ret = Function.moveFile(elemLoIdxUp.get(0), elemLoIdxUp.get(1), dbLr);
+            if (ret>0) {
+                koLoExtUpdateDo = koLoExtUpdateDo + ret;
+                listFilesNotInLog.remove(elemLoIdxUp.get(1));
+            }
+            elemLoIdxUp = iterLoIdxUp.hasNext() ? iterLoIdxUp.next() : null;
+        }
+        //------------------------------------------------
+
+
+        //------------------------------------------------
+        //move physique lost sidecar to rejet
+        List<String> listPhLostSidecarToRejet = new ArrayList<>();
+        int koPhLostSidecarToRejetDo =0;
+        for (String element : listFilesNotInLog) {
+            for (String suffix : ctx.getParamElementsRejet().getarrayExtensionFileRejetSup()) {
+                if (element.toLowerCase().endsWith(suffix.toLowerCase())) {
+                    listPhLostSidecarToRejet.add(element);
+                    break;  // If a match is found, break out of the inner loop
+                }
+            }
+        }
+        koPhLostSidecarToRejetDo = putThatInRejet(listPhLostSidecarToRejet);
+        //------------------------------------------------
+
+        //------------------------------------------------
+        //move physique already hash in database to rejet
+        int koPhHashExistToRejetDo =0;
+        for (String element : listFilesNotInLog) {
+                if (dbLr.getFileByHash(lrHashOf(element)).compareTo("")!=0) {
+                    koPhHashExistToRejetDo = koPhHashExistToRejetDo + moveTo99Rejet(element);
+                }
+        }
+
+        //------------------------------------------------
+        //move physique file start with dot
+        int koPhStartDotDo = 0;
+        String baseNameNew = "";
+        for (String element : listFilesNotInLog) {
+            String baseName = FilenameUtils.getBaseName(element);
+            if (baseName.startsWith(".")) {
+                baseNameNew = baseName;
+                while (baseNameNew.startsWith(".")) {
+                    baseNameNew = baseNameNew.substring(1);
+                }
+                koPhStartDotDo = koPhStartDotDo + Function.moveFile(element, element.replace(baseName,baseNameNew), dbLr);
+            }
+        }
+        //------------------------------------------------
+
+//        //------------------------------------------------
+//        //create physique avi file for gif
+//        int koPhGifAviDo = 0;
+//        for (String element : listFilesNotInLog) {
+//            if (element.toLowerCase().endsWith("gif")) {
+//
+//                // FFmpeg command
+//                String ffmpegCommand = "Y:\\95_Boite_a_outils\\ffmpeg\\bin\\ffmpeg -y -i  \"" + element + "\" -filter_complex \"[0:v] fps=15\" -vsync 0 -f mp4 \"" + element.substring(0,element.lastIndexOf(".")) + ".mp4\" ";
+//
+//                try {
+//                    // Run FFmpeg command
+//                    ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c" , ffmpegCommand);
+//                    processBuilder.redirectErrorStream(true);
+//                    Process process = processBuilder.start();
+//                    // Wait for the process to finish
+////                    int exitCode = process.waitFor();
+//                    Thread.sleep(4000);
+//
+//                    // Print the exit code (0 usually means success)
+////                    System.out.println("FFmpeg process exited with code: " + exitCode);
+//
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                LOGGER.info(ffmpegCommand);
+//                koPhGifAviDo++;
+//            }
+//        }
+//        //------------------------------------------------
+
+
+        LOGGER.info(" nb path logique  = " + nbLog + " : absent logique in physique = " + koLog + "\n");
+        LOGGER.info(" nb path physique = " + nbPhy + " : absent physique in logique = " + koPhy + "\n");
+        LOGGER.info("    --- corrige Physique lc_duplicate            : toDo = " + listFilesToRename.size() + " , Done = " + koRenameDo + "\n");
+        LOGGER.info("    --- corrige Correct logique U/L case         : toDo = " + listLoIdxFilenameToUpdate.size() + " , Done = " + koLoExtUpdateDo + "\n");
+        LOGGER.info("    --- corrige physique lost sidecar to rejet   : toDo = " + listPhLostSidecarToRejet.size() + " , Done = " + koPhLostSidecarToRejetDo + "\n");
+        LOGGER.info("    --- corrige physique hash already exist      : -------------- Done = " + koPhHashExistToRejetDo + "\n");
+        LOGGER.info("    --- corrige physique start dot               : -------------- Done = " + koPhStartDotDo + "\n");
+//        LOGGER.info("    --- corrige physique gif avi                 : -------------- Done = " + koPhGifAviDo + "\n");
+        //LOGGER.info("    --- corrige Physique         = " + "koPhyCor" + "\n");
+        //LOGGER.info("    --- corrige Logique          = " + "koLogCor" + "\n");
+        LOGGER.info("\n");
+    }
+
+    private static String lrHashOf(String file) throws IOException, ParseException {
+        //706893605.66357:img_2337.MOV:86632353
+        //modtime(windows):filename:sizeinbytes
+
+        Path filePath = Paths.get(file);
+        FileTime fileTime = Files.getLastModifiedTime(filePath);
+        // Convert the FileTime to microsecond
+        long unixTimeMicro = fileTime.to(TimeUnit.MICROSECONDS);
+        double dbFileTime = ((((double) unixTimeMicro) /10) / 100000) - GMT01JAN200112AM;//GMT: Monday, January 1, 2001 12:00:00 AM
+        //--706893605.66357:img_2337.MOV:86632353
+        //==706893605.66357:img_2337.MOV:86632353
+        //--706893555.38844:img_2339.MOV:71847462
+        //==706893555.38844:img_2339.MOV:71847462
+        //--706893554.67468:img_2343.MOV:111480158
+        //==706893554.67467:img_2343.MOV:111480158
+        //708523851:2023-06-15_14-10-51_20230615_141050.jpg:5419618
+//        return new DecimalFormat("#.#####").format(dbFileTime) + ":" + filePath.getFileName() + ":" + String.valueOf(Files.size(filePath));
+//        return new DecimalFormat("#.#####").format(dbFileTime) + ":" + "%" + ":" + String.valueOf(Files.size(filePath));
+        String timestamp = new DecimalFormat("#.#####").format(dbFileTime);
+        String hashLike = timestamp.substring(0, timestamp.length() - 3) + "%:%" + filePath.getFileName() + ":" + String.valueOf(Files.size(filePath));
+        return hashLike;
     }
 
     private static String isMoreZeroComm(String commentaireAAnalyser) {
@@ -689,7 +1003,7 @@ public class Main {
 
         progress.setMaximum(78286);
 
-        Output output1 = new Output(new String[]{"total size is","bytes  received","Number of","deleting"},new String[]{"%"},progress);
+        Output output1 = new Output(new String[]{"total size is", "bytes  received", "Number of", "deleting"}, new String[]{"%"}, progress);
         StreamingProcessOutput output = new StreamingProcessOutput(output1);
         output.monitor(rsync.builder());
 
@@ -722,7 +1036,9 @@ public class Main {
     private static boolean isItTimeToSave() throws IOException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         File syncMouchard = new File(ctx.getRepFonctionnel().getRepertoiresyncdest() + ctx.getRepFonctionnel().getSyncdestmouchard());
-        if (!syncMouchard.exists()){syncMouchard.createNewFile();}
+        if (!syncMouchard.exists()) {
+            syncMouchard.createNewFile();
+        }
         Calendar cal = Calendar.getInstance();
         long lastModified = syncMouchard.lastModified();
         cal.setTime(new Date(lastModified));
@@ -745,7 +1061,7 @@ public class Main {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         //Regroupement
-        String[] repertoire50NEW = new String[]{ctx.getParamTriNew().getRepertoire50NEW(),ctx.getRepertoire00NEW()};
+        String[] repertoire50NEW = new String[]{ctx.getParamTriNew().getRepertoire50NEW(), ctx.getRepertoire00NEW()};
         ResultSet rsele = dbLr.sqlgetListelementnewaclasser(ctx.getParamTriNew().getTempsAdherence(), repertoire50NEW);
 
         GrpPhoto listFileBazar = new GrpPhoto();
@@ -754,7 +1070,7 @@ public class Main {
         GrpPhoto listEletmp = new GrpPhoto();
 
         int numRow = 0;
-        String txtPr =  dbLr.retWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName());
+        String txtPr = dbLr.retWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName());
         int numRowMax = dbLr.getQueryRowCount(dbLr.sqlgetListelementnewaclasser(ctx.getParamTriNew().getTempsAdherence(), repertoire50NEW));
 
         List<String> listkidsModel = ctx.getParamTriNew().getListeModelKidz();
@@ -794,7 +1110,7 @@ public class Main {
                 }
             }
 
-            visuProgress(progress,txtPr,numRow++,numRowMax);
+            visuProgress(progress, txtPr, numRow++, numRowMax);
 
         }
         if (listEletmp.size() > ctx.getParamTriNew().getThresholdNew()) {
@@ -909,7 +1225,7 @@ public class Main {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER2);
 
         for (GrpPhoto listEle : listGrpEletmp) {
-            Map< String , Map<String , Integer>> listeAction = new HashMap<>();
+            Map<String, Map<String, Integer>> listeAction = new HashMap<>();
             if (listEle.size() > 1 && listEle.getArrayRep(Context.IREP_NEW) > 0 && listEle.size() > listEle.getArrayRep(Context.IREP_NEW)) {
                 Context.nbDiscretionnaire++;
                 String nbDiscr = String.format("%1$03X", Context.nbDiscretionnaire);
@@ -927,11 +1243,11 @@ public class Main {
                 List<ElementFichier> lstEleFile = listEle.getLstEleFile();
                 for (i = 0; i < lstEleFile.size(); i++) {
                     String masterKey = lstEleFile.get(i).getAbsolutePath();
-                    if (listeAction.containsKey(masterKey)){
+                    if (listeAction.containsKey(masterKey)) {
 
                         Map<String, Integer> listeValueAction = listeAction.get(masterKey);
                         String valueKey = lstEleFile.get(i).getPathFromRoot();
-                        if (listeValueAction.containsKey(valueKey)){
+                        if (listeValueAction.containsKey(valueKey)) {
                             listeValueAction.replace(valueKey, listeValueAction.get(valueKey) + 1);
                         } else {
                             listeValueAction.put(valueKey, 1);
@@ -940,8 +1256,8 @@ public class Main {
                         listeAction.replace(masterKey, listeValueAction);
 
                     } else {
-                        Map< String , Integer> value = new HashMap<>();
-                        value.put(lstEleFile.get(i).getPathFromRoot(),1);
+                        Map<String, Integer> value = new HashMap<>();
+                        value.put(lstEleFile.get(i).getPathFromRoot(), 1);
                         listeAction.put(masterKey, value);
                     }
                 }
@@ -976,9 +1292,9 @@ public class Main {
                 listEle.deBounce();
                 for (ElementFichier eleGrp : listEle.lstEleFileWithoutDuplicates) {
 
-                    String newName = ctx.getParamTriNew().getRepertoire50NEW() + nomRep + File.separator + addSourceToNameFor(SystemFiles.normalizePath(eleGrp.getAbsolutePath()).compareTo(SystemFiles.normalizePath(ctx.getRepertoire00NEW()))==0,eleGrp.getPathFromRoot(),eleGrp.getLcIdxFilename());
+                    String newName = ctx.getParamTriNew().getRepertoire50NEW() + nomRep + File.separator + addSourceToNameFor(SystemFiles.normalizePath(eleGrp.getAbsolutePath()).compareTo(SystemFiles.normalizePath(ctx.getRepertoire00NEW())) == 0, eleGrp.getPathFromRoot(), eleGrp.getLcIdxFilename());
 //                    LOGGER.info("move from {} to {} " , eleGrp.getPath(), newName );
-                    WorkWithFiles.moveFileintoFolder(eleGrp, newName, dbLr);
+                    Function.moveFile(eleGrp.getPath(), Function.modifyPathIfExistWithRandom(newName), dbLr);
 
                 }
             }
@@ -990,7 +1306,7 @@ public class Main {
             LOGGER.info("Repertoire New - vers Kidz : " + String.format("%05d", listElekidz.lstEleFile.size()));
             for (ElementFichier eleGrp : listElekidz.lstEleFile) {
                 String newName = ctx.getParamTriNew().getRepertoireKidz() + File.separator + eleGrp.getLcIdxFilename();
-                WorkWithFiles.moveFileintoFolder(eleGrp, newName, null);
+                Function.moveFile(eleGrp.getPath(), Function.modifyPathIfExistWithRandom(newName), null);
             }
         }
 
@@ -999,15 +1315,15 @@ public class Main {
             LOGGER.info("Repertoire New - nb Bazar  : " + String.format("%05d", listFileBazar.lstEleFile.size()));
             for (ElementFichier eleGrp : listFileBazar.lstEleFile) {
                 String newName = ctx.getParamTriNew().getRepertoireBazar() + File.separator + eleGrp.getLcIdxFilename();
-                WorkWithFiles.moveFileintoFolder(eleGrp, newName, dbLr);
+                Function.moveFile(eleGrp.getPath(), Function.modifyPathIfExistWithRandom(newName), dbLr);
             }
         }
     }
 
     private static String addSourceToNameFor(boolean toDo, String path, String lcIdxFilename) {
-        if (toDo){
-            return path.replaceAll("[@\\/\\'()]","_") + lcIdxFilename;
-        }else{
+        if (toDo) {
+            return path.replaceAll("[@\\/\\'()]", "_") + lcIdxFilename;
+        } else {
             return lcIdxFilename;
         }
     }
@@ -1028,7 +1344,7 @@ public class Main {
             ListIterator<String> repertoireIterator = listRep.listIterator();
             while (repertoireIterator.hasNext()) {
 
-                visuProgress(progress,repPhoto.repertoire,i++,listRep.size());
+                visuProgress(progress, repPhoto.repertoire, i++, listRep.size());
 
                 String repertoire = repertoireIterator.next();
                 findZipAndExtractToRejet(repertoire);
@@ -1115,17 +1431,18 @@ public class Main {
         String folderlocation = ctx.getRepertoire50Phototheque();
         boolean isFinished = false;
         do {
-            isFinished = WorkWithRepertory.deleteEmptyRep(folderlocation, progress);
+            isFinished = WorkWithRepertory.deleteEmptyRep(new File(folderlocation), progress);
         } while (!isFinished);
         progress.setString("");
     }
+
     private static void purgeDesRepertoireVide50New() throws IOException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
-        String folderlocation = ctx.getParamTriNew().getRepertoire50NEW() ;
+        String folderlocation = ctx.getParamTriNew().getRepertoire50NEW();
         boolean isFinished = false;
         do {
-            isFinished = WorkWithRepertory.deleteEmptyRep(folderlocation, progress);
+            isFinished = WorkWithRepertory.deleteEmptyRep(new File(folderlocation), progress);
         } while (!isFinished);
         progress.setString("");
     }
@@ -1136,7 +1453,7 @@ public class Main {
         String folderlocation = ctx.getRepertoire00NEW();
         boolean isFinished = false;
         do {
-            isFinished = WorkWithRepertory.deleteEmptyRep(folderlocation, progress);
+            isFinished = WorkWithRepertory.deleteEmptyRep(new File(folderlocation), progress);
         } while (!isFinished);
         progress.setString("");
     }
@@ -1145,6 +1462,12 @@ public class Main {
     private static void rangerLesRejets() throws IOException, SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
+        List<String> arrayFichierRejetStr = getFichierRejetStr();
+
+        putThatInRejet(arrayFichierRejetStr);
+    }
+
+    private static List<String> getFichierRejetStr() throws SQLException {
         List<File> arrayFichierRejet = WorkWithFiles.getFilesFromRepertoryWithFilter(ctx.getRepertoire50Phototheque(), ctx.getArrayNomSubdirectoryRejet(), ctx.getParamElementsRejet().getExtFileRejet());
 
         List<String> arrayFichierRejetStr = new ArrayList<>();
@@ -1153,7 +1476,7 @@ public class Main {
         }
 
         for (int y = 0; y < arrayFichierRejetStr.size(); y++) {
-            if (arrayFichierRejetStr.get(y).toLowerCase(Locale.ROOT).contains((ctx.getRepertoire50Phototheque() + "99-rejet").toLowerCase(Locale.ROOT))) {
+            if (arrayFichierRejetStr.get(y).toLowerCase(Locale.ROOT).contains((ctx.getRepertoire50Phototheque() + repertoirerejet).toLowerCase(Locale.ROOT))) {
                 arrayFichierRejetStr.remove(y);
                 y--;
             }
@@ -1161,7 +1484,12 @@ public class Main {
 
         //todo add all photo rejected to arrayFichierRejetStr
         arrayFichierRejetStr.addAll(dbLr.getlistPhotoFlagRejeter());
+        return arrayFichierRejetStr;
+    }
 
+    private static int putThatInRejet(List<String> arrayFichierRejetStr) throws IOException, SQLException {
+
+        int countMove = 0;
         Map<String, Integer> countExt = new HashMap<>();
         Map<String, Integer> countExtDo = new HashMap<>();
         Map<String, Integer> countExtDel = new HashMap<>();
@@ -1169,6 +1497,9 @@ public class Main {
 
         for (int y = 0; y < arrayFichierRejetStr.size(); y++) {
             String fichierStr = arrayFichierRejetStr.get(y);
+
+            visuProgress(progress,fichierStr,y,arrayFichierRejetStr.size());
+
             String fileExt = FilenameUtils.getExtension(fichierStr).toLowerCase();
             String filepath = FilenameUtils.getFullPath(fichierStr).toLowerCase();
 
@@ -1185,59 +1516,72 @@ public class Main {
                 WorkWithFiles.extractZipFile(new File(fichierStr));
             }
 
-            if (ctx.getParamElementsRejet().getArrayNomFileRejet().contains(fileExt.toLowerCase()) ||
+            if (ctx.getExtensionsUseFile().contains(fileExt.toLowerCase()) ||
                     (
                             ctx.getParamElementsRejet().getExtFileRejet().compareTo(fileExt.toLowerCase()) == 0
                                     && !ctx.getParamElementsRejet().getArrayNomSubdirectoryRejet().stream().anyMatch(filepath::contains)
                     )
             ) {
+                String generatedString =  new Random().ints(48, 122 + 1)
+                        .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
+                        .limit(5)
+                        .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                        .toString();
+
                 //rename to rejet dans meme repertoire
                 String oldName = fichierStr;
-                String newName = addRejetSubRepToPath(oldName) + "." + ctx.getParamElementsRejet().getExtFileRejet();
+                String newName = addRejetSubRepToPath(oldName) + "." + generatedString + "." + ctx.getParamElementsRejet().getExtFileRejet();
                 File fsource = new File(oldName);
                 File fdest = new File(newName);
                 if (fsource.exists() && fsource.isFile() && !fdest.exists()) {
                     countExtDo.replace(fileExt, countExtDo.get(fileExt), countExtDo.get(fileExt) + 1);
-                    WorkWithFiles.renameFile(oldName, newName, dbLr);
+                    countMove = countMove + Function.moveFile(oldName, newName, dbLr);
                 }
             } else {
-                if (ctx.getParamElementsRejet().getArrayNomFileRejetSup().contains(fileExt.toLowerCase())) {
-                    //move to 99-rejet
-                    int i;
-                    List<RepertoirePhoto> arrayRepertoirePhoto = ctx.getArrayRepertoirePhoto();
-                    for (i = 0; i < arrayRepertoirePhoto.size(); i++) {
-                        RepertoirePhoto repertoirePhoto = arrayRepertoirePhoto.get(i);
-                        if (repertoirePhoto.getRepertoire().toLowerCase(Locale.ROOT).contains("99-rejet")) {
+                if (ctx.getParamElementsRejet().getarrayExtensionFileRejetSup().contains(fileExt.toLowerCase())) {
+                    int retNb = moveTo99Rejet(fichierStr);
+                    countMove = countMove + retNb;
+                    countExtDel.replace(fileExt, countExtDel.get(fileExt), countExtDel.get(fileExt) + retNb);
 
-                            String oldName = fichierStr;
-                            File fsource = new File(oldName);
-
-                            File fdest = new File(ctx.getRepertoire50Phototheque() + repertoirePhoto.getRepertoire() + Context.FOLDERDELIM + oldName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_"));
-                            String newName = fdest.toString();
-
-                            if (fsource.exists() && fsource.isFile() && !fdest.exists()) {
-                                countExtDel.replace(fileExt, countExtDel.get(fileExt), countExtDel.get(fileExt) + 1);
-                                WorkWithFiles.renameFile(oldName, newName, dbLr);
-                            } else {
-                                LOGGER.debug("oldName " + oldName + " move impossile to newName : " + newName);
-                                LOGGER.debug("fsource.exists() " + fsource.exists());
-                                LOGGER.debug("fsource.isFile()  " + fsource.isFile());
-                                LOGGER.debug("!fdest.exists() " + !fdest.exists());
-                            }
-
-                        }
-                    }
                 }
             }
         }
-
+        progress.setString("");
         Iterator it = countExt.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
             LOGGER.info("arrayFichierRejet." + pair.getKey() + " => " + String.format("%05d", pair.getValue()) + " => do : " + String.format("%05d", countExtDo.get(pair.getKey())) + " => del : " + String.format("%05d", countExtDel.get(pair.getKey())));
         }
+        return countMove;
+    }
 
+    private static int moveTo99Rejet(String fichierStr) throws IOException, SQLException {
+        //move to 99-rejet
+        int i;
+        int countMove = 0;
+        List<RepertoirePhoto> arrayRepertoirePhoto = ctx.getArrayRepertoirePhoto();
+        for (i = 0; i < arrayRepertoirePhoto.size(); i++) {
+            RepertoirePhoto repertoirePhoto = arrayRepertoirePhoto.get(i);
+            if (repertoirePhoto.getNomunique().contains("Rejet")) {
 
+                String oldName = fichierStr;
+                File fsource = new File(oldName);
+
+                File fdest = new File(ctx.getRepertoire50Phototheque() + repertoirePhoto.getRepertoire() + Context.FOLDERDELIM + oldName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_"));
+                String newName = fdest.toString();
+
+                if (fsource.exists() && fsource.isFile() && !fdest.exists()) {
+                    countMove = countMove + Function.moveFile(oldName, newName, dbLr);
+                } else {
+                    LOGGER.debug("oldName " + oldName + " move impossile to newName : " + newName);
+                    LOGGER.debug("fsource.exists() " + fsource.exists());
+                    LOGGER.debug("fsource.isFile()  " + fsource.isFile());
+                    LOGGER.debug("!fdest.exists() " + !fdest.exists());
+                }
+
+            }
+        }
+        return countMove;
     }
 
     private static String addRejetSubRepToPath(String fichierStr) throws SQLException {
@@ -1261,6 +1605,6 @@ public class Main {
     public static void visuProgress(JProgressBar progress, String txtPr, int numRow, int numRowMax) {
         progress.setValue(numRow);
         progress.setMaximum(numRowMax);
-        progress.setString(txtPr + " - " + new DecimalFormat("#.##").format(numRow*100/numRowMax) + "%");
+        progress.setString(txtPr + " - " + new DecimalFormat("#.##").format(numRow * 100L / numRowMax) + "%");
     }
 }

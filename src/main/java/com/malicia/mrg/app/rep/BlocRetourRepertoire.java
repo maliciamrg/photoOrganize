@@ -132,7 +132,7 @@ public class BlocRetourRepertoire {
         for (File file : files) {
             if (!file.isDirectory()) {
                 String fileExt = FilenameUtils.getExtension(file.getName()).toLowerCase();
-                if (ctx.getParamElementsRejet().getArrayNomFileRejet().contains(fileExt.toLowerCase())) {
+                if (ctx.getExtensionsUseFile().contains(fileExt.toLowerCase())) {
                     nbelementsin++;
                 }
             }

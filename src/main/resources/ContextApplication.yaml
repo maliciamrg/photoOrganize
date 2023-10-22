@@ -1,6 +1,9 @@
 workflow:
   IS_DRY_RUN: false  # Est-ce un dry_run (sans mise a jour des bases)
   TODO:
+#    - IS_WRK_REJET_000000 # ranger [les repertoire rejet et les les photo tagger rejeter] dans les repertoires rejet ou le 99-rejet (pour suppression)
+    - IS_SYNCR_LR_0000000 # Synchronise les repertoire et fichiers physique avec la base LR
+  NOTTODO:
     - IS_SYNCR_LR_0000000 # Synchronise les repertoire et fichiers physique avec la base LR
     - IS_MAINT_LR_0000000 # Maintenance sur la base LR
     - IS_PURGE_FOLDER_000 # purgeDesRepertoireVide50Phototheque() (local) et purgeDesRepertoireVide00NEW() (reseau)
@@ -17,7 +20,7 @@ workflow:
     - IS_WRK_REP_PHOTO_00 # (analFonctionRep) analyse des repertoires en function des regles => analFonctionRep
     - IS_TAG_CTRL_REP_000 # (analFonctionRep) => appliquer des tag TAG_REPSWEEP++ sur les photo et mise a 'RED' de repertoire en fonction de analFonctionRep.getListOfretourValRepertoire()
     - IS_EXEC_FONC_REP_00 # (analFonctionRep) => Renommage des repertoire via POP UP.
-  NOTTODO:
+#  NOTTODO:
     - IS_UNZIP_REP_PHOTO0 # extraire les ZIP dans les repertoire rejet
     - IS_SVG_LRCONFIG_000 # sauvegarde du la config LR sur le reseau.
     - EMPTY
@@ -35,6 +38,26 @@ paramControleRepertoire:
     - nbphotoapurger
     - nbelements
     - limitemaxfolder
+extensionsUseFile:
+    - jpg
+    - tif
+    - tiff
+    - dng
+    - jpeg
+    - arw
+    - mp4
+    - png
+    - mts
+    - mov
+    - avi
+    - m2ts
+    - 3gp
+    - m4v
+    - mpg
+    - psd
+    - bmp
+    - gif
+    - tiff_original
 paramElementsRejet:
   arrayNomSubdirectoryRejet:
     - rejet
@@ -42,21 +65,17 @@ paramElementsRejet:
     - offset
     - flat
     - brut
+    - image
     - jpg
-  arrayNomFileRejet:
-    - jpg
-    - tif
-    - dng
-    - jpeg
-    - arw
-    - mp4
-    - thm
-    - png
-    - mts
-  arrayNomFileRejetSup:
+  arrayExtensionFileRejetSup:
     - txt
     - tmp
     - pto
+    - xmp
+    - thm
+    - lrv
+    - pxd
+    - lrbak
   extFileRejet: rejet
 paramTriNew:
   repertoire50NEW: "C:\\Users\\cleme\\Desktop\\@New\\"
