@@ -39,6 +39,7 @@ public class Context {
             " left join AgLibraryKeyword k " +
             " on k.id_local = ki.tag ";
     public static final String filtreImportScanDeux = " and k.lc_name != 'import_argentique_bf_evolution' ";
+    public static final long GMT01JAN200112AM = 978307200;
     private static final String JSON = ".json";
     private static final Logger LOGGER = LogManager.getLogger(Context.class);
     public static int nbDiscretionnaire = 0;

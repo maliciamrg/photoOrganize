@@ -1,6 +1,5 @@
 package com.malicia.mrg.app;
 
-import com.malicia.mrg.Main;
 import com.malicia.mrg.util.UnzipUtility;
 
 import com.malicia.mrg.util.WhereIAm;
@@ -70,84 +69,12 @@ public class WorkWithFiles {
         return Arrays.stream(items).anyMatch(inputStr::contains);
     }
 
-    public static String changeExtensionTo(String filename, String extension) {
-        if (filename.contains(".")) {
-            filename = filename.substring(0, filename.lastIndexOf('.'));
-        }
-        filename += "." + extension;
-        return filename;
-    }
-
     public static void extractZipFile(File fichier) throws IOException {
         UnzipUtility uZip = new UnzipUtility();
         uZip.unzip(fichier.toString(), fichier.getParent());
     }
 
-    public static List<String> getAllFiles(List<String> rootPaths, List<String> allowedExtensions, List<String> excludeSubdirectoryRejet, JProgressBar progress) {
-        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-
-        List<String> fileList = new ArrayList<>();
-
-        for (String rootPath : rootPaths) {
-            progress.setString(rootPath);
-            File rootDirectory = new File(rootPath);
-
-            // Make sure the root path is a directory
-            if (rootDirectory.isDirectory()) {
-                // List all files in the directory and its subdirectories
-                List<String> files = listFiles(rootDirectory, allowedExtensions,excludeSubdirectoryRejet, progress);
-                fileList.addAll(files);
-            } else {
-                System.out.println("Invalid directory: " + rootPath);
-            }
-        }
-        progress.setString("");
-        // Sort the file list alphabetically
-        Collections.sort(fileList);
-
-        return fileList;
-    }
-
-    private static List<String> listFiles(File directory, List<String> allowedExtensions, List<String> excludeSubdirectoryRejet, JProgressBar progress) {
-        List<String> fileList = new ArrayList<>();
-
-        int numRow = 0;
-        // List all files in the directory
-        File[] files = directory.listFiles();
-        if (files != null) {
-            for (File file : files) {
-
-                Main.visuProgress(progress, file.getParent(),numRow++,files.length);
-
-                if (file.isDirectory()) {
-                    if (!excludeSubdirectoryRejet.contains(file.getName())) {
-                        // Recursively list files in subdirectories
-                        List<String> subdirectoryFiles = listFiles(file, allowedExtensions, excludeSubdirectoryRejet, progress);
-                        fileList.addAll(subdirectoryFiles);
-                    }
-                } else {
-                    // Check if the file has an allowed extension
-                    if (hasAllowedExtension(file, allowedExtensions)) {
-                        // Add the file path to the list
-                        fileList.add(normalizePath(file.getAbsolutePath()));
-                    }
-                }
-            }
-        }
-
-        return fileList;
-    }
-
-    private static boolean hasAllowedExtension(File file, List<String> allowedExtensions) {
-        for (String extension : allowedExtensions) {
-            if (file.getName().toLowerCase().endsWith(extension.toLowerCase())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static List<String> getAllFiles2(List<String> rootPaths, List<String> allowedExtensions, List<String> excludeSubdirectoryRejet, JProgressBar progress) {
+    public static List<String> getAllPhysicalFiles(List<String> rootPaths, List<String> allowedExtensions, List<String> excludeSubdirectoryRejet, JProgressBar progress) {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         List<String> fileList = new ArrayList<>();
@@ -157,7 +84,7 @@ public class WorkWithFiles {
 
             // Make sure the root path is a directory
             try {
-                fileList.addAll(listFiles2(rootPath, allowedExtensions,excludeSubdirectoryRejet));
+                fileList.addAll(listFiles(rootPath, allowedExtensions,excludeSubdirectoryRejet));
             } catch (IOException e) {
                 System.out.println("Error due to: " + e.getMessage());
             }
@@ -170,7 +97,7 @@ public class WorkWithFiles {
     }
 
 
-    private static List<String> listFiles2(String directoryPath, List<String> extension, List<String> excludeSubdirectoryRejet) throws IOException {
+    private static List<String> listFiles(String directoryPath, List<String> extension, List<String> excludeSubdirectoryRejet) throws IOException {
         Path start = Paths.get(directoryPath);
         try (Stream<Path> stream = Files.walk(start, Integer.MAX_VALUE)) {
             return stream

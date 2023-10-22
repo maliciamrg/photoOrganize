@@ -48,8 +48,8 @@ public class Main {
     public static final String colorTagNew = Context.RED;
     public static final String colorTagWhatsApp = Context.GREEN;
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
-    private static final Logger LOGGER2 = LogManager.getLogger("logger2info");
-    public static final long GMT01JAN200112AM = 978307200;
+    private static final Logger LOGGER_TO_TAG_RAP = LogManager.getLogger("loggerToTagRap");
+    private static final Logger LOGGER_TO_SYNC_PH_FILE = LogManager.getLogger("loggerToSyncPhFile");
     private static Context ctx;
     private static Database dbLr;
     private static JFrame frame;
@@ -66,6 +66,8 @@ public class Main {
             //*
 
             LOGGER.info(InfoVersion.showVersionInfo());
+            LOGGER_TO_TAG_RAP.info(InfoVersion.showVersionInfo());
+            LOGGER_TO_SYNC_PH_FILE.info(InfoVersion.showVersionInfo());
 
 
             // chargement application
@@ -74,11 +76,9 @@ public class Main {
 
             closelightroom(ctx.dataApplication.getApplicationToClose());
             dbLr = Database.chargeDatabaseLR(ctx.getCatalogLrcat(), ctx.workflow.IS_DRY_RUN);
-//            AnalyseGlobalRepertoires.init(ctx, dbLr);
 
             SystemFiles.setIsDryRun(ctx.workflow.IS_DRY_RUN);
             ctx.getActionVersRepertoire().populate(dbLr.getFolderCollection(Context.COLLECTIONS, Context.TAG_ORG, ""));
-            //ctx.getActionVersRepertoire().populate(dbLr.getFolderCollection("01-Cataloque_Photo", Context.TAG_ORG, ""));
             //*
 
             // chargement parameter
@@ -117,11 +117,11 @@ public class Main {
                     lstIdKey = creationDesKeywordProjet();
                 }
                 purgeKeywordProjet(lstIdKey);
-//                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
-//                    //Maintenance database lr
-//                    maintenanceDatabase();
-//                    //*
-//                }
+                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
+                    //Maintenance database lr
+                    maintenanceDatabase();
+                    //*
+                }
             }
 
             if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RETAG_RED_000000"))) {
@@ -149,7 +149,6 @@ public class Main {
             if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
                 //En Fonction De La Strategies De Rangement
                 analFonctionRep = analyseFonctionellesDesRepertoires();
-//                LOGGER.info(analFonctionRep.toDisplay());
                 //*
             }
             if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RGP_NEW_00000000"))) {
@@ -441,7 +440,7 @@ public class Main {
 
     }
 
-    private static void displayBooleen() {
+    private static void displayBooleen() throws IOException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         String txt = "\n";
@@ -461,6 +460,8 @@ public class Main {
         }
         if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_ACTION_FROM_KEY0"))) {
             txt += "   -  " + "makeActionFromKeyword()" + "\n";
+        }
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_PURGE_ACTION_000"))) {
             txt += "   -  " + "removeLinkWithActionFromKeyword()" + "\n";
         }
         if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_DEL_00000000"))) {
@@ -515,12 +516,13 @@ public class Main {
             }
         }
 
-
-        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_SVG_LRCONFIG_000"))) {
-            txt += "   -  " + "sauvegardeLightroomConfigSauve()" + "\n";
-        }
-        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RSYNC_BIB_000000"))) {
-            txt += "   -  " + "sauvegardeStudioPhoto2Reseaux()" + "\n";
+        if (isItTimeToSave() || Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_FORCE_SVG_000000"))) {
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_SVG_LRCONFIG_000"))) {
+                txt += "   -  " + "sauvegardeLightroomConfigSauve()" + "\n";
+            }
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RSYNC_BIB_000000"))) {
+                txt += "   -  " + "sauvegardeStudioPhoto2Reseaux()" + "\n";
+            }
         }
 
         txt += "   -                                                                               -   " + "\n";
@@ -640,10 +642,8 @@ public class Main {
 
     private static void synchroDatabase() throws SQLException, IOException, ParseException, InterruptedException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_SYNC_PH_FILE);
 
-
-
-//        List<String> listFilesPh = WorkWithFiles.getAllFiles(dbLr.getAllAbsolutePath(), ctx.paramElementsRejet.getArrayNomFileRejet(), ctx.getArrayNomSubdirectoryRejet(), progress);
         List<String> extensionsUseFile = new ArrayList<>() ;
         extensionsUseFile.addAll(ctx.getExtensionsUseFile());
         extensionsUseFile.addAll(ctx.getParamElementsRejet().getarrayExtensionFileRejetSup());
@@ -653,13 +653,12 @@ public class Main {
         nomSubdirectoryRejet.addAll(ctx.getParamElementsRejet().getArrayNomSubdirectoryRejet());
         nomSubdirectoryRejet.add(repertoirerejet);
 
-        List<String> listFilesPh = WorkWithFiles.getAllFiles2(dbLr.getAllAbsolutePath(), extensionsUseFile, nomSubdirectoryRejet, progress);
+        List<String> listFilesPh = WorkWithFiles.getAllPhysicalFiles(dbLr.getAllAbsolutePath(), extensionsUseFile, nomSubdirectoryRejet, progress);
+
         List<String> listFilesLog = dbLr.getAllFilesLogiques();
 
         analyseFilePhysiqueAndLogiques(listFilesPh, listFilesLog);
 
-//        splitLOGGERInfo(isMoreZeroComm(dbLr.pathAbsentPhysique(progress)));
-//        splitLOGGERInfo(isMoreZeroComm(dbLr.folderAbsentPhysique(progress)));
         progress.setString("");
     }
 
@@ -674,7 +673,7 @@ public class Main {
 //        int posPhy = 0;
         int nbPhy = listFilesPh.size();
 
-        System.out.println("Differences between listFilesPh and listFilesLog:");
+        LOGGER_TO_SYNC_PH_FILE.info("Differences between listFilesPh and listFilesLog:");
 
         Iterator<String> iterPh = listFilesPh.listIterator();
         Iterator<String> iterLo = listFilesLog.listIterator();
@@ -685,10 +684,6 @@ public class Main {
         while (elemPh != null || elemLo != null) {
             int compareResult;
 
-//            if(elemLo.toLowerCase().endsWith("2337.mov") || elemPh.toLowerCase().endsWith("2337.mov")){
-//                int stop = 1;
-//            }
-
             if (elemPh == null) {
                 compareResult = 1; // listFilesPh is exhausted
             } else if (elemLo == null) {
@@ -698,12 +693,12 @@ public class Main {
             }
 
             if (compareResult < 0) {
-                System.out.println("not in listFilesLog - " + elemPh + "");
+                LOGGER_TO_SYNC_PH_FILE.info("not in listFilesLog - " + elemPh + "");
                 listFilesNotInLog.add(elemPh);
                 koPhy++;
                 elemPh = iterPh.hasNext() ? iterPh.next() : null;
             } else if (compareResult > 0) {
-                System.out.println("not in listFilesPh  - " + elemLo + " ");
+                LOGGER_TO_SYNC_PH_FILE.info("not in listFilesPh  - " + elemLo + " ");
                 koLog++;
                 elemLo = iterLo.hasNext() ? iterLo.next() : null;
             } else {
@@ -713,6 +708,132 @@ public class Main {
             }
         }
 
+        LOGGER.info(" nb path logique  = " + nbLog + " : absent logique in physique = " + koLog + "\n");
+        LOGGER_TO_SYNC_PH_FILE.info(" nb path logique  = " + nbLog + " : absent logique in physique = " + koLog + "\n");
+        LOGGER.info(" nb path physique = " + nbPhy + " : absent physique in logique = " + koPhy + "\n");
+        LOGGER_TO_SYNC_PH_FILE.info(" nb path physique = " + nbPhy + " : absent physique in logique = " + koPhy + "\n");
+
+        correctPhysique_lc_duplicate(listFilesPh, listFilesNotInLog);
+
+        correctLogicalLowercase(listFilesLog, listFilesNotInLog);
+
+        correctPhysiqueLostSidecar(listFilesNotInLog);
+
+        correctPhysiqueAlreadyHash(listFilesNotInLog);
+
+        correctPhysiqueStartDot(listFilesNotInLog);
+
+        //todo
+        // - gif 2 mp4
+        // - bmp 2 jpeg
+        // - mp3 2 mp4
+
+        LOGGER.info("\n");
+    }
+
+    private static void correctLogicalLowercase(List<String> listFilesLog, List<String> listFilesNotInLog) throws IOException, SQLException {
+        //------------------------------------------------
+        //correct logique extension lowercase/uppercase
+        //correct logique filename lowercase/uppercase
+        List<List<String>> listLoIdxFilenameToUpdate = new ArrayList<>();
+
+        Collections.sort(listFilesNotInLog);
+
+        Iterator<String> iterLoRe = listFilesLog.listIterator();
+        Iterator<String> iterPhNotLog = listFilesNotInLog.listIterator();
+
+        String elemLoRe = iterLoRe.hasNext() ? iterLoRe.next() : null;
+        String elemPhNotLog = iterPhNotLog.hasNext() ? iterPhNotLog.next() : null;
+
+        while (elemLoRe != null || elemPhNotLog != null) {
+            int compareResult;
+
+            if (elemLoRe == null) {
+                compareResult = 1; // listFilesPh is exhausted
+            } else if (elemPhNotLog == null) {
+                compareResult = -1; // listFilesLog is exhausted
+            } else {
+                compareResult = elemLoRe.toLowerCase().compareTo(elemPhNotLog.toLowerCase());
+            }
+
+            if (compareResult < 0) {
+                elemLoRe = iterLoRe.hasNext() ? iterLoRe.next() : null;
+            } else if (compareResult > 0) {
+                elemPhNotLog = iterPhNotLog.hasNext() ? iterPhNotLog.next() : null;
+            } else {
+                // Elements are equal, move both iterators forward
+                if (elemLoRe.compareTo(elemPhNotLog)!=0){
+                    listLoIdxFilenameToUpdate.add(Arrays.asList(elemLoRe,elemPhNotLog));
+                }
+                elemLoRe = iterLoRe.hasNext() ? iterLoRe.next() : null;
+                elemPhNotLog = iterPhNotLog.hasNext() ? iterPhNotLog.next() : null;
+            }
+        }
+
+        Iterator<List<String>> iterLoIdxUp = listLoIdxFilenameToUpdate.listIterator();
+        List<String> elemLoIdxUp = iterLoIdxUp.hasNext() ? iterLoIdxUp.next() : null;
+        int koLoExtUpdateDo = 0;
+        while (elemLoIdxUp != null ) {
+            int ret = Function.moveFile(elemLoIdxUp.get(0), elemLoIdxUp.get(1), dbLr);
+            if (ret>0) {
+                koLoExtUpdateDo = koLoExtUpdateDo + ret;
+                listFilesNotInLog.remove(elemLoIdxUp.get(1));
+            }
+            elemLoIdxUp = iterLoIdxUp.hasNext() ? iterLoIdxUp.next() : null;
+        }
+        LOGGER.info("    --- corrige Correct logique U/L case         : toDo = " + listLoIdxFilenameToUpdate.size() + " , Done = " + koLoExtUpdateDo + "\n");
+        //------------------------------------------------
+    }
+
+    private static void correctPhysiqueLostSidecar(List<String> listFilesNotInLog) throws IOException, SQLException {
+        //------------------------------------------------
+        //move physique lost sidecar to rejet
+        List<String> listPhLostSidecarToRejet = new ArrayList<>();
+        int koPhLostSidecarToRejetDo =0;
+        for (String element : listFilesNotInLog) {
+            for (String suffix : ctx.getParamElementsRejet().getarrayExtensionFileRejetSup()) {
+                if (element.toLowerCase().endsWith(suffix.toLowerCase())) {
+                    listPhLostSidecarToRejet.add(element);
+                    break;  // If a match is found, break out of the inner loop
+                }
+            }
+        }
+        koPhLostSidecarToRejetDo = putThatInRejet(listPhLostSidecarToRejet);
+        LOGGER.info("    --- corrige physique lost sidecar to rejet   : toDo = " + listPhLostSidecarToRejet.size() + " , Done = " + koPhLostSidecarToRejetDo + "\n");
+        //------------------------------------------------
+    }
+
+    private static void correctPhysiqueAlreadyHash(List<String> listFilesNotInLog) throws SQLException, IOException, ParseException {
+        //------------------------------------------------
+        //move physique already hash in database to rejet
+        int koPhHashExistToRejetDo =0;
+        for (String element : listFilesNotInLog) {
+                if (dbLr.getFileByHash(lrHashOf(element)).compareTo("")!=0) {
+                    koPhHashExistToRejetDo = koPhHashExistToRejetDo + moveTo99Rejet(element);
+                }
+        }
+        LOGGER.info("    --- corrige physique hash already exist      : -------------- Done = " + koPhHashExistToRejetDo + "\n");
+    }
+
+    private static void correctPhysiqueStartDot(List<String> listFilesNotInLog) throws IOException, SQLException {
+        //------------------------------------------------
+        //move physique file start with dot
+        int koPhStartDotDo = 0;
+        String baseNameNew = "";
+        for (String element : listFilesNotInLog) {
+            String baseName = FilenameUtils.getBaseName(element);
+            if (baseName.startsWith(".")) {
+                baseNameNew = baseName;
+                while (baseNameNew.startsWith(".")) {
+                    baseNameNew = baseNameNew.substring(1);
+                }
+                koPhStartDotDo = koPhStartDotDo + Function.moveFile(element, element.replace(baseName,baseNameNew), dbLr);
+            }
+        }
+        LOGGER.info("    --- corrige physique start dot               : -------------- Done = " + koPhStartDotDo + "\n");
+    }
+
+    private static void correctPhysique_lc_duplicate(List<String> listFilesPh, List<String> listFilesNotInLog) throws IOException, SQLException {
         //------------------------------------------------
         //correct physique file in double in lowercase (db can handler only one unique folder+lc_idx_filename)
         List<String> listFilesToRename = new ArrayList<>();
@@ -765,153 +886,11 @@ public class Main {
             //rename to rejet dans meme repertoire
             String oldName = elemPhRep;
             String newName = elemPhRep.substring(0,elemPhRep.lastIndexOf(".")) + "_" + generatedString + elemPhRep.substring(elemPhRep.lastIndexOf("."));
-//            File fsource = new File(oldName);
-//            File fdest = new File(newName);
-//            if (fsource.exists() && fsource.isFile() && !fdest.exists()) {
-//                Function.renameFile(oldName, newName, dbLr);
-//                koRenameDo++;
-//            }
             koRenameDo = koRenameDo + Function.moveFile(oldName, newName, dbLr);
             elemPhRep = iterPhRen.hasNext() ? iterPhRen.next() : null;
         }
-
-        //------------------------------------------------
-
-
-        //------------------------------------------------
-        //correct logique extension lowercase/uppercase
-        //correct logique filename lowercase/uppercase
-        List<List<String>> listLoIdxFilenameToUpdate = new ArrayList<>();
-
-        Collections.sort(listFilesNotInLog);
-
-        Iterator<String> iterLoRe = listFilesLog.listIterator();
-        Iterator<String> iterPhNotLog = listFilesNotInLog.listIterator();
-
-        String elemLoRe = iterLoRe.hasNext() ? iterLoRe.next() : null;
-        String elemPhNotLog = iterPhNotLog.hasNext() ? iterPhNotLog.next() : null;
-
-        while (elemLoRe != null || elemPhNotLog != null) {
-            int compareResult;
-
-            if (elemLoRe == null) {
-                compareResult = 1; // listFilesPh is exhausted
-            } else if (elemPhNotLog == null) {
-                compareResult = -1; // listFilesLog is exhausted
-            } else {
-                compareResult = elemLoRe.toLowerCase().compareTo(elemPhNotLog.toLowerCase());
-            }
-
-            if (compareResult < 0) {
-                elemLoRe = iterLoRe.hasNext() ? iterLoRe.next() : null;
-            } else if (compareResult > 0) {
-                elemPhNotLog = iterPhNotLog.hasNext() ? iterPhNotLog.next() : null;
-            } else {
-                // Elements are equal, move both iterators forward
-                if (elemLoRe.compareTo(elemPhNotLog)!=0){
-                    listLoIdxFilenameToUpdate.add(Arrays.asList(elemLoRe,elemPhNotLog));
-                }
-                elemLoRe = iterLoRe.hasNext() ? iterLoRe.next() : null;
-                elemPhNotLog = iterPhNotLog.hasNext() ? iterPhNotLog.next() : null;
-            }
-        }
-
-        Iterator<List<String>> iterLoIdxUp = listLoIdxFilenameToUpdate.listIterator();
-        List<String> elemLoIdxUp = iterLoIdxUp.hasNext() ? iterLoIdxUp.next() : null;
-        int koLoExtUpdateDo = 0;
-        while (elemLoIdxUp != null ) {
-            int ret = Function.moveFile(elemLoIdxUp.get(0), elemLoIdxUp.get(1), dbLr);
-            if (ret>0) {
-                koLoExtUpdateDo = koLoExtUpdateDo + ret;
-                listFilesNotInLog.remove(elemLoIdxUp.get(1));
-            }
-            elemLoIdxUp = iterLoIdxUp.hasNext() ? iterLoIdxUp.next() : null;
-        }
-        //------------------------------------------------
-
-
-        //------------------------------------------------
-        //move physique lost sidecar to rejet
-        List<String> listPhLostSidecarToRejet = new ArrayList<>();
-        int koPhLostSidecarToRejetDo =0;
-        for (String element : listFilesNotInLog) {
-            for (String suffix : ctx.getParamElementsRejet().getarrayExtensionFileRejetSup()) {
-                if (element.toLowerCase().endsWith(suffix.toLowerCase())) {
-                    listPhLostSidecarToRejet.add(element);
-                    break;  // If a match is found, break out of the inner loop
-                }
-            }
-        }
-        koPhLostSidecarToRejetDo = putThatInRejet(listPhLostSidecarToRejet);
-        //------------------------------------------------
-
-        //------------------------------------------------
-        //move physique already hash in database to rejet
-        int koPhHashExistToRejetDo =0;
-        for (String element : listFilesNotInLog) {
-                if (dbLr.getFileByHash(lrHashOf(element)).compareTo("")!=0) {
-                    koPhHashExistToRejetDo = koPhHashExistToRejetDo + moveTo99Rejet(element);
-                }
-        }
-
-        //------------------------------------------------
-        //move physique file start with dot
-        int koPhStartDotDo = 0;
-        String baseNameNew = "";
-        for (String element : listFilesNotInLog) {
-            String baseName = FilenameUtils.getBaseName(element);
-            if (baseName.startsWith(".")) {
-                baseNameNew = baseName;
-                while (baseNameNew.startsWith(".")) {
-                    baseNameNew = baseNameNew.substring(1);
-                }
-                koPhStartDotDo = koPhStartDotDo + Function.moveFile(element, element.replace(baseName,baseNameNew), dbLr);
-            }
-        }
-        //------------------------------------------------
-
-//        //------------------------------------------------
-//        //create physique avi file for gif
-//        int koPhGifAviDo = 0;
-//        for (String element : listFilesNotInLog) {
-//            if (element.toLowerCase().endsWith("gif")) {
-//
-//                // FFmpeg command
-//                String ffmpegCommand = "Y:\\95_Boite_a_outils\\ffmpeg\\bin\\ffmpeg -y -i  \"" + element + "\" -filter_complex \"[0:v] fps=15\" -vsync 0 -f mp4 \"" + element.substring(0,element.lastIndexOf(".")) + ".mp4\" ";
-//
-//                try {
-//                    // Run FFmpeg command
-//                    ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c" , ffmpegCommand);
-//                    processBuilder.redirectErrorStream(true);
-//                    Process process = processBuilder.start();
-//                    // Wait for the process to finish
-////                    int exitCode = process.waitFor();
-//                    Thread.sleep(4000);
-//
-//                    // Print the exit code (0 usually means success)
-////                    System.out.println("FFmpeg process exited with code: " + exitCode);
-//
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                LOGGER.info(ffmpegCommand);
-//                koPhGifAviDo++;
-//            }
-//        }
-//        //------------------------------------------------
-
-
-        LOGGER.info(" nb path logique  = " + nbLog + " : absent logique in physique = " + koLog + "\n");
-        LOGGER.info(" nb path physique = " + nbPhy + " : absent physique in logique = " + koPhy + "\n");
         LOGGER.info("    --- corrige Physique lc_duplicate            : toDo = " + listFilesToRename.size() + " , Done = " + koRenameDo + "\n");
-        LOGGER.info("    --- corrige Correct logique U/L case         : toDo = " + listLoIdxFilenameToUpdate.size() + " , Done = " + koLoExtUpdateDo + "\n");
-        LOGGER.info("    --- corrige physique lost sidecar to rejet   : toDo = " + listPhLostSidecarToRejet.size() + " , Done = " + koPhLostSidecarToRejetDo + "\n");
-        LOGGER.info("    --- corrige physique hash already exist      : -------------- Done = " + koPhHashExistToRejetDo + "\n");
-        LOGGER.info("    --- corrige physique start dot               : -------------- Done = " + koPhStartDotDo + "\n");
-//        LOGGER.info("    --- corrige physique gif avi                 : -------------- Done = " + koPhGifAviDo + "\n");
-        //LOGGER.info("    --- corrige Physique         = " + "koPhyCor" + "\n");
-        //LOGGER.info("    --- corrige Logique          = " + "koLogCor" + "\n");
-        LOGGER.info("\n");
+        //------------------------------------------------
     }
 
     private static String lrHashOf(String file) throws IOException, ParseException {
@@ -922,16 +901,8 @@ public class Main {
         FileTime fileTime = Files.getLastModifiedTime(filePath);
         // Convert the FileTime to microsecond
         long unixTimeMicro = fileTime.to(TimeUnit.MICROSECONDS);
-        double dbFileTime = ((((double) unixTimeMicro) /10) / 100000) - GMT01JAN200112AM;//GMT: Monday, January 1, 2001 12:00:00 AM
-        //--706893605.66357:img_2337.MOV:86632353
-        //==706893605.66357:img_2337.MOV:86632353
-        //--706893555.38844:img_2339.MOV:71847462
-        //==706893555.38844:img_2339.MOV:71847462
-        //--706893554.67468:img_2343.MOV:111480158
-        //==706893554.67467:img_2343.MOV:111480158
-        //708523851:2023-06-15_14-10-51_20230615_141050.jpg:5419618
-//        return new DecimalFormat("#.#####").format(dbFileTime) + ":" + filePath.getFileName() + ":" + String.valueOf(Files.size(filePath));
-//        return new DecimalFormat("#.#####").format(dbFileTime) + ":" + "%" + ":" + String.valueOf(Files.size(filePath));
+        double dbFileTime = ((((double) unixTimeMicro) /10) / 100000) - Context.GMT01JAN200112AM;//GMT: Monday, January 1, 2001 12:00:00 AM
+        String PerfectHash = new DecimalFormat("#.#####").format(dbFileTime) + ":" + filePath.getFileName() + ":" + String.valueOf(Files.size(filePath));
         String timestamp = new DecimalFormat("#.#####").format(dbFileTime);
         String hashLike = timestamp.substring(0, timestamp.length() - 3) + "%:%" + filePath.getFileName() + ":" + String.valueOf(Files.size(filePath));
         return hashLike;
@@ -1222,7 +1193,7 @@ public class Main {
 
     private static void miseEnPlaceDesTagDeRapprochement(List<GrpPhoto> listGrpEletmp) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER2);
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TAG_RAP);
 
         for (GrpPhoto listEle : listGrpEletmp) {
             Map<String, Map<String, Integer>> listeAction = new HashMap<>();
@@ -1231,12 +1202,12 @@ public class Main {
                 String nbDiscr = String.format("%1$03X", Context.nbDiscretionnaire);
                 String tag = Context.TAG_RAPPROCHEMENT + "_" + nbDiscr + "_" + Context.POSSIBLE_NEW_GROUP;
                 LOGGER.info("tag : " + tag + " ==> ");
-                LOGGER2.info("    ");
-                LOGGER2.info("tag : " + tag + " ==> ");
+                LOGGER_TO_TAG_RAP.info("    ");
+                LOGGER_TO_TAG_RAP.info("tag : " + tag + " ==> ");
                 for (ElementFichier eleFile : listEle.lstEleFile) {
                     dbLr.AddKeywordToFile(eleFile.getFileIdLocal(), tag, Context.TAG_RAPPROCHEMENT);
                     LOGGER.debug(" --- " + eleFile.getPathFromRoot() + File.separator + eleFile.getLcIdxFilename());
-                    LOGGER2.debug(" --- " + eleFile.getPathFromRoot() + File.separator + eleFile.getLcIdxFilename());
+                    LOGGER_TO_TAG_RAP.debug(" --- " + eleFile.getPathFromRoot() + File.separator + eleFile.getLcIdxFilename());
                 }
                 //display info
                 int i;
@@ -1264,19 +1235,12 @@ public class Main {
                 for (String masterKey : listeAction.keySet()) {
                     Map<String, Integer> listeValueAction = listeAction.get(masterKey);
                     LOGGER.info("    " + masterKey);
-                    LOGGER2.info("    " + masterKey);
+                    LOGGER_TO_TAG_RAP.info("    " + masterKey);
                     for (String valueKey : listeValueAction.keySet()) {
                         LOGGER.info("        " + String.format("%05d", listeValueAction.get(valueKey)) + " - " + valueKey);
-                        LOGGER2.info("        " + String.format("%05d", listeValueAction.get(valueKey)) + " - " + valueKey);
+                        LOGGER_TO_TAG_RAP.info("        " + String.format("%05d", listeValueAction.get(valueKey)) + " - " + valueKey);
                     }
                 }
-//                LOGGER.info("    " + "---------------------------");
-//                for (i = 0; i < ctx.getArrayRepertoirePhoto().size(); i++) {
-//                    if (listEle.getArrayRep(i) > 0) {
-//                        LOGGER.info("    " + String.format("%05d", listEle.getArrayRep(i)) + " - " + ctx.getArrayRepertoirePhoto().get(i).getRepertoire());
-//                    }
-//                }
-//                LOGGER.info("    " + String.format("%05d", listEle.getArrayRep(Context.IREP_NEW)) + " - " + ctx.getParamTriNew().getRepertoire50NEW());
             }
         }
     }
