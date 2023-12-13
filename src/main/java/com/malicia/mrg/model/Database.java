@@ -152,7 +152,7 @@ public class Database extends SQLiteJDBCDriverConnection {
 
     }
 
-    public int topperAGreen50NEW(String[] repertoire50NEW, String color) throws SQLException {
+    public int topperAGreen50NEWWhatsApp(String[] repertoire50NEW, String color) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         String sql;
         sql = "update Adobe_images " +

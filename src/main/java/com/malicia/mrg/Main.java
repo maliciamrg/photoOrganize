@@ -21,6 +21,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.sound.midi.MidiDevice;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -50,6 +51,7 @@ public class Main {
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
     private static final Logger LOGGER_TO_TAG_RAP = LogManager.getLogger("loggerToTagRap");
     private static final Logger LOGGER_TO_SYNC_PH_FILE = LogManager.getLogger("loggerToSyncPhFile");
+    private static final Logger LOGGER_TO_ANAL_REP = LogManager.getLogger("loggerToAnalRepDisplay");
     private static Context ctx;
     private static Database dbLr;
     private static JFrame frame;
@@ -68,7 +70,7 @@ public class Main {
             LOGGER.info(InfoVersion.showVersionInfo());
             LOGGER_TO_TAG_RAP.info(InfoVersion.showVersionInfo());
             LOGGER_TO_SYNC_PH_FILE.info(InfoVersion.showVersionInfo());
-
+            LOGGER_TO_ANAL_REP.info(InfoVersion.showVersionInfo());
 
             // chargement application
             ctx = Context.chargeParam();
@@ -125,12 +127,12 @@ public class Main {
             }
 
             if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RETAG_RED_000000"))) {
-                reTAGlesColorTagARED(colorTagNew);
+                tagRedOnlyRep00New(colorTagNew);
             }
             //*
 
             if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RETAG_GREEN_0000"))) {
-                reTAGlesColorTagAGREEN(colorTagWhatsApp);
+                tagGreenOnlyRep00NewWhatsApp(colorTagWhatsApp);
             }
             //*
 
@@ -146,11 +148,21 @@ public class Main {
                 rangerLesRejets();
                 //*
             }
+
+            //************************************************************
+            //*     analyse                                              *
+            //*                                                          *
+
             if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
                 //En Fonction De La Strategies De Rangement
                 analFonctionRep = analyseFonctionellesDesRepertoires();
+                LOGGER_TO_ANAL_REP.info(analFonctionRep.toDisplay());
                 //*
             }
+
+            //*                                                          *
+            //************************************************************
+
             if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RGP_NEW_00000000"))) {
                 //regrouper le new
                 regrouperLesNouvellesPhoto(progress);
@@ -186,6 +198,10 @@ public class Main {
                 //*
             }
 
+            //************************************************************
+            //*     tagging                                              *
+            //*                                                          *
+
             if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
                 if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_EXEC_FONC_REP_00"))) {
                     //Popup Action sur les erreurs Fonctionelle des repertoires
@@ -197,6 +213,10 @@ public class Main {
                     tagretourValRepertoire(analFonctionRep.getListOfretourValRepertoire(), colorTagNew);
                 }
             }
+
+            //*                                                          *
+            //************************************************************
+
             if (isItTimeToSave() || Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_FORCE_SVG_000000"))) {
                 if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_SVG_LRCONFIG_000"))) {
                     //Sauvegarde Lightroom sur Local
@@ -257,7 +277,7 @@ public class Main {
                                         String number = formatter.format(nbDiscr);
 //                                            String tag = champ.getCompTagRetour() + "_" + "(" + number +")"  ;
 
-                                        String[] tags = (Context.TAG_REPSWEEP + "_" + TagRetour + " id:" + number).replace("[", "").replace("]", "").split("_");
+                                        String[] tags = (Context.TAG_REPSWEEP + "_" + TagRetour +  "..." + "("+ number +")" ).replace("[", "").replace("]", "").split("_");
 
 
                                         String cletrace = tags[1] + ":" + tags[2];
@@ -410,7 +430,7 @@ public class Main {
         return String.format("%-60s", s);
     }
 
-    private static void reTAGlesColorTagARED(String color) throws SQLException {
+    private static void tagRedOnlyRep00New(String color) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         int unNbMisARED = dbLr.deTopperAColorOld50NEW(new String[]{ctx.getParamTriNew().getRepertoire50NEW(), ctx.getRepertoire00NEW()}, color);
@@ -425,14 +445,14 @@ public class Main {
 
     }
 
-    private static void reTAGlesColorTagAGREEN(String color) throws SQLException {
+    private static void tagGreenOnlyRep00NewWhatsApp(String color) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
         int unNbMisAGREEN = dbLr.deTopperAColorOld50NEW(new String[]{ctx.getParamTriNew().getRepertoire50NEW(), ctx.getRepertoire00NEW()}, color);
         loggerInfo("UnTag a GREEN " + String.format("%05d", unNbMisAGREEN) + " - images ", unNbMisAGREEN);
 
 //        dbLr.MiseAzeroDesColorLabels("green");
-        int nbMisAGREEN = dbLr.topperAGreen50NEW(new String[]{ctx.getParamTriNew().getRepertoire50NEW(), ctx.getRepertoire00NEW()}, color);
+        int nbMisAGREEN = dbLr.topperAGreen50NEWWhatsApp(new String[]{ctx.getParamTriNew().getRepertoire50NEW(), ctx.getRepertoire00NEW()}, color);
         loggerInfo("Tag a GREEN " + String.format("%05d", nbMisAGREEN) + " - images ", nbMisAGREEN);
 
 //        unNbMisAGREENRep = dbLr.deTopperARedOldRepertoire(color.toLowerCase(Locale.ROOT));
@@ -474,10 +494,10 @@ public class Main {
             }
         }
         if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RETAG_RED_000000"))) {
-            txt += "   -  " + "reTAGlesColorTagARED()" + "\n";
+            txt += "   -  " + "tagRedOnlyRep00New()" + "\n";
         }
         if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RETAG_GREEN_0000"))) {
-            txt += "   -  " + "reTAGlesColorTagAGREEN()" + "\n";
+            txt += "   -  " + "tagGreenOnlyRep00NewWhatsApp()" + "\n";
         }
         if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
             if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_UNZIP_REP_PHOTO0"))) {
