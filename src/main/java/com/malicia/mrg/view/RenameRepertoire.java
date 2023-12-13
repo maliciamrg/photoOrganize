@@ -228,7 +228,7 @@ public class RenameRepertoire extends JFrame{
             textField1.setText(retourRepertoireEle.getRepertoire());
 
             //combobox reprtoire
-            comboBox1.setSelectedItem(retourRepertoireEle.getRepPhoto());
+            comboBox1.setSelectedItem(retourRepertoireEle.getRepPhoto().getRepertoire());
 
             //imagepreview
             img1.setText("");

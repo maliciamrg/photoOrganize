@@ -214,13 +214,13 @@ public class Database extends SQLiteJDBCDriverConnection {
 
     private String getTextualConditionForNew(String[] repertoire50NEW) {
         return "(" +
-                "'" + SystemFiles.normalizePath(repertoire50NEW[0]) + "' like p.absolutePath || '%'  " +
-                "and p.absolutePath || b.pathFromRoot like '" + SystemFiles.normalizePath(repertoire50NEW[0]) + "' || '%' " +
+                "\"" + SystemFiles.normalizePath(repertoire50NEW[0]) + "\" like p.absolutePath || '%'  " +
+                "and p.absolutePath || b.pathFromRoot like \"" + SystemFiles.normalizePath(repertoire50NEW[0]) + "\" || '%' " +
                 ")" +
                 " or " +
                 "(" +
-                "'" + SystemFiles.normalizePath(repertoire50NEW[1]) + "' like p.absolutePath || '%'  " +
-                "and p.absolutePath || b.pathFromRoot like '" + SystemFiles.normalizePath(repertoire50NEW[1]) + "' || '%' " +
+                "\"" + SystemFiles.normalizePath(repertoire50NEW[1]) + "\" like p.absolutePath || '%'  " +
+                "and p.absolutePath || b.pathFromRoot like \"" + SystemFiles.normalizePath(repertoire50NEW[1]) + "\" || '%' " +
                 ")";
     }
 
@@ -394,12 +394,12 @@ public class Database extends SQLiteJDBCDriverConnection {
                         "from AgLibraryRootFolder as p , " +
                         "AgLibraryFolder as fo , " +
                         "AgLibraryFile as fi " +
-                        "where '" + SystemFiles.normalizePath(fpath.getParent()) + "' like p.absolutePath || '%'  " +
+                        "where \"" + SystemFiles.normalizePath(fpath.getParent()) + "\" like p.absolutePath || '%'  " +
                         "and fo.rootFolder = p.id_local " +
-                        "and '" + SystemFiles.normalizePath(fpath.getParent() + File.separator) + "' = p.absolutePath || fo.pathFromRoot  " +
+                        "and \"" + SystemFiles.normalizePath(fpath.getParent() + File.separator) + "\" = p.absolutePath || fo.pathFromRoot  " +
                         "and fi.folder = fo.id_local " +
-                        "and ( ( fi.idx_filename =  '" + baseName + "." + ext + "' ) " +
-                        "or ( fi.baseName =  '" + baseName + "' " +
+                        "and ( ( fi.idx_filename =  \"" + baseName + "." + ext + "\" ) " +
+                        "or ( fi.baseName =  \"+" + baseName + "\" " +
                         "and fi.extension =  '" + ext + "'  ) ) " +
                         ";");
 
@@ -419,9 +419,9 @@ public class Database extends SQLiteJDBCDriverConnection {
                 "select p.absolutePath ,  p.id_local , fo.rootFolder , fo.pathFromRoot , fo.id_local as result  " +
                         "from AgLibraryRootFolder as p , " +
                         "AgLibraryFolder as fo " +
-                        "where '" + SystemFiles.normalizePath(repertoire + File.separator) + "' like p.absolutePath || '%'  " +
+                        "where \"" + SystemFiles.normalizePath(repertoire + File.separator) + "\" like p.absolutePath || '%'  " +
                         "and fo.rootFolder = p.id_local " +
-                        "and '" + SystemFiles.normalizePath(repertoire + File.separator) + "' = p.absolutePath || fo.pathFromRoot  " +
+                        "and \"" + SystemFiles.normalizePath(repertoire + File.separator) + "\" = p.absolutePath || fo.pathFromRoot  " +
                         ";");
         Map<String, String> ret = new HashMap<>();
         ret.put("Folderidlocal", "0");
@@ -1205,8 +1205,8 @@ public class Database extends SQLiteJDBCDriverConnection {
         String sql;
         sql = "update AgLibraryFolder " +
                 "set pathFromRoot = " +
-                "replace( pathFromRoot, '" + src.get("pathFromRoot") + "' , '" + dest + "' ) " +
-                "where id_local = '" + src.get("Folderidlocal") + "' " +
+                "replace( pathFromRoot, \"" + src.get("pathFromRoot") + "\" , \"" + dest + "\" ) " +
+                "where id_local = \"" + src.get("Folderidlocal") + "\" " +
                 ";";
 //        return 1;
         return executeUpdate(sql);
@@ -1393,7 +1393,7 @@ public class Database extends SQLiteJDBCDriverConnection {
         String sql = "select " +
                 "a.id_local as id_local " +
                 "from AgLibraryFile a  " +
-                "where a.importHash like '" + hash + "' " +
+                "where a.importHash like \"" + hash + "\" " +
                 ";";
         ResultSet rs = select(sql);
         while (rs.next()) {
