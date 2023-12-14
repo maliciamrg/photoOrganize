@@ -268,27 +268,18 @@ public class Main {
                             (champ) -> {
                                 if (!champ.isRetourControle()) {
 
-                                    champ.getCompTagRetour().forEach((TagRetour) -> {
+                                    champ.getCompTagRetour().forEach((tagRetour) -> {
 
 //                                            System.out.println(blocRetourRep.getRepertoire() + " -- " + champ.getCompTagRetour());
-                                        LOGGER.debug(blocRetourRep.getRepertoire() + " -- " + TagRetour);
-                                        NumberFormat formatter = new DecimalFormat("0000");
-                                        int nbDiscr = ThreadLocalRandom.current().nextInt(0, 9999);
-                                        String number = formatter.format(nbDiscr);
-//                                            String tag = champ.getCompTagRetour() + "_" + "(" + number +")"  ;
-
-                                        String[] tags = (Context.TAG_REPSWEEP + "_" + TagRetour +  "..." + "("+ number +")" ).replace("[", "").replace("]", "").split("_");
-
-
-                                        String cletrace = tags[1] + ":" + tags[2];
                                         try {
-                                            for (int i = 0; i <= tags.length - 1 - 1; i++) {
-                                                dbLr.sqlcreateKeyword(tags[i], tags[i + 1]);
-                                            }
 
-                                            dbLr.AddKeywordToRepNoVideo(blocRetourRep.getRepertoire(), tags[tags.length - 1], tags[tags.length - 1 - 1]);
+                                            String repertoireToUpdate = blocRetourRep.getRepertoire();
+                                            LOGGER.debug(repertoireToUpdate + " -- " + tagRetour);
 
-                                            int ret = dbLr.topperRepertoireARed(blocRetourRep.getRepertoire(), color);
+                                            String[] tags = putTagOnAllPhotoNoVideoOfFolder(tagRetour, repertoireToUpdate);
+
+                                            //put repertory at red
+                                            int ret = dbLr.topperRepertoireARed(repertoireToUpdate, color);
                                             if (ret > 0) {
                                                 LOGGER.debug("   Tag a RED ");
                                                 if (!miseared[0]) {
@@ -297,6 +288,8 @@ public class Main {
                                                 }
                                             }
 
+                                            //use for display in log
+                                            String cletrace = tags[1] + ":" + tags[2];
                                             if (lstIdKey.containsKey(cletrace)) {
                                                 lstIdKey.replace(cletrace, lstIdKey.get(cletrace) + 1);
                                             } else {
@@ -325,6 +318,18 @@ public class Main {
         lstIdKeyByKey.forEach((tempKey) -> {
             LOGGER.info(getStringLn(tempKey) + " = " + formatter.format(lstIdKey.get(tempKey)));
         });
+    }
+
+    private static String[] putTagOnAllPhotoNoVideoOfFolder(String stringTag, String repertoireToUpdate) throws SQLException {
+        NumberFormat formatter = new DecimalFormat("0000");
+        int nbDiscr = ThreadLocalRandom.current().nextInt(0, 9999);
+        String number = formatter.format(nbDiscr);
+        String[] tags = (Context.TAG_REPSWEEP + "_" + stringTag +  "..." + "("+ number +")" ).replace("[", "").replace("]", "").split("_");
+        for (int i = 0; i <= tags.length - 1 - 1; i++) {
+            dbLr.sqlcreateKeyword(tags[i], tags[i + 1]);
+        }
+        dbLr.AddKeywordToRepNoVideo(repertoireToUpdate, tags[tags.length - 1], tags[tags.length - 1 - 1]);
+        return tags;
     }
 
     private static void chargementParametre(Context ctx, String[] args) {
@@ -1274,13 +1279,24 @@ public class Main {
                 SimpleDateFormat repDateFormat = new SimpleDateFormat(TriNew.FORMATDATE_YYYY_MM_DD);
                 String nomRep = repDateFormat.format(new Date(listEle.getFirstDate() * 1000)) + "_(" + String.format("%05d", listEle.lstEleFile.size()) + ")";
                 listEle.deBounce();
-                for (ElementFichier eleGrp : listEle.lstEleFileWithoutDuplicates) {
+                for (ElementFichier elementFichier : listEle.lstEleFileWithoutDuplicates) {
 
-                    String newName = ctx.getParamTriNew().getRepertoire50NEW() + nomRep + File.separator + addSourceToNameFor(SystemFiles.normalizePath(eleGrp.getAbsolutePath()).compareTo(SystemFiles.normalizePath(ctx.getRepertoire00NEW())) == 0, eleGrp.getPathFromRoot(), eleGrp.getLcIdxFilename());
-//                    LOGGER.info("move from {} to {} " , eleGrp.getPath(), newName );
-                    Function.moveFile(eleGrp.getPath(), Function.modifyPathIfExistWithRandom(newName), dbLr);
+                    String newName = ctx.getParamTriNew().getRepertoire50NEW() + nomRep + File.separator + addSourceToNameFor(
+                            SystemFiles.normalizePath(elementFichier.getAbsolutePath()).compareTo(SystemFiles.normalizePath(ctx.getRepertoire00NEW())) == 0,
+                            elementFichier.getPathFromRoot(),
+                            elementFichier.getLcIdxFilename());
+//                    LOGGER.info("move from {} to {} " , elementFichier.getPath(), newName );
+                    Function.moveFile(elementFichier.getPath(), Function.modifyPathIfExistWithRandom(newName), dbLr);
 
                 }
+
+                //Tag all new repository
+                String tagRetour = "@new_"
+                        + nomRep.replace(ctx.getRepertoire50Phototheque(), "").replace("_", " ") + "_"
+                        + "create folder inside ##";
+                putTagOnAllPhotoNoVideoOfFolder(tagRetour, SystemFiles.normalizePath(ctx.getParamTriNew().getRepertoire50NEW() + nomRep + File.separator));
+
+
             }
             LOGGER.info("Repertoire New - Nb groupe => " + String.format("%05d", listGrpEletmp.size()) + " pour un total de " + String.format("%05d", nbtot) + " elements ");
         }

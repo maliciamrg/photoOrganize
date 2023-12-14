@@ -21,7 +21,7 @@ workflow:
     - IS_WRK_REP_PHOTO_00 # (analFonctionRep) analyse des repertoires en function des regles => analFonctionRep
     - IS_TAG_CTRL_REP_000 # (analFonctionRep) => appliquer des tag TAG_REPSWEEP++ sur les photo et mise a 'RED' de repertoire en fonction de analFonctionRep.getListOfretourValRepertoire()
     - IS_EXEC_FONC_REP_00 # (analFonctionRep) => Renommage des repertoire via POP UP.
-#  NOTTODO:
+  NOTTODO:
     - IS_UNZIP_REP_PHOTO0 # extraire les ZIP dans les repertoire rejet
     - IS_SVG_LRCONFIG_000 # sauvegarde du la config LR sur le reseau.
     - EMPTY

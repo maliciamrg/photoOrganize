@@ -62,6 +62,10 @@ public class BlocRetourRepertoire {
         String ancienNomDuRepertoire = new File(repertoire).getName();
         String[] oldChamp = ancienNomDuRepertoire.split(ControleRepertoire.CARAC_SEPARATEUR);
 
+        NumberFormat formatter = new DecimalFormat("0000");
+        int nbDiscr = ThreadLocalRandom.current().nextInt(0, 9999);
+        String repDiscrNumber = formatter.format(nbDiscr);
+
         //controle nom du repertoire
         List<EleChamp> listOfChampNom = new ArrayList<>();
         int i = 0;
@@ -75,7 +79,7 @@ public class BlocRetourRepertoire {
             } else {
                 eChamp = new EleChamp(valeurAdmise, "");
             }
-            controleChamp(repertoire, repPhoto, eChamp);
+            controleChamp(repertoire, repPhoto, eChamp, repDiscrNumber);
             listOfChampNom.add(eChamp);
             i++;
         }
@@ -89,7 +93,7 @@ public class BlocRetourRepertoire {
             EleChamp eChamp = new EleChamp();
             String ele = listControleRepertoireIterator.next();
             eChamp.setcChamp(ele);
-            controleChamp(repertoire, repPhoto, eChamp);
+            controleChamp(repertoire, repPhoto, eChamp, repDiscrNumber);
             listOfChampCtrl.add(eChamp);
         }
         setListOfControleValRepertoire(listOfChampCtrl);
@@ -194,7 +198,7 @@ public class BlocRetourRepertoire {
         }
     }
 
-    public void controleChamp(String repertoire, RepertoirePhoto repPhoto, EleChamp ele) throws SQLException {
+    public void controleChamp(String repertoire, RepertoirePhoto repPhoto, EleChamp ele, String repDiscrNumber) throws SQLException {
         LOGGER.debug("controleChamp : {}", ele.getcChamp());
 
         ele.setRetourControle(false);
@@ -204,15 +208,12 @@ public class BlocRetourRepertoire {
         for (String elechamp : arrayChamp) {
 
             if (!ele.isRetourControle()) {
-                testElementChamp(repertoire, repPhoto, elechamp, ele);
+                testElementChamp(repertoire, repPhoto, elechamp, ele, repDiscrNumber);
             }
         }
     }
 
-    private void testElementChamp(String repertoire, RepertoirePhoto repPhoto, String elechamp, EleChamp ele) throws SQLException {
-        NumberFormat formatter = new DecimalFormat("0000");
-        int nbDiscr = ThreadLocalRandom.current().nextInt(0, 9999);
-        String number = formatter.format(nbDiscr);
+    private void testElementChamp(String repertoire, RepertoirePhoto repPhoto, String elechamp, EleChamp ele, String repDiscrNumber) throws SQLException {
 
         switch (elechamp) {
             case ControleRepertoire.DATE_DATE:
@@ -244,7 +245,7 @@ public class BlocRetourRepertoire {
                     ele.setRetourToFalse(String.valueOf(nbelementsPhysiqueNonRejet),
                             "Repertoire_"
                                     + repertoire.replace(repPhoto.getRepertoire() + "\\", "").replace(ctx.getRepertoire50Phototheque(), "").replace("_", " ") + "_"
-                                    + "elePhy" + "..." + "("+ number +")" + "_"
+                                    + "elePhy" + "..." + "("+ repDiscrNumber +")" + "_"
                                     + "zero photo not rejected"
                     );
                 }
@@ -255,7 +256,7 @@ public class BlocRetourRepertoire {
                     ele.setRetourToFalse(String.valueOf(nbPickNoVideo),
                             "Repertoire_"
                                     + repertoire.replace(repPhoto.getRepertoire() + "\\", "").replace(ctx.getRepertoire50Phototheque(), "").replace("_", " ") + "_"
-                                    + "Flag:" + String.format("%05d", limitemaxfolderphoto) + "..." + "("+ number +")" + "_"
+                                    + "Flag:" + String.format("%05d", limitemaxfolderphoto) + "..." + "("+ repDiscrNumber +")" + "_"
                                     + "zero elements selected"
                     );
                 }
@@ -266,7 +267,7 @@ public class BlocRetourRepertoire {
                     ele.setRetourToFalse(String.valueOf(nbNoPickNoVideo),
                             "Repertoire_"
                                     + repertoire.replace(repPhoto.getRepertoire() + "\\", "").replace(ctx.getRepertoire50Phototheque(), "").replace("_", " ") + "_"
-                                    + "Flag:" + String.format("%05d", limitemaxfolderphoto) + "..." + "("+ number +")" + "_"
+                                    + "Flag:" + String.format("%05d", limitemaxfolderphoto) + "..." + "("+ repDiscrNumber +")" + "_"
                                     + "pick or reject " + String.format("%05d", nbNoPickNoVideo) + " photo"
                     );
                 }
@@ -277,7 +278,7 @@ public class BlocRetourRepertoire {
                     ele.setRetourToFalse(String.valueOf(nbphotoapurger),
                             "Repertoire_"
                                     + repertoire.replace(repPhoto.getRepertoire() + "\\", "").replace(ctx.getRepertoire50Phototheque(), "").replace("_", " ") + "_"
-                                    + "Flag:" + String.format("%05d", limitemaxfolderphoto) + "..." + "("+ number +")" + "_"
+                                    + "Flag:" + String.format("%05d", limitemaxfolderphoto) + "..." + "("+ repDiscrNumber +")" + "_"
                                     + "reject " + String.format("%05d", nbphotoapurger) + " photo"
                     );
                 }
@@ -288,7 +289,7 @@ public class BlocRetourRepertoire {
                     ele.setRetourToFalse(String.valueOf(limitemaxfolderphoto),
                             "Repertoire_"
                                     + repertoire.replace(repPhoto.getRepertoire() + "\\", "").replace(ctx.getRepertoire50Phototheque(), "").replace("_", " ") + "_"
-                                    + "limitemaxazero" + "..." + "("+ number +")" + "_"
+                                    + "limitemaxazero" + "..." + "("+ repDiscrNumber +")" + "_"
                                     + "(noLMax)"
                     );
                 }
