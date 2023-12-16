@@ -1281,12 +1281,15 @@ public class Main {
                 listEle.deBounce();
                 for (ElementFichier elementFichier : listEle.lstEleFileWithoutDuplicates) {
 
-                    String newName = ctx.getParamTriNew().getRepertoire50NEW() + nomRep + File.separator + addSourceToNameFor(
+                    String newPath = ctx.getParamTriNew().getRepertoire50NEW() + nomRep + File.separator + addSourceToNameFor(
                             SystemFiles.normalizePath(elementFichier.getAbsolutePath()).compareTo(SystemFiles.normalizePath(ctx.getRepertoire00NEW())) == 0,
                             elementFichier.getPathFromRoot(),
                             elementFichier.getLcIdxFilename());
 //                    LOGGER.info("move from {} to {} " , elementFichier.getPath(), newName );
-                    Function.moveFile(elementFichier.getPath(), Function.modifyPathIfExistWithRandom(newName), dbLr);
+                    String srcPath = elementFichier.getPath();
+                    if (SystemFiles.normalizePath(newPath).compareTo(SystemFiles.normalizePath(srcPath))!=0) {
+                        Function.moveFile(srcPath, Function.modifyPathIfExistWithRandom(newPath), dbLr);
+                    }
 
                 }
 
@@ -1305,8 +1308,11 @@ public class Main {
             //deplacement des group d'elements Kidz
             LOGGER.info("Repertoire New - vers Kidz : " + String.format("%05d", listElekidz.lstEleFile.size()));
             for (ElementFichier eleGrp : listElekidz.lstEleFile) {
-                String newName = ctx.getParamTriNew().getRepertoireKidz() + File.separator + eleGrp.getLcIdxFilename();
-                Function.moveFile(eleGrp.getPath(), Function.modifyPathIfExistWithRandom(newName), null);
+                String newPath = ctx.getParamTriNew().getRepertoireKidz() + File.separator + eleGrp.getLcIdxFilename();
+                String srcPath = eleGrp.getPath();
+                if (SystemFiles.normalizePath(newPath).compareTo(SystemFiles.normalizePath(srcPath))!=0) {
+                    Function.moveFile(eleGrp.getPath(), Function.modifyPathIfExistWithRandom(newPath), null);
+                }
             }
         }
 
@@ -1314,8 +1320,11 @@ public class Main {
             //deplacement des group d'elements Bazar
             LOGGER.info("Repertoire New - nb Bazar  : " + String.format("%05d", listFileBazar.lstEleFile.size()));
             for (ElementFichier eleGrp : listFileBazar.lstEleFile) {
-                String newName = ctx.getParamTriNew().getRepertoireBazar() + File.separator + eleGrp.getLcIdxFilename();
-                Function.moveFile(eleGrp.getPath(), Function.modifyPathIfExistWithRandom(newName), dbLr);
+                String newPath = ctx.getParamTriNew().getRepertoireBazar() + File.separator + eleGrp.getLcIdxFilename();
+                String srcPath = eleGrp.getPath();
+                if (SystemFiles.normalizePath(newPath).compareTo(SystemFiles.normalizePath(srcPath))!=0) {
+                    Function.moveFile(eleGrp.getPath(), Function.modifyPathIfExistWithRandom(newPath), dbLr);
+                }
             }
         }
     }
