@@ -102,6 +102,14 @@ public class Context {
         return YamlConfigRunner("ContextApplication.yaml");
     }
 
+    public Workflow getWorkflow() {
+        return workflow;
+    }
+
+    public void setWorkflow(Workflow workflow) {
+        this.workflow = workflow;
+    }
+
     public List<String> getExtensionsUseFile() {
         return extensionsUseFile;
     }
@@ -282,5 +290,19 @@ public class Context {
 
     private ClassLoader getContextClassLoader() {
         return Thread.currentThread().getContextClassLoader();
+    }
+
+    public void updateWorkflow(String resourceFileWorkflow) throws IOException, URISyntaxException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+
+        Context contexte = new Context();
+        Yaml yaml = new Yaml();
+
+        try (InputStream in = Context.class.getResourceAsStream("/" + resourceFileWorkflow)) {
+//        try( InputStream in = Files.newInputStream( Paths.get( args ) ) ) {
+            contexte = yaml.loadAs(in, Context.class);
+            setWorkflow(contexte.getWorkflow());
+            LOGGER.debug(toString());
+        }
     }
 }

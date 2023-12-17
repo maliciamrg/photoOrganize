@@ -28,6 +28,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -332,13 +334,16 @@ public class Main {
         return tags;
     }
 
-    private static void chargementParametre(Context ctx, String[] args) {
+    private static void chargementParametre(Context ctx, String[] args) throws IOException, URISyntaxException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         for (int i = 0; i < args.length; i++) {
             String[] decomp = args[i].split(":");
 
             switch (decomp[0]) {
                 case "thresholdNew":
                     ctx.getParamTriNew().setThresholdNew(Long.parseLong(decomp[1]));
+                    break;
+                case "workflow":
+                    ctx.updateWorkflow(decomp[1]);
                     break;
             }
             LOGGER.info("Parameter : " + i + " = " + args[i]);
@@ -596,7 +601,7 @@ public class Main {
                 String newPath = fileToTag.get(scrFileIdLocal).get("newPath");
                 if (new File(oldPath).exists() && !new File(newPath).exists()) {
                     LOGGER.debug("---move " + key + " : " + oldPath + " -> " + newPath);
-                    Function.moveFile(oldPath, newPath, dbLr);
+                    Function.moveFile(SystemFiles.normalizePath(oldPath), SystemFiles.normalizePath(newPath), dbLr);
                     dbLr.removeKeywordImages(fileToTag.get(scrFileIdLocal).get("kiIdLocal"));
                 }
             }
