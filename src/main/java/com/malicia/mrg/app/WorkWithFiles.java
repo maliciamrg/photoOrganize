@@ -1,5 +1,6 @@
 package com.malicia.mrg.app;
 
+import com.malicia.mrg.TimeTracker;
 import com.malicia.mrg.util.UnzipUtility;
 
 import com.malicia.mrg.util.WhereIAm;
@@ -17,6 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.malicia.mrg.Main.LOGGER_TO_TIME;
 import static com.malicia.mrg.util.SystemFiles.normalizePath;
 
 public class WorkWithFiles {
@@ -27,11 +29,30 @@ public class WorkWithFiles {
         throw new IllegalStateException("Utility class");
     }
 
-    public static List<File> getFilesFromRepertoryWithFilter(String repertory, List<String> arrayFiltreDeNomDeSubdirectory, String extFileAExclure) {
-        List<File> ret = new ArrayList<>();
-        File[] files = new File(repertory).listFiles();
-        showFiles(files, ret, arrayFiltreDeNomDeSubdirectory, extFileAExclure, "", true);
-        return ret;
+    // a partir d'un chemin
+    //  - recupere tout les fihchier contenue dans les sous repertoire "arraySubDirectoryToIclude"
+    //  - qui non pas comme extension extFileToExclude
+    public static List<File> getFilesFromRepertoryWithFilter(String repertoryToSearch, List<String> arraySubDirectoryToInclude, List<String> arraySubDirectoryToExclude, String extFileToExclude) throws IOException {
+        TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+
+        String[] arraySubDirectoryToIncludeArray = arraySubDirectoryToInclude.toArray(new String[0]);
+        String[] arraySubDirectoryToExcludeArray = arraySubDirectoryToExclude.toArray(new String[0]);
+        List<Path> filesOutList = new ArrayList<>();
+        try (Stream<Path> walk = Files.walk(Paths.get(repertoryToSearch))) {
+            filesOutList = walk.filter(Files::isRegularFile)
+                    .filter(p -> !p.getFileName().toString().endsWith(extFileToExclude))
+                    .filter(p -> Arrays.stream(arraySubDirectoryToIncludeArray).anyMatch(p.getParent().toString()::contains))
+                    .filter(p -> Arrays.stream(arraySubDirectoryToExcludeArray).noneMatch(p.getParent().toString()::contains))
+                    .collect(Collectors.toList());
+        }
+
+        // Convert List<Path> to List<File>
+        List<File> fileList = filesOutList.stream()
+                .map(Path::toFile)
+                .collect(Collectors.toList());
+
+        TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+        return fileList;
     }
 
     public static List<File> getFilesFromRepertoryWithFilter(String repertory, String extFileAInclure) {

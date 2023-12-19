@@ -1,6 +1,7 @@
 package com.malicia.mrg.app;
 
 import com.malicia.mrg.Main;
+import com.malicia.mrg.TimeTracker;
 import com.malicia.mrg.model.Database;
 import com.malicia.mrg.param.electx.RepertoirePhoto;
 import com.malicia.mrg.util.SystemFiles;
@@ -16,6 +17,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.malicia.mrg.Main.LOGGER_TO_TIME;
+
 public class WorkWithRepertory {
 
     private static final Logger LOGGER = LogManager.getLogger(WorkWithRepertory.class);
@@ -25,6 +28,8 @@ public class WorkWithRepertory {
     }
 
     public static boolean deleteEmptyRep(File directory, JProgressBar progress) throws IOException {
+        TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName() + " -- " + directory, LOGGER_TO_TIME);
+
         FileFilter fileFilter = new FileFilter(){
             public boolean accept(File dir) {
                 if (dir.isDirectory()) {
@@ -57,6 +62,8 @@ public class WorkWithRepertory {
                 }
             }
         }
+        TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName() + " -- " + directory, LOGGER_TO_TIME);
+
         return true;
     }
     public static boolean deleteEmptyRep_old(String fileLocation, JProgressBar progress) throws IOException {

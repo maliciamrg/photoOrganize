@@ -1,6 +1,8 @@
 workflow:
   IS_DRY_RUN: false  # Est-ce un dry_run (sans mise a jour des bases)
   TODO:
+    - IS_SYNCR_LR_0000000 # Synchronise les repertoire et fichiers physique avec la base LR
+    - IS_MAINT_LR_0000000 # Maintenance sur la base LR
     - IS_WRK_REJET_000000 # ranger [les repertoire rejet et les les photo tagger rejeter] dans les repertoires rejet ou le 99-rejet (pour suppression)
     - IS_ACTION_FROM_KEY0 # (action) déplacement des photos tagger par TAG_ACTION_GO_RAPPROCHEMENT et Context.COLLECTIONS
     - IS_PURGE_ACTION_000 # (prepare) remove les tag [action] des photos (TAG_ACTION_GO_RAPPROCHEMENT et Context.COLLECTIONS)
@@ -13,8 +15,6 @@ workflow:
     - IS_LST_RAPP_NEW_REP # (raprochement) lister Les Rapprochement Avec Les Repertoires Photo (regrouper les photo New avec la photothèque par temps adherence) => grpPhotosRapprocher
     - IS_TAG_RAPP_NEW_REP # (raprochement) grpPhotosRapprocher => mise En Place Des TAG_RAPPROCHEMENT++ possible entre les new et la phototheque
   NOTTODO:
-    - IS_SYNCR_LR_0000000 # Synchronise les repertoire et fichiers physique avec la base LR
-    - IS_MAINT_LR_0000000 # Maintenance sur la base LR
     - IS_WRK_REP_PHOTO_00 # (analFonctionRep) analyse des repertoires en function des regles => analFonctionRep
     - IS_TAG_CTRL_REP_000 # (analFonctionRep) => appliquer des tag TAG_REPSWEEP++ sur les photo et mise a 'RED' de repertoire en fonction de analFonctionRep.getListOfretourValRepertoire()
     - IS_EXEC_FONC_REP_00 # (analFonctionRep) => Renommage des repertoire via POP UP.

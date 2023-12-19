@@ -21,7 +21,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.sound.midi.MidiDevice;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -54,6 +53,7 @@ public class Main {
     private static final Logger LOGGER_TO_TAG_RAP = LogManager.getLogger("loggerToTagRap");
     private static final Logger LOGGER_TO_SYNC_PH_FILE = LogManager.getLogger("loggerToSyncPhFile");
     private static final Logger LOGGER_TO_ANAL_REP = LogManager.getLogger("loggerToAnalRepDisplay");
+    public static final Logger LOGGER_TO_TIME = LogManager.getLogger("loggerToTime");
     private static Context ctx;
     private static Database dbLr;
     private static JFrame frame;
@@ -87,151 +87,11 @@ public class Main {
 
             // chargement parameter
             chargementParametre(ctx, args);
-            //*
+            //*;
 
-            displayBooleen();
+            mainWorkflow(false);
+            mainWorkflow(true);
 
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_SYNCR_LR_0000000"))) {
-                //Synchro fichier physique avec database lr
-                synchroDatabase();
-                //*
-            }
-
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
-                //Maintenance database lr
-                maintenanceDatabase();
-                //*
-            }
-
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_ACTION_FROM_KEY0"))) {
-                //effectuer les actions demander via le tag Lightroom
-                makeActionFromKeyword();
-                //*
-            }
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_PURGE_ACTION_000"))) {
-                //purger les action demander via les keywords
-                removeLinkWithActionFromKeyword();
-                //*
-            }
-
-            //initialization pour nouveau démarrage
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_DEL_00000000"))) {
-                List<String> lstIdKey = new ArrayList<>();
-                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_CR_000000000"))) {
-                    lstIdKey = creationDesKeywordProjet();
-                }
-                purgeKeywordProjet(lstIdKey);
-                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
-                    //Maintenance database lr
-                    maintenanceDatabase();
-                    //*
-                }
-            }
-
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RETAG_RED_000000"))) {
-                tagRedOnlyRep00New(colorTagNew);
-            }
-            //*
-
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RETAG_GREEN_0000"))) {
-                tagGreenOnlyRep00NewWhatsApp(colorTagWhatsApp);
-            }
-            //*
-
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
-                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_UNZIP_REP_PHOTO0"))) {
-                    unzipAndExtractAllZip();
-                }
-            }
-
-            //En Fonction De La Strategies De Rangement
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REJET_000000"))) {
-                //En Fonction De La Strategies De Rangement
-                rangerLesRejets();
-                //*
-            }
-
-            //************************************************************
-            //*     analyse                                              *
-            //*                                                          *
-
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
-                //En Fonction De La Strategies De Rangement
-                analFonctionRep = analyseFonctionellesDesRepertoires();
-                LOGGER_TO_ANAL_REP.info(analFonctionRep.toDisplay());
-                //*
-            }
-
-            //*                                                          *
-            //************************************************************
-
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RGP_NEW_00000000"))) {
-                //regrouper le new
-                regrouperLesNouvellesPhoto(progress);
-                progress.setString("");
-                //*
-                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_LST_RAPP_NEW_REP"))) {
-                    //lister les possible photo oublier
-                    List<GrpPhoto> grpPhotosRapprocher = listerLesRapprochermentAvecLesRepertoirePhoto();
-                    if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_RAPP_NEW_REP")) && Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_CR_000000000"))) {
-                        miseEnPlaceDesTagDeRapprochement(grpPhotosRapprocher);
-                    }
-                    //*
-                }
-                //*
-            }
-            //*
-
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_PURGE_FOLDER_000"))) {
-                //Nettoyage repertoires phototheque
-                purgeDesRepertoireVide50Phototheque();
-                //*
-                //Nettoyage repertoires a trier
-                purgeDesRepertoireVide50New();
-                //*
-                //Nettoyage repertoires check in
-                purgeDesRepertoireVide00NEW();
-                //*
-            }
-
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
-                //Maintenance database lr
-                maintenanceDatabase();
-                //*
-            }
-
-            //************************************************************
-            //*     tagging                                              *
-            //*                                                          *
-
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
-                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_EXEC_FONC_REP_00"))) {
-                    //Popup Action sur les erreurs Fonctionelle des repertoires
-                    analFonctionRep.action(ctx, dbLr);
-                    //*
-                }
-
-                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_CTRL_REP_000"))) {
-                    tagretourValRepertoire(analFonctionRep.getListOfretourValRepertoire(), colorTagNew);
-                }
-            }
-
-            //*                                                          *
-            //************************************************************
-
-            if (isItTimeToSave() || Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_FORCE_SVG_000000"))) {
-                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_SVG_LRCONFIG_000"))) {
-                    //Sauvegarde Lightroom sur Local
-                    sauvegardeLightroomConfigSauve();
-                    //*
-                }
-
-                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RSYNC_BIB_000000"))) {
-                    //sauvegarde Vers Réseaux Pour Cloud
-                    sauvegardeStudioPhoto2Reseaux();
-                    //*
-                }
-            }
 
             endall();
 
@@ -246,6 +106,175 @@ public class Main {
 
     }
 
+    private static void mainWorkflow(boolean makeAction) throws Exception {
+        TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+
+        if (!makeAction) {
+            LOGGER.info("");
+            LOGGER.info("");
+            LOGGER.info("----------------------------------------------------ACTION PREVU------------------------------------------------------------------");
+            LOGGER.info("--                                                                                                                              --");
+            if (Boolean.TRUE.equals(ctx.workflow.IS_DRY_RUN)) {
+                LOGGER.info("");
+                LOGGER.info("------DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN-------");
+                LOGGER.info("");
+            }
+        }
+
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_SYNCR_LR_0000000"))) {
+            //Synchro fichier physique avec database lr
+            synchroDatabase(makeAction);
+            //*
+        }
+
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
+            //Maintenance database lr
+            maintenanceDatabase(makeAction);
+            //*
+        }
+
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_ACTION_FROM_KEY0"))) {
+            //effectuer les actions demander via le tag Lightroom
+            makeActionFromKeyword(makeAction);
+            //*
+        }
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_PURGE_ACTION_000"))) {
+            //purger les action demander via les keywords
+            removeLinkWithActionFromKeyword(makeAction);
+            //*
+        }
+
+        //initialization pour nouveau démarrage
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_DEL_00000000"))) {
+            List<String> lstIdKey = new ArrayList<>();
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_CR_000000000"))) {
+                lstIdKey = creationDesKeywordProjet(makeAction);
+            }
+            purgeKeywordProjet(makeAction,lstIdKey);
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
+                //Maintenance database lr
+                maintenanceDatabase(makeAction);
+                //*
+            }
+        }
+
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RETAG_RED_000000"))) {
+            tagRedOnlyRep00New(makeAction,colorTagNew);
+        }
+        //*
+
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RETAG_GREEN_0000"))) {
+            tagGreenOnlyRep00NewWhatsApp(makeAction,colorTagWhatsApp);
+        }
+        //*
+
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_UNZIP_REP_PHOTO0"))) {
+                unzipAndExtractAllZip(makeAction);
+            }
+        }
+
+        //En Fonction De La Strategies De Rangement
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REJET_000000"))) {
+            //En Fonction De La Strategies De Rangement
+            rangerLesRejets(makeAction);
+            //*
+        }
+
+        //************************************************************
+        //*     analyse                                              *
+        //*                                                          *
+
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
+            //En Fonction De La Strategies De Rangement
+            analFonctionRep = analyseFonctionellesDesRepertoires(makeAction);
+            //*
+        }
+
+        //*                                                          *
+        //************************************************************
+
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RGP_NEW_00000000"))) {
+            //regrouper le new
+            regrouperLesNouvellesPhoto(makeAction,progress);
+            progress.setString("");
+            //*
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_LST_RAPP_NEW_REP"))) {
+                //lister les possible photo oublier
+                List<GrpPhoto> grpPhotosRapprocher = listerLesRapprochermentAvecLesRepertoirePhoto(makeAction);
+                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_RAPP_NEW_REP")) && Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_CR_000000000"))) {
+                    miseEnPlaceDesTagDeRapprochement(makeAction,grpPhotosRapprocher);
+                }
+                //*
+            }
+            //*
+        }
+        //*
+
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_PURGE_FOLDER_000"))) {
+            //Nettoyage repertoires phototheque
+            purgeDesRepertoireVide50Phototheque(makeAction);
+            //*
+            //Nettoyage repertoires a trier
+            purgeDesRepertoireVide50New(makeAction);
+            //*
+            //Nettoyage repertoires check in
+            purgeDesRepertoireVide00NEW(makeAction);
+            //*
+        }
+
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
+            //Maintenance database lr
+            maintenanceDatabase(makeAction);
+            //*
+        }
+
+        //************************************************************
+        //*     tagging                                              *
+        //*                                                          *
+
+        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_EXEC_FONC_REP_00"))) {
+                //Popup Action sur les erreurs Fonctionelle des repertoires
+                analFonctionRep.action(makeAction,ctx, dbLr);
+                //*
+            }
+
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_CTRL_REP_000"))) {
+                tagretourValRepertoire(makeAction,analFonctionRep.getListOfretourValRepertoire(), colorTagNew);
+            }
+        }
+
+        //*                                                          *
+        //************************************************************
+
+        if (isItTimeToSave(makeAction) || Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_FORCE_SVG_000000"))) {
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_SVG_LRCONFIG_000"))) {
+                //Sauvegarde Lightroom sur Local
+                sauvegardeLightroomConfigSauve(makeAction);
+                //*
+            }
+
+            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RSYNC_BIB_000000"))) {
+                //sauvegarde Vers Réseaux Pour Cloud
+                sauvegardeStudioPhoto2Reseaux(makeAction);
+                //*
+            }
+        }
+        if (!makeAction) {
+            if (Boolean.TRUE.equals(ctx.workflow.IS_DRY_RUN)) {
+                LOGGER.info("");
+                LOGGER.info("------DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN-------");
+                LOGGER.info("");
+            }
+            LOGGER.info("--                                                                                                                              --");
+            LOGGER.info("----------------------------------------------------ACTION PREVU END -------------------------------------------------------------");
+            LOGGER.info("");
+            LOGGER.info("");
+        }
+        TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+    }
+
     private static void loadCustomContext() throws IllegalStateException {
         int i;
         for (i = 0; i < ctx.arrayRepertoirePhoto.size(); i++) {
@@ -258,68 +287,74 @@ public class Main {
         }
     }
 
-    private static void tagretourValRepertoire(List<BlocRetourRepertoire> retourValRepertoire, String color) {
+    private static void tagretourValRepertoire(boolean makeAction, List<BlocRetourRepertoire> retourValRepertoire, String color) {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        final int[] nbTopRed = {0};
-        HashMap<String, Integer> lstIdKey = new HashMap<>();
-        retourValRepertoire.forEach(
-                (blocRetourRep) -> {
-                    final boolean[] miseared = {false};
-                    List<EleChamp> eChamp = blocRetourRep.getListOfControleValRepertoire();
-                    eChamp.forEach(
-                            (champ) -> {
-                                if (!champ.isRetourControle()) {
+        if (makeAction) {
+            TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+            
+            final int[] nbTopRed = {0};
+            HashMap<String, Integer> lstIdKey = new HashMap<>();
+            retourValRepertoire.forEach(
+                    (blocRetourRep) -> {
+                        final boolean[] miseared = {false};
+                        List<EleChamp> eChamp = blocRetourRep.getListOfControleValRepertoire();
+                        eChamp.forEach(
+                                (champ) -> {
+                                    if (!champ.isRetourControle()) {
 
-                                    champ.getCompTagRetour().forEach((tagRetour) -> {
+                                        champ.getCompTagRetour().forEach((tagRetour) -> {
 
 //                                            System.out.println(blocRetourRep.getRepertoire() + " -- " + champ.getCompTagRetour());
-                                        try {
+                                            try {
 
-                                            String repertoireToUpdate = blocRetourRep.getRepertoire();
-                                            LOGGER.debug(repertoireToUpdate + " -- " + tagRetour);
+                                                String repertoireToUpdate = blocRetourRep.getRepertoire();
+                                                LOGGER.debug(repertoireToUpdate + " -- " + tagRetour);
 
-                                            String[] tags = putTagOnAllPhotoNoVideoOfFolder(tagRetour, repertoireToUpdate);
+                                                String[] tags = putTagOnAllPhotoNoVideoOfFolder(tagRetour, repertoireToUpdate);
 
-                                            //put repertory at red
-                                            int ret = dbLr.topperRepertoireARed(repertoireToUpdate, color);
-                                            if (ret > 0) {
-                                                LOGGER.debug("   Tag a RED ");
-                                                if (!miseared[0]) {
-                                                    nbTopRed[0]++;
-                                                    miseared[0] = true;
+                                                //put repertory at red
+                                                int ret = dbLr.topperRepertoireARed(repertoireToUpdate, color);
+                                                if (ret > 0) {
+                                                    LOGGER.debug("   Tag a RED ");
+                                                    if (!miseared[0]) {
+                                                        nbTopRed[0]++;
+                                                        miseared[0] = true;
+                                                    }
                                                 }
+
+                                                //use for display in log
+                                                String cletrace = tags[1] + ":" + tags[2];
+                                                if (lstIdKey.containsKey(cletrace)) {
+                                                    lstIdKey.replace(cletrace, lstIdKey.get(cletrace) + 1);
+                                                } else {
+                                                    lstIdKey.put(cletrace, 1);
+                                                }
+
+                                            } catch (SQLException throwables) {
+                                                throwables.printStackTrace();
                                             }
 
-                                            //use for display in log
-                                            String cletrace = tags[1] + ":" + tags[2];
-                                            if (lstIdKey.containsKey(cletrace)) {
-                                                lstIdKey.replace(cletrace, lstIdKey.get(cletrace) + 1);
-                                            } else {
-                                                lstIdKey.put(cletrace, 1);
-                                            }
-
-                                        } catch (SQLException throwables) {
-                                            throwables.printStackTrace();
-                                        }
-
-                                    });
+                                        });
+                                    }
                                 }
-                            }
 
-                    );
-                }
-        );
+                        );
+                    }
+            );
 
-        NumberFormat formatter = new DecimalFormat("00000");
+            NumberFormat formatter = new DecimalFormat("00000");
 
-        loggerInfo("Tag a RED " + String.format("%05d", nbTopRed[0]) + " - repertoire ", nbTopRed[0]);
-        loggerInfo("Delta Tag a RED " + String.format("%+05d", nbTopRed[0] - unNbMisAREDRep) + " - repertoire ", nbTopRed[0] - unNbMisAREDRep);
+            loggerInfo("Tag a RED " + String.format("%05d", nbTopRed[0]) + " - repertoire ", nbTopRed[0]);
+            loggerInfo("Delta Tag a RED " + String.format("%+05d", nbTopRed[0] - unNbMisAREDRep) + " - repertoire ", nbTopRed[0] - unNbMisAREDRep);
 
-        List<String> lstIdKeyByKey = new ArrayList<>(lstIdKey.keySet());
-        Collections.sort(lstIdKeyByKey);
-        lstIdKeyByKey.forEach((tempKey) -> {
-            LOGGER.info(getStringLn(tempKey) + " = " + formatter.format(lstIdKey.get(tempKey)));
-        });
+            List<String> lstIdKeyByKey = new ArrayList<>(lstIdKey.keySet());
+            Collections.sort(lstIdKeyByKey);
+            lstIdKeyByKey.forEach((tempKey) -> {
+                LOGGER.info(getStringLn(tempKey) + " = " + formatter.format(lstIdKey.get(tempKey)));
+            });
+            
+            TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+        }
     }
 
     private static String[] putTagOnAllPhotoNoVideoOfFolder(String stringTag, String repertoireToUpdate) throws SQLException {
@@ -358,81 +393,94 @@ public class Main {
         }
     }
 
-    private static void removeLinkWithActionFromKeyword() throws IOException, SQLException {
+    private static void removeLinkWithActionFromKeyword(boolean makeAction) throws IOException, SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
 
-        //action collection
-        Map<String, String> listeAction = ctx.getActionVersRepertoire().getListeAction();
-        //action GO
-        listeAction.put(Context.TAG_ACTION_GO_RAPPROCHEMENT, "");
+        if (makeAction) {
+            TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+            //action collection
+            Map<String, String> listeAction = ctx.getActionVersRepertoire().getListeAction();
+            //action GO
+            listeAction.put(Context.TAG_ACTION_GO_RAPPROCHEMENT, "");
 
-        for (String tag : listeAction.keySet()) {
+            for (String tag : listeAction.keySet()) {
 
-            Map<String, Map<String, String>> filetoPurge = dbLr.getFileForGoTag(tag);
-            int nb = 0;
-            loggerInfo("purge link tag " + " - " + String.format("%05d", filetoPurge.size()) + " - " + tag, filetoPurge.size());
-            for (String key : filetoPurge.keySet()) {
-                nb += dbLr.removeKeywordImages(filetoPurge.get(key).get("kiIdLocal"));
+                Map<String, Map<String, String>> filetoPurge = dbLr.getFileForGoTag(tag);
+                int nb = 0;
+                loggerInfo("purge link tag " + " - " + String.format("%05d", filetoPurge.size()) + " - " + tag, filetoPurge.size());
+                for (String key : filetoPurge.keySet()) {
+                    nb += dbLr.removeKeywordImages(filetoPurge.get(key).get("kiIdLocal"));
+                }
+                loggerInfo("        - fait " + " - " + String.format("%05d", nb) + " - " + tag, nb);
+
             }
-            loggerInfo("        - fait " + " - " + String.format("%05d", nb) + " - " + tag, nb);
-
+            TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
         }
-
     }
 
-    private static void purgeKeywordProjet(List<String> lstIdKey) throws SQLException {
+    private static void purgeKeywordProjet(boolean makeAction, List<String> lstIdKey) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        int nbPurge = dbLr.purgeGroupeKeyword(Context.TAG_ORG, lstIdKey);
-        loggerInfo("purge " + String.format("%05d", nbPurge) + " - keywords ", nbPurge);
+        if (makeAction) {
+            TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+            int nbPurge = dbLr.purgeGroupeKeyword(Context.TAG_ORG, lstIdKey);
+            loggerInfo("purge " + String.format("%05d", nbPurge) + " - keywords ", nbPurge);
 
-        splitLOGGERInfo(isMoreZeroComm(dbLr.KeywordImageWithoutImages(progress)));
+            splitLOGGERInfo(isMoreZeroComm(dbLr.KeywordImageWithoutImages(progress)));
 
-        splitLOGGERInfo(isMoreZeroComm(dbLr.keywordImageWithoutKeyword(progress)));
+            splitLOGGERInfo(isMoreZeroComm(dbLr.keywordImageWithoutKeyword(progress)));
 
-        progress.setString("");
+            progress.setString("");
+
+            TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+        }
     }
 
-    private static List<String> creationDesKeywordProjet() throws SQLException {
+    private static List<String> creationDesKeywordProjet(boolean makeAction) throws SQLException {
         List<String> lstIdKey = new ArrayList<>();
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        String idKey = "";
+        if (makeAction) {
+            TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
 
-        Map<String, String> dbLrSqlcreateKeyword = new HashMap<>();
+            String idKey = "";
 
-        dbLrSqlcreateKeyword = dbLr.sqlcreateKeyword("", Context.TAG_ORG);
-        lstIdKey.add(dbLrSqlcreateKeyword.get("keyWordIdlocal"));
-        if (Boolean.valueOf(dbLrSqlcreateKeyword.get("NewkeyWordIdlocal"))) {
-            LOGGER.info(getStringLn("Keyword " + Context.TAG_ORG) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
-        }
+            Map<String, String> dbLrSqlcreateKeyword = new HashMap<>();
 
-        dbLrSqlcreateKeyword = dbLr.sqlcreateKeyword(Context.TAG_ORG, Context.TAG_RAPPROCHEMENT);
-        lstIdKey.add(dbLrSqlcreateKeyword.get("keyWordIdlocal"));
-        if (Boolean.valueOf(dbLrSqlcreateKeyword.get("NewkeyWordIdlocal"))) {
-            LOGGER.info(getStringLn("Keyword " + Context.TAG_ORG) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
-        }
-
-        dbLrSqlcreateKeyword = dbLr.sqlcreateKeyword(Context.TAG_ORG, Context.TAG_REPSWEEP);
-        lstIdKey.add(dbLrSqlcreateKeyword.get("keyWordIdlocal"));
-        if (Boolean.valueOf(dbLrSqlcreateKeyword.get("NewkeyWordIdlocal"))) {
-            LOGGER.info(getStringLn("Keyword " + Context.TAG_ORG) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
-        }
-
-        dbLrSqlcreateKeyword = dbLr.sqlcreateKeyword(Context.TAG_RAPPROCHEMENT, Context.TAG_ACTION_GO_RAPPROCHEMENT);
-        lstIdKey.add(dbLrSqlcreateKeyword.get("keyWordIdlocal"));
-        if (Boolean.valueOf(dbLrSqlcreateKeyword.get("NewkeyWordIdlocal"))) {
-            LOGGER.info(getStringLn("Keyword " + Context.TAG_ACTION_GO_RAPPROCHEMENT) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
-        }
-
-        for (String key : ctx.getActionVersRepertoire().getListeAction().keySet()) {
-
-            dbLrSqlcreateKeyword = dbLr.sqlcreateKeyword(Context.TAG_ORG, key);
+            dbLrSqlcreateKeyword = dbLr.sqlcreateKeyword("", Context.TAG_ORG);
             lstIdKey.add(dbLrSqlcreateKeyword.get("keyWordIdlocal"));
             if (Boolean.valueOf(dbLrSqlcreateKeyword.get("NewkeyWordIdlocal"))) {
-                LOGGER.info(getStringLn("Keyword " + key) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
+                LOGGER.info(getStringLn("Keyword " + Context.TAG_ORG) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
             }
 
-        }
+            dbLrSqlcreateKeyword = dbLr.sqlcreateKeyword(Context.TAG_ORG, Context.TAG_RAPPROCHEMENT);
+            lstIdKey.add(dbLrSqlcreateKeyword.get("keyWordIdlocal"));
+            if (Boolean.valueOf(dbLrSqlcreateKeyword.get("NewkeyWordIdlocal"))) {
+                LOGGER.info(getStringLn("Keyword " + Context.TAG_ORG) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
+            }
 
+            dbLrSqlcreateKeyword = dbLr.sqlcreateKeyword(Context.TAG_ORG, Context.TAG_REPSWEEP);
+            lstIdKey.add(dbLrSqlcreateKeyword.get("keyWordIdlocal"));
+            if (Boolean.valueOf(dbLrSqlcreateKeyword.get("NewkeyWordIdlocal"))) {
+                LOGGER.info(getStringLn("Keyword " + Context.TAG_ORG) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
+            }
+
+            dbLrSqlcreateKeyword = dbLr.sqlcreateKeyword(Context.TAG_RAPPROCHEMENT, Context.TAG_ACTION_GO_RAPPROCHEMENT);
+            lstIdKey.add(dbLrSqlcreateKeyword.get("keyWordIdlocal"));
+            if (Boolean.valueOf(dbLrSqlcreateKeyword.get("NewkeyWordIdlocal"))) {
+                LOGGER.info(getStringLn("Keyword " + Context.TAG_ACTION_GO_RAPPROCHEMENT) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
+            }
+
+            for (String key : ctx.getActionVersRepertoire().getListeAction().keySet()) {
+
+                dbLrSqlcreateKeyword = dbLr.sqlcreateKeyword(Context.TAG_ORG, key);
+                lstIdKey.add(dbLrSqlcreateKeyword.get("keyWordIdlocal"));
+                if (Boolean.valueOf(dbLrSqlcreateKeyword.get("NewkeyWordIdlocal"))) {
+                    LOGGER.info(getStringLn("Keyword " + key) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
+                }
+
+            }
+
+            TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+        }
         return lstIdKey;
     }
 
@@ -440,125 +488,42 @@ public class Main {
         return String.format("%-60s", s);
     }
 
-    private static void tagRedOnlyRep00New(String color) throws SQLException {
+    private static void tagRedOnlyRep00New(boolean makeAction, String color) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        if (makeAction) {
+            TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
 
-        int unNbMisARED = dbLr.deTopperAColorOld50NEW(new String[]{ctx.getParamTriNew().getRepertoire50NEW(), ctx.getRepertoire00NEW()}, color);
-        loggerInfo("UnTag a RED " + String.format("%05d", unNbMisARED) + " - images ", unNbMisARED);
+            int unNbMisARED = dbLr.deTopperAColorOld50NEW(new String[]{ctx.getParamTriNew().getRepertoire50NEW(), ctx.getRepertoire00NEW()}, color);
+            loggerInfo("UnTag a RED " + String.format("%05d", unNbMisARED) + " - images ", unNbMisARED);
 
-        dbLr.MiseAzeroDesColorLabels("rouge");
-        int nbMisARED = dbLr.topperARed50NEW(new String[]{ctx.getParamTriNew().getRepertoire50NEW(), ctx.getRepertoire00NEW()}, color);
-        loggerInfo("Tag a RED " + String.format("%05d", nbMisARED) + " - images ", nbMisARED);
+            dbLr.MiseAzeroDesColorLabels("rouge");
+            int nbMisARED = dbLr.topperARed50NEW(new String[]{ctx.getParamTriNew().getRepertoire50NEW(), ctx.getRepertoire00NEW()}, color);
+            loggerInfo("Tag a RED " + String.format("%05d", nbMisARED) + " - images ", nbMisARED);
 
-        unNbMisAREDRep = dbLr.deTopperARedOldRepertoire(color.toLowerCase(Locale.ROOT));
-        loggerInfo("UnTag a RED " + String.format("%05d", unNbMisAREDRep) + " - repertoire ", unNbMisAREDRep);
-
+            unNbMisAREDRep = dbLr.deTopperARedOldRepertoire(color.toLowerCase(Locale.ROOT));
+            loggerInfo("UnTag a RED " + String.format("%05d", unNbMisAREDRep) + " - repertoire ", unNbMisAREDRep);
+            
+            TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+        }
     }
 
-    private static void tagGreenOnlyRep00NewWhatsApp(String color) throws SQLException {
+    private static void tagGreenOnlyRep00NewWhatsApp(boolean makeAction, String color) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        if (makeAction) {
+            TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
 
-        int unNbMisAGREEN = dbLr.deTopperAColorOld50NEW(new String[]{ctx.getParamTriNew().getRepertoire50NEW(), ctx.getRepertoire00NEW()}, color);
-        loggerInfo("UnTag a GREEN " + String.format("%05d", unNbMisAGREEN) + " - images ", unNbMisAGREEN);
+            int unNbMisAGREEN = dbLr.deTopperAColorOld50NEW(new String[]{ctx.getParamTriNew().getRepertoire50NEW(), ctx.getRepertoire00NEW()}, color);
+            loggerInfo("UnTag a GREEN " + String.format("%05d", unNbMisAGREEN) + " - images ", unNbMisAGREEN);
 
 //        dbLr.MiseAzeroDesColorLabels("green");
-        int nbMisAGREEN = dbLr.topperAGreen50NEWWhatsApp(new String[]{ctx.getParamTriNew().getRepertoire50NEW(), ctx.getRepertoire00NEW()}, color);
-        loggerInfo("Tag a GREEN " + String.format("%05d", nbMisAGREEN) + " - images ", nbMisAGREEN);
+            int nbMisAGREEN = dbLr.topperAGreen50NEWWhatsApp(new String[]{ctx.getParamTriNew().getRepertoire50NEW(), ctx.getRepertoire00NEW()}, color);
+            loggerInfo("Tag a GREEN " + String.format("%05d", nbMisAGREEN) + " - images ", nbMisAGREEN);
 
 //        unNbMisAGREENRep = dbLr.deTopperARedOldRepertoire(color.toLowerCase(Locale.ROOT));
 //        loggerInfo("UnTag a GREEN " + String.format("%05d", unNbMisAGREENRep) + " - repertoire ", unNbMisAREDRep);
-
-    }
-
-    private static void displayBooleen() throws IOException {
-        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-
-        String txt = "\n";
-        if (Boolean.TRUE.equals(ctx.workflow.IS_DRY_RUN)) {
-            txt += "\n";
-            txt += "   --DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN----DRY-RUN--   " + "\n";
-            txt += "\n";
-
+            
+            TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
         }
-        txt += "   -------------------------------ACTION PREVU--------------------------------------   " + "\n";
-        txt += "   -                                                                               -   " + "\n";
-        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_SYNCR_LR_0000000"))) {
-            txt += "   -  " + "synchroDatabase()" + "\n";
-        }
-        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
-            txt += "   -  " + "maintenanceDatabase()" + "\n";
-        }
-        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_ACTION_FROM_KEY0"))) {
-            txt += "   -  " + "makeActionFromKeyword()" + "\n";
-        }
-        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_PURGE_ACTION_000"))) {
-            txt += "   -  " + "removeLinkWithActionFromKeyword()" + "\n";
-        }
-        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_DEL_00000000"))) {
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_CR_000000000"))) {
-                txt += "   -  - " + "creationDesKeywordProjet()" + "\n";
-            }
-            txt += "   -  " + "purgeKeywordProjet()" + "\n";
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
-                txt += "   -  " + "maintenanceDatabase()" + "\n";
-            }
-        }
-        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RETAG_RED_000000"))) {
-            txt += "   -  " + "tagRedOnlyRep00New()" + "\n";
-        }
-        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RETAG_GREEN_0000"))) {
-            txt += "   -  " + "tagGreenOnlyRep00NewWhatsApp()" + "\n";
-        }
-        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_UNZIP_REP_PHOTO0"))) {
-                txt += "   -  - " + "UnzipAndExtractAllZip()" + "\n";
-            }
-        }
-        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REJET_000000"))) {
-            txt += "   -  " + "rangerLesRejets()" + "\n";
-        }
-        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
-            txt += "   -  " + "analyseFonctionellesDesRepertoires()" + "\n";
-        }
-        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RGP_NEW_00000000"))) {
-            txt += "   -  " + "regrouperLesNouvellesPhoto()" + "\n";
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_LST_RAPP_NEW_REP"))) {
-                txt += "   -  - " + "listerLesRapprochermentAvecLesRepertoirePhoto()" + "\n";
-                if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_RAPP_NEW_REP")) && Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_CR_000000000"))) {
-                    txt += "   -  -  - " + "miseEnPlaceDesTagDeRapprochement()" + "\n";
-                }
-            }
-        }
-        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_PURGE_FOLDER_000"))) {
-            txt += "   -  " + "isItTimeToSave()" + "\n";
-            txt += "   -  - " + "purgeDesRepertoireVide50Phototheque()" + "\n";
-            txt += "   -  - " + "purgeDesRepertoireVide00NEW()" + "\n";
-        }
-        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_MAINT_LR_0000000"))) {
-            txt += "   -  " + "maintenanceDatabase()" + "\n";
-        }
-        if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_WRK_REP_PHOTO_00"))) {
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_EXEC_FONC_REP_00"))) {
-                txt += "   -  - " + "analFonctionRep.action()" + "\n";
-            }
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_TAG_CTRL_REP_000"))) {
-                txt += "   -  - " + "tagretourValRepertoire(analFonctionRep.getListOfretourValRepertoire())" + "\n";
-            }
-        }
-
-        if (isItTimeToSave() || Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_FORCE_SVG_000000"))) {
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_SVG_LRCONFIG_000"))) {
-                txt += "   -  " + "sauvegardeLightroomConfigSauve()" + "\n";
-            }
-            if (Boolean.TRUE.equals(ctx.workflow.TODO.contains("IS_RSYNC_BIB_000000"))) {
-                txt += "   -  " + "sauvegardeStudioPhoto2Reseaux()" + "\n";
-            }
-        }
-
-        txt += "   -                                                                               -   " + "\n";
-        txt += "   ---------------------------------------------------------------------------------   " + "\n";
-        LOGGER.info(txt);
-
     }
 
     private static void endall() throws InterruptedException {
@@ -569,42 +534,46 @@ public class Main {
         }
     }
 
-    private static void makeActionFromKeyword() throws SQLException, IOException {
+    private static void makeActionFromKeyword(boolean makeAction) throws SQLException, IOException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        if (makeAction) {
+            TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
 
-        //Action GO
-        Map<String, Map<String, String>> fileToGo = dbLr.getFileForGoTag(Context.TAG_ACTION_GO_RAPPROCHEMENT);
-        loggerInfo("nb de fichier tagger : " + Context.TAG_ACTION_GO_RAPPROCHEMENT + " => " + String.format("%05d", fileToGo.size()), fileToGo.size());
-        int nb = 0;
-        for (String scrFileIdLocal : fileToGo.keySet()) {
-            Map<String, String> forGoTag = dbLr.getNewPathForGoTagandFileIdlocal(Context.TAG_ORG, scrFileIdLocal);
-            if (forGoTag.size() > 0) {
-                nb++;
-                String source = fileToGo.get(scrFileIdLocal).get("oldPath");
-                String newPath = forGoTag.get("newPath");
-                if (new File(source).exists() && !new File(newPath).exists()) {
-                    LOGGER.debug("---move " + Context.TAG_ACTION_GO_RAPPROCHEMENT + " : " + source + " -> " + newPath);
-                    Function.moveFile(source, newPath, dbLr);
-                    dbLr.removeKeywordImages(forGoTag.get("kiIdLocal"));
+            //Action GO
+            Map<String, Map<String, String>> fileToGo = dbLr.getFileForGoTag(Context.TAG_ACTION_GO_RAPPROCHEMENT);
+            loggerInfo("nb de fichier tagger : " + Context.TAG_ACTION_GO_RAPPROCHEMENT + " => " + String.format("%05d", fileToGo.size()), fileToGo.size());
+            int nb = 0;
+            for (String scrFileIdLocal : fileToGo.keySet()) {
+                Map<String, String> forGoTag = dbLr.getNewPathForGoTagandFileIdlocal(Context.TAG_ORG, scrFileIdLocal);
+                if (forGoTag.size() > 0) {
+                    nb++;
+                    String source = fileToGo.get(scrFileIdLocal).get("oldPath");
+                    String newPath = forGoTag.get("newPath");
+                    if (new File(source).exists() && !new File(newPath).exists()) {
+                        LOGGER.debug("---move " + Context.TAG_ACTION_GO_RAPPROCHEMENT + " : " + source + " -> " + newPath);
+                        Function.moveFile(source, newPath, dbLr);
+                        dbLr.removeKeywordImages(forGoTag.get("kiIdLocal"));
+                    }
                 }
             }
-        }
-        loggerInfo("move " + String.format("%05d", nb) + " - " + Context.TAG_ACTION_GO_RAPPROCHEMENT, nb);
+            loggerInfo("move " + String.format("%05d", nb) + " - " + Context.TAG_ACTION_GO_RAPPROCHEMENT, nb);
 
-        //action collection
-        Map<String, String> listeAction = ctx.getActionVersRepertoire().getListeAction();
-        for (String key : listeAction.keySet()) {
-            Map<String, Map<String, String>> fileToTag = dbLr.sqllistAllFileWithTagtoRep(key, listeAction.get(key));
-            loggerInfo("move " + String.format("%05d", fileToTag.size()) + " - " + key, fileToTag.size());
-            for (String scrFileIdLocal : fileToTag.keySet()) {
-                String oldPath = fileToTag.get(scrFileIdLocal).get("oldPath");
-                String newPath = fileToTag.get(scrFileIdLocal).get("newPath");
-                if (new File(oldPath).exists() && !new File(newPath).exists()) {
-                    LOGGER.debug("---move " + key + " : " + oldPath + " -> " + newPath);
-                    Function.moveFile(SystemFiles.normalizePath(oldPath), SystemFiles.normalizePath(newPath), dbLr);
-                    dbLr.removeKeywordImages(fileToTag.get(scrFileIdLocal).get("kiIdLocal"));
+            //action collection
+            Map<String, String> listeAction = ctx.getActionVersRepertoire().getListeAction();
+            for (String key : listeAction.keySet()) {
+                Map<String, Map<String, String>> fileToTag = dbLr.sqllistAllFileWithTagtoRep(key, listeAction.get(key));
+                loggerInfo("move " + String.format("%05d", fileToTag.size()) + " - " + key, fileToTag.size());
+                for (String scrFileIdLocal : fileToTag.keySet()) {
+                    String oldPath = fileToTag.get(scrFileIdLocal).get("oldPath");
+                    String newPath = fileToTag.get(scrFileIdLocal).get("newPath");
+                    if (new File(oldPath).exists() && !new File(newPath).exists()) {
+                        LOGGER.debug("---move " + key + " : " + oldPath + " -> " + newPath);
+                        Function.moveFile(SystemFiles.normalizePath(oldPath), SystemFiles.normalizePath(newPath), dbLr);
+                        dbLr.removeKeywordImages(fileToTag.get(scrFileIdLocal).get("kiIdLocal"));
+                    }
                 }
             }
+            TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
         }
     }
 
@@ -660,36 +629,45 @@ public class Main {
         frame.setVisible(true);
     }
 
-    private static void maintenanceDatabase() throws SQLException {
+    private static void maintenanceDatabase(boolean makeAction) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        splitLOGGERInfo(isMoreZeroComm(dbLr.AdobeImagesWithoutLibraryFile(progress)));
-        splitLOGGERInfo(isMoreZeroComm(dbLr.folderWithoutRoot(progress)));
-        splitLOGGERInfo(isMoreZeroComm(dbLr.fileWithoutFolder(progress)));
-        splitLOGGERInfo(isMoreZeroComm(dbLr.KeywordImageWithoutImages(progress)));
-        splitLOGGERInfo(isMoreZeroComm(dbLr.keywordImageWithoutKeyword(progress)));
-        progress.setString("");
+        if (makeAction) {
+            TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+            splitLOGGERInfo(isMoreZeroComm(dbLr.AdobeImagesWithoutLibraryFile(progress)));
+            splitLOGGERInfo(isMoreZeroComm(dbLr.folderWithoutRoot(progress)));
+            splitLOGGERInfo(isMoreZeroComm(dbLr.fileWithoutFolder(progress)));
+            splitLOGGERInfo(isMoreZeroComm(dbLr.KeywordImageWithoutImages(progress)));
+            splitLOGGERInfo(isMoreZeroComm(dbLr.keywordImageWithoutKeyword(progress)));
+            progress.setString("");
+            
+            TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+        }
     }
 
-    private static void synchroDatabase() throws SQLException, IOException, ParseException, InterruptedException {
+    private static void synchroDatabase(boolean makeAction) throws SQLException, IOException, ParseException, InterruptedException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_SYNC_PH_FILE);
+        if (makeAction) {
+            TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+            List<String> extensionsUseFile = new ArrayList<>();
+            extensionsUseFile.addAll(ctx.getExtensionsUseFile());
+            extensionsUseFile.addAll(ctx.getParamElementsRejet().getarrayExtensionFileRejetSup());
 
-        List<String> extensionsUseFile = new ArrayList<>() ;
-        extensionsUseFile.addAll(ctx.getExtensionsUseFile());
-        extensionsUseFile.addAll(ctx.getParamElementsRejet().getarrayExtensionFileRejetSup());
+            List<String> nomSubdirectoryRejet = new ArrayList<>();
+            nomSubdirectoryRejet.addAll(ctx.getArrayNomSubdirectoryRejet());
+            nomSubdirectoryRejet.addAll(ctx.getParamElementsRejet().getArrayNomSubdirectoryRejet());
+            nomSubdirectoryRejet.add(repertoirerejet);
 
-        List<String> nomSubdirectoryRejet = new ArrayList<>() ;
-        nomSubdirectoryRejet.addAll(ctx.getArrayNomSubdirectoryRejet());
-        nomSubdirectoryRejet.addAll(ctx.getParamElementsRejet().getArrayNomSubdirectoryRejet());
-        nomSubdirectoryRejet.add(repertoirerejet);
+            List<String> listFilesPh = WorkWithFiles.getAllPhysicalFiles(dbLr.getAllAbsolutePath(), extensionsUseFile, nomSubdirectoryRejet, progress);
 
-        List<String> listFilesPh = WorkWithFiles.getAllPhysicalFiles(dbLr.getAllAbsolutePath(), extensionsUseFile, nomSubdirectoryRejet, progress);
+            List<String> listFilesLog = dbLr.getAllFilesLogiques();
 
-        List<String> listFilesLog = dbLr.getAllFilesLogiques();
+            analyseFilePhysiqueAndLogiques(listFilesPh, listFilesLog);
 
-        analyseFilePhysiqueAndLogiques(listFilesPh, listFilesLog);
-
-        progress.setString("");
+            progress.setString("");
+            
+            TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+        }
     }
 
     private static void analyseFilePhysiqueAndLogiques(List<String> listFilesPh, List<String> listFilesLog) throws SQLException, IOException, ParseException, InterruptedException {
@@ -984,31 +962,36 @@ public class Main {
         LOGGER.info("Start");
     }
 
-    private static void sauvegardeStudioPhoto2Reseaux() throws Exception {
+    private static void sauvegardeStudioPhoto2Reseaux(boolean makeAction) throws Exception {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        if (makeAction) {
+            TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
 
-        RSync rsync = new RSync()
-                .sources(ctx.getRepFonctionnel().getRepertoiresyncsource())
-                .destination(ctx.getRepFonctionnel().getRepertoiresyncdest())
-                .info("PROGRESS2,STATS2")
-                .outputCommandline(true)
-                .recursive(true)
-                .exclude(ctx.getRepFonctionnel().getRsyncexclude())
-                .dryRun(ctx.workflow.IS_DRY_RUN)
-                .stats(true)
-                .progress(true)
-                .itemizeChanges(true)
-                .humanReadable(true)
-                .delete(true)
-                .verbose(true);
+            RSync rsync = new RSync()
+                    .sources(ctx.getRepFonctionnel().getRepertoiresyncsource())
+                    .destination(ctx.getRepFonctionnel().getRepertoiresyncdest())
+                    .info("PROGRESS2,STATS2")
+                    .outputCommandline(true)
+                    .recursive(true)
+                    .exclude(ctx.getRepFonctionnel().getRsyncexclude())
+                    .dryRun(ctx.workflow.IS_DRY_RUN)
+                    .stats(true)
+                    .progress(true)
+                    .itemizeChanges(true)
+                    .humanReadable(true)
+                    .delete(true)
+                    .verbose(true);
 
-        progress.setMaximum(78286);
+            progress.setMaximum(78286);
 
-        Output output1 = new Output(new String[]{"total size is", "bytes  received", "Number of", "deleting"}, new String[]{"%"}, progress);
-        StreamingProcessOutput output = new StreamingProcessOutput(output1);
-        output.monitor(rsync.builder());
+            Output output1 = new Output(new String[]{"total size is", "bytes  received", "Number of", "deleting"}, new String[]{"%"}, progress);
+            StreamingProcessOutput output = new StreamingProcessOutput(output1);
+            output.monitor(rsync.builder());
 
-        writeMouchard(output1);
+            writeMouchard(output1);
+            
+            TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+        }
     }
 
     private static void writeMouchard(Output output) throws IOException {
@@ -1034,244 +1017,262 @@ public class Main {
         }
     }
 
-    private static boolean isItTimeToSave() throws IOException {
+    private static boolean isItTimeToSave(boolean makeAction) throws IOException {
+        boolean isItTimeToSave = true;
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        File syncMouchard = new File(ctx.getRepFonctionnel().getRepertoiresyncdest() + ctx.getRepFonctionnel().getSyncdestmouchard());
-        if (!syncMouchard.exists()) {
-            syncMouchard.createNewFile();
+        if (makeAction) {
+            TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+
+            File syncMouchard = new File(ctx.getRepFonctionnel().getRepertoiresyncdest() + ctx.getRepFonctionnel().getSyncdestmouchard());
+            if (!syncMouchard.exists()) {
+                syncMouchard.createNewFile();
+            }
+            Calendar cal = Calendar.getInstance();
+            long lastModified = syncMouchard.lastModified();
+            cal.setTime(new Date(lastModified));
+            cal.add(Calendar.DATE, Integer.parseInt(ctx.getRepFonctionnel().getSyncAmountDaysBetween()));
+
+            Calendar calt = Calendar.getInstance();
+            calt.setTime(new Date());
+
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+            LOGGER.info("Today                                   : " + sdf.format(calt.getTimeInMillis()));
+            LOGGER.info("Dernier Modification du fichier mouchard: " + sdf.format(lastModified));
+            LOGGER.info("Prochain TimeToSave                     : " + sdf.format(cal.getTimeInMillis()));
+
+            isItTimeToSave = calt.compareTo(cal) > 0;
+            LOGGER.info("isItTimeToSave                          : " + isItTimeToSave);
+            
+            TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
         }
-        Calendar cal = Calendar.getInstance();
-        long lastModified = syncMouchard.lastModified();
-        cal.setTime(new Date(lastModified));
-        cal.add(Calendar.DATE, Integer.parseInt(ctx.getRepFonctionnel().getSyncAmountDaysBetween()));
-
-        Calendar calt = Calendar.getInstance();
-        calt.setTime(new Date());
-
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        LOGGER.info("Today                                   : " + sdf.format(calt.getTimeInMillis()));
-        LOGGER.info("Dernier Modification du fichier mouchard: " + sdf.format(lastModified));
-        LOGGER.info("Prochain TimeToSave                     : " + sdf.format(cal.getTimeInMillis()));
-
-        boolean isItTimeToSave = calt.compareTo(cal) > 0;
-        LOGGER.info("isItTimeToSave                          : " + isItTimeToSave);
         return isItTimeToSave;
     }
 
-    private static void regrouperLesNouvellesPhoto(JProgressBar progress) throws SQLException, IOException {
+    private static void regrouperLesNouvellesPhoto(boolean makeAction, JProgressBar progress) throws SQLException, IOException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        if (makeAction) {
+            TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
 
-        //Regroupement
-        String[] repertoire50NEW = new String[]{ctx.getParamTriNew().getRepertoire50NEW(), ctx.getRepertoire00NEW()};
-        ResultSet rsele = dbLr.sqlgetListelementnewaclasser(ctx.getParamTriNew().getTempsAdherence(), repertoire50NEW);
+            //Regroupement
+            String[] repertoire50NEW = new String[]{ctx.getParamTriNew().getRepertoire50NEW(), ctx.getRepertoire00NEW()};
+            ResultSet rsele = dbLr.sqlgetListelementnewaclasser(ctx.getParamTriNew().getTempsAdherence(), repertoire50NEW);
 
-        GrpPhoto listFileBazar = new GrpPhoto();
-        GrpPhoto listElekidz = new GrpPhoto();
+            GrpPhoto listFileBazar = new GrpPhoto();
+            GrpPhoto listElekidz = new GrpPhoto();
+            List<GrpPhoto> listGrpEletmp = new ArrayList();
+            GrpPhoto listEletmp = new GrpPhoto();
+
+            int numRow = 0;
+            String txtPr = dbLr.retWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName());
+            int numRowMax = dbLr.getQueryRowCount(dbLr.sqlgetListelementnewaclasser(ctx.getParamTriNew().getTempsAdherence(), repertoire50NEW));
+
+            List<String> listkidsModel = ctx.getParamTriNew().getListeModelKidz();
+            long maxprev = 0;
+            while (rsele.next()) {
+
+                if (rsele.getBoolean("isNew")) {
+                    // Recuperer les info de l'elements
+                    String fileIdLocal = rsele.getString("file_id_local");
+                    String absolutePath = rsele.getString("absolutePath");
+                    String pathFromRoot = rsele.getString("pathFromRoot");
+                    String lcIdxFilename = rsele.getString("lc_idx_filename");
+                    String cameraModel = rsele.getString("CameraModel");
+                    long mint = rsele.getLong("mint");
+                    long maxt = rsele.getLong("maxt");
+                    long captureTime = rsele.getLong("captureTime");
+
+                    ElementFichier eleFile = new ElementFichier(absolutePath, pathFromRoot, lcIdxFilename, fileIdLocal);
+
+                    if (listkidsModel.contains(cameraModel)) {
+                        listElekidz.add(eleFile);
+                    } else {
+                        if (mint > maxprev) {
+
+                            if (listEletmp.size() > ctx.getParamTriNew().getThresholdNew()) {
+                                listGrpEletmp.add(listEletmp);
+                            } else {
+                                listFileBazar.addAll(listEletmp);
+                            }
+
+                            listEletmp = new GrpPhoto();
+
+                        }
+                        maxprev = maxt;
+                        listEletmp.setFirstDate(captureTime);
+                        listEletmp.add(eleFile);
+                    }
+                }
+
+                visuProgress(progress, txtPr, numRow++, numRowMax);
+
+            }
+            if (listEletmp.size() > ctx.getParamTriNew().getThresholdNew()) {
+                listGrpEletmp.add(listEletmp);
+            } else {
+                listFileBazar.addAll(listEletmp);
+            }
+
+            deplacementDesGroupes(listFileBazar, listElekidz, listGrpEletmp);
+            
+            TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+        }
+
+    }
+
+
+    private static List<GrpPhoto> listerLesRapprochermentAvecLesRepertoirePhoto(boolean makeAction) throws SQLException, IOException {
         List<GrpPhoto> listGrpEletmp = new ArrayList();
-        GrpPhoto listEletmp = new GrpPhoto();
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        if (makeAction) {
+            TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
 
-        int numRow = 0;
-        String txtPr = dbLr.retWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName());
-        int numRowMax = dbLr.getQueryRowCount(dbLr.sqlgetListelementnewaclasser(ctx.getParamTriNew().getTempsAdherence(), repertoire50NEW));
+            //Regroupement
+            ResultSet rsele = dbLr.sqlgetListelementnewaclasser(ctx.getParamTriNew().getTempsAdherence(), new String[]{});
 
-        List<String> listkidsModel = ctx.getParamTriNew().getListeModelKidz();
-        long maxprev = 0;
-        while (rsele.next()) {
+            GrpPhoto listEletmp = new GrpPhoto();
 
-            if (rsele.getBoolean("isNew")) {
+            long maxprev = 0;
+            long captureTimeprev = Long.MIN_VALUE;
+            while (rsele.next()) {
+
                 // Recuperer les info de l'elements
                 String fileIdLocal = rsele.getString("file_id_local");
                 String absolutePath = rsele.getString("absolutePath");
                 String pathFromRoot = rsele.getString("pathFromRoot");
                 String lcIdxFilename = rsele.getString("lc_idx_filename");
-                String cameraModel = rsele.getString("CameraModel");
                 long mint = rsele.getLong("mint");
                 long maxt = rsele.getLong("maxt");
                 long captureTime = rsele.getLong("captureTime");
+                if (rsele.wasNull()) {
+                    captureTime = Long.MIN_VALUE; // set it to empty string as you desire.
+                }
 
-                ElementFichier eleFile = new ElementFichier(absolutePath, pathFromRoot, lcIdxFilename, fileIdLocal);
+                // recherche du repPhoto concerner
+                String ch = absolutePath + pathFromRoot;
+                List<RepertoirePhoto> arrayRepertoirePhoto = ctx.getArrayRepertoirePhoto();
+                int numeroRep = -1;
+                int i;
+                for (i = 0; i < arrayRepertoirePhoto.size(); i++) {
+                    if (arrayRepertoirePhoto.get(i).isRapprochermentNewOk() && ch.startsWith(SystemFiles.normalizePath(ctx.getRepertoire50Phototheque() + arrayRepertoirePhoto.get(i).getRepertoire()))) {
+                        numeroRep = i;
+                    }
+                }
+                if (ch.startsWith(SystemFiles.normalizePath(ctx.getParamTriNew().getRepertoire50NEW()))) {
+                    numeroRep = Context.IREP_NEW;
+                }
 
-                if (listkidsModel.contains(cameraModel)) {
-                    listElekidz.add(eleFile);
-                } else {
+
+                if (numeroRep > -1) {
+                    ElementFichier eleFile = new ElementFichier(absolutePath, pathFromRoot, lcIdxFilename, fileIdLocal, numeroRep);
+
+                    eleFile.setcaptureTime(captureTime);
+                    eleFile.setmint(mint);
+                    eleFile.setmaxt(maxt);
+
+                    if (captureTime < captureTimeprev) {
+                        throw new IllegalStateException("captureTime not in order = " + captureTime + " < " + captureTimeprev);
+                    }
+
                     if (mint > maxprev) {
-
-                        if (listEletmp.size() > ctx.getParamTriNew().getThresholdNew()) {
+                        if (listEletmp.size() > 1 && listEletmp.getArrayRep(Context.IREP_NEW) > 0 && listEletmp.size() > listEletmp.getArrayRep(Context.IREP_NEW)) {
                             listGrpEletmp.add(listEletmp);
-                        } else {
-                            listFileBazar.addAll(listEletmp);
                         }
 
                         listEletmp = new GrpPhoto();
 
                     }
                     maxprev = maxt;
+                    captureTimeprev = captureTime;
                     listEletmp.setFirstDate(captureTime);
                     listEletmp.add(eleFile);
                 }
+
             }
-
-            visuProgress(progress, txtPr, numRow++, numRowMax);
-
-        }
-        if (listEletmp.size() > ctx.getParamTriNew().getThresholdNew()) {
-            listGrpEletmp.add(listEletmp);
-        } else {
-            listFileBazar.addAll(listEletmp);
-        }
-
-        deplacementDesGroupes(listFileBazar, listElekidz, listGrpEletmp);
-
-
-    }
-
-
-    private static List<GrpPhoto> listerLesRapprochermentAvecLesRepertoirePhoto() throws SQLException, IOException {
-        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-
-        //Regroupement
-        ResultSet rsele = dbLr.sqlgetListelementnewaclasser(ctx.getParamTriNew().getTempsAdherence(), new String[]{});
-
-        List<GrpPhoto> listGrpEletmp = new ArrayList();
-        GrpPhoto listEletmp = new GrpPhoto();
-
-        long maxprev = 0;
-        long captureTimeprev = Long.MIN_VALUE;
-        while (rsele.next()) {
-
-            // Recuperer les info de l'elements
-            String fileIdLocal = rsele.getString("file_id_local");
-            String absolutePath = rsele.getString("absolutePath");
-            String pathFromRoot = rsele.getString("pathFromRoot");
-            String lcIdxFilename = rsele.getString("lc_idx_filename");
-            long mint = rsele.getLong("mint");
-            long maxt = rsele.getLong("maxt");
-            long captureTime = rsele.getLong("captureTime");
-            if (rsele.wasNull()) {
-                captureTime = Long.MIN_VALUE; // set it to empty string as you desire.
-            }
-
-            // recherche du repPhoto concerner
-            String ch = absolutePath + pathFromRoot;
-            List<RepertoirePhoto> arrayRepertoirePhoto = ctx.getArrayRepertoirePhoto();
-            int numeroRep = -1;
-            int i;
-            for (i = 0; i < arrayRepertoirePhoto.size(); i++) {
-                if (arrayRepertoirePhoto.get(i).isRapprochermentNewOk() && ch.startsWith(SystemFiles.normalizePath(ctx.getRepertoire50Phototheque() + arrayRepertoirePhoto.get(i).getRepertoire()))) {
-                    numeroRep = i;
-                }
-            }
-            if (ch.startsWith(SystemFiles.normalizePath(ctx.getParamTriNew().getRepertoire50NEW()))) {
-                numeroRep = Context.IREP_NEW;
+            if (listEletmp.size() > 0) {
+                listGrpEletmp.add(listEletmp);
             }
 
 
-            if (numeroRep > -1) {
-                ElementFichier eleFile = new ElementFichier(absolutePath, pathFromRoot, lcIdxFilename, fileIdLocal, numeroRep);
+            //display des rapprochement
+            for (GrpPhoto listEle : listGrpEletmp) {
+                if (listEle.size() > 1 && listEle.getArrayRep(Context.IREP_NEW) > 0 && listEle.size() > listEle.getArrayRep(Context.IREP_NEW)) {
+                    LOGGER.info("---------------------------");
+                    int nbele = listEle.lstEleFile.size();
+                    LOGGER.info(String.format("%05d", nbele) + " ===========");
+                    int i;
+                    for (i = 0; i < ctx.getArrayRepertoirePhoto().size(); i++) {
+                        if (listEle.getArrayRep(i) > 0) {
 
-                eleFile.setcaptureTime(captureTime);
-                eleFile.setmint(mint);
-                eleFile.setmaxt(maxt);
-
-                if (captureTime < captureTimeprev) {
-                    throw new IllegalStateException("captureTime not in order = " + captureTime + " < " + captureTimeprev);
-                }
-
-                if (mint > maxprev) {
-                    if (listEletmp.size() > 1 && listEletmp.getArrayRep(Context.IREP_NEW) > 0 && listEletmp.size() > listEletmp.getArrayRep(Context.IREP_NEW)) {
-                        listGrpEletmp.add(listEletmp);
-                    }
-
-                    listEletmp = new GrpPhoto();
-
-                }
-                maxprev = maxt;
-                captureTimeprev = captureTime;
-                listEletmp.setFirstDate(captureTime);
-                listEletmp.add(eleFile);
-            }
-
-        }
-        if (listEletmp.size() > 0) {
-            listGrpEletmp.add(listEletmp);
-        }
-
-
-        //display des rapprochement
-        for (GrpPhoto listEle : listGrpEletmp) {
-            if (listEle.size() > 1 && listEle.getArrayRep(Context.IREP_NEW) > 0 && listEle.size() > listEle.getArrayRep(Context.IREP_NEW)) {
-                LOGGER.info("---------------------------");
-                int nbele = listEle.lstEleFile.size();
-                LOGGER.info(String.format("%05d", nbele) + " ===========");
-                int i;
-                for (i = 0; i < ctx.getArrayRepertoirePhoto().size(); i++) {
-                    if (listEle.getArrayRep(i) > 0) {
-
-                        int ii;
-                        for (ii = 0; ii < listEle.getLstEleFile().size(); ii++) {
-                            LOGGER.debug(listEle.getLstEleFile().get(ii).toString());
+                            int ii;
+                            for (ii = 0; ii < listEle.getLstEleFile().size(); ii++) {
+                                LOGGER.debug(listEle.getLstEleFile().get(ii).toString());
+                            }
+                            LOGGER.info(String.format("%05d", listEle.getArrayRep(i)) + " - " + ctx.getArrayRepertoirePhoto().get(i).getRepertoire());
                         }
-                        LOGGER.info(String.format("%05d", listEle.getArrayRep(i)) + " - " + ctx.getArrayRepertoirePhoto().get(i).getRepertoire());
                     }
+                    LOGGER.info(String.format("%05d", listEle.getArrayRep(Context.IREP_NEW)) + " - " + ctx.getParamTriNew().getRepertoire50NEW());
                 }
-                LOGGER.info(String.format("%05d", listEle.getArrayRep(Context.IREP_NEW)) + " - " + ctx.getParamTriNew().getRepertoire50NEW());
             }
+            TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
         }
-
         return listGrpEletmp;
     }
 
-    private static void miseEnPlaceDesTagDeRapprochement(List<GrpPhoto> listGrpEletmp) throws SQLException {
+    private static void miseEnPlaceDesTagDeRapprochement(boolean makeAction, List<GrpPhoto> listGrpEletmp) throws SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TAG_RAP);
+        if (makeAction) {
+            TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
 
-        for (GrpPhoto listEle : listGrpEletmp) {
-            Map<String, Map<String, Integer>> listeAction = new HashMap<>();
-            if (listEle.size() > 1 && listEle.getArrayRep(Context.IREP_NEW) > 0 && listEle.size() > listEle.getArrayRep(Context.IREP_NEW)) {
-                Context.nbDiscretionnaire++;
-                String nbDiscr = String.format("%1$03X", Context.nbDiscretionnaire);
-                String tag = Context.TAG_RAPPROCHEMENT + "_" + nbDiscr + "_" + Context.POSSIBLE_NEW_GROUP;
-                LOGGER.info("tag : " + tag + " ==> ");
-                LOGGER_TO_TAG_RAP.info("    ");
-                LOGGER_TO_TAG_RAP.info("tag : " + tag + " ==> ");
-                for (ElementFichier eleFile : listEle.lstEleFile) {
-                    dbLr.AddKeywordToFile(eleFile.getFileIdLocal(), tag, Context.TAG_RAPPROCHEMENT);
-                    LOGGER.debug(" --- " + eleFile.getPathFromRoot() + File.separator + eleFile.getLcIdxFilename());
-                    LOGGER_TO_TAG_RAP.debug(" --- " + eleFile.getPathFromRoot() + File.separator + eleFile.getLcIdxFilename());
-                }
-                //display info
-                int i;
-                List<ElementFichier> lstEleFile = listEle.getLstEleFile();
-                for (i = 0; i < lstEleFile.size(); i++) {
-                    String masterKey = lstEleFile.get(i).getAbsolutePath();
-                    if (listeAction.containsKey(masterKey)) {
-
-                        Map<String, Integer> listeValueAction = listeAction.get(masterKey);
-                        String valueKey = lstEleFile.get(i).getPathFromRoot();
-                        if (listeValueAction.containsKey(valueKey)) {
-                            listeValueAction.replace(valueKey, listeValueAction.get(valueKey) + 1);
-                        } else {
-                            listeValueAction.put(valueKey, 1);
-                        }
-
-                        listeAction.replace(masterKey, listeValueAction);
-
-                    } else {
-                        Map<String, Integer> value = new HashMap<>();
-                        value.put(lstEleFile.get(i).getPathFromRoot(), 1);
-                        listeAction.put(masterKey, value);
+            for (GrpPhoto listEle : listGrpEletmp) {
+                Map<String, Map<String, Integer>> listeAction = new HashMap<>();
+                if (listEle.size() > 1 && listEle.getArrayRep(Context.IREP_NEW) > 0 && listEle.size() > listEle.getArrayRep(Context.IREP_NEW)) {
+                    Context.nbDiscretionnaire++;
+                    String nbDiscr = String.format("%1$03X", Context.nbDiscretionnaire);
+                    String tag = Context.TAG_RAPPROCHEMENT + "_" + nbDiscr + "_" + Context.POSSIBLE_NEW_GROUP;
+                    LOGGER.info("tag : " + tag + " ==> ");
+                    LOGGER_TO_TAG_RAP.info("    ");
+                    LOGGER_TO_TAG_RAP.info("tag : " + tag + " ==> ");
+                    for (ElementFichier eleFile : listEle.lstEleFile) {
+                        dbLr.AddKeywordToFile(eleFile.getFileIdLocal(), tag, Context.TAG_RAPPROCHEMENT);
+                        LOGGER.debug(" --- " + eleFile.getPathFromRoot() + File.separator + eleFile.getLcIdxFilename());
+                        LOGGER_TO_TAG_RAP.debug(" --- " + eleFile.getPathFromRoot() + File.separator + eleFile.getLcIdxFilename());
                     }
-                }
-                for (String masterKey : listeAction.keySet()) {
-                    Map<String, Integer> listeValueAction = listeAction.get(masterKey);
-                    LOGGER.info("    " + masterKey);
-                    LOGGER_TO_TAG_RAP.info("    " + masterKey);
-                    for (String valueKey : listeValueAction.keySet()) {
-                        LOGGER.info("        " + String.format("%05d", listeValueAction.get(valueKey)) + " - " + valueKey);
-                        LOGGER_TO_TAG_RAP.info("        " + String.format("%05d", listeValueAction.get(valueKey)) + " - " + valueKey);
+                    //display info
+                    int i;
+                    List<ElementFichier> lstEleFile = listEle.getLstEleFile();
+                    for (i = 0; i < lstEleFile.size(); i++) {
+                        String masterKey = lstEleFile.get(i).getAbsolutePath();
+                        if (listeAction.containsKey(masterKey)) {
+
+                            Map<String, Integer> listeValueAction = listeAction.get(masterKey);
+                            String valueKey = lstEleFile.get(i).getPathFromRoot();
+                            if (listeValueAction.containsKey(valueKey)) {
+                                listeValueAction.replace(valueKey, listeValueAction.get(valueKey) + 1);
+                            } else {
+                                listeValueAction.put(valueKey, 1);
+                            }
+
+                            listeAction.replace(masterKey, listeValueAction);
+
+                        } else {
+                            Map<String, Integer> value = new HashMap<>();
+                            value.put(lstEleFile.get(i).getPathFromRoot(), 1);
+                            listeAction.put(masterKey, value);
+                        }
+                    }
+                    for (String masterKey : listeAction.keySet()) {
+                        Map<String, Integer> listeValueAction = listeAction.get(masterKey);
+                        LOGGER.info("    " + masterKey);
+                        LOGGER_TO_TAG_RAP.info("    " + masterKey);
+                        for (String valueKey : listeValueAction.keySet()) {
+                            LOGGER.info("        " + String.format("%05d", listeValueAction.get(valueKey)) + " - " + valueKey);
+                            LOGGER_TO_TAG_RAP.info("        " + String.format("%05d", listeValueAction.get(valueKey)) + " - " + valueKey);
+                        }
                     }
                 }
             }
+            TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
         }
     }
 
@@ -1342,54 +1343,61 @@ public class Main {
         }
     }
 
-    private static void unzipAndExtractAllZip() throws IOException, SQLException {
+    private static void unzipAndExtractAllZip(boolean makeAction) throws IOException, SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        if (makeAction) {
+            TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
 
-        List<RepertoirePhoto> arrayRepertoirePhoto = ctx.getArrayRepertoirePhoto();
+            List<RepertoirePhoto> arrayRepertoirePhoto = ctx.getArrayRepertoirePhoto();
 
-        ListIterator<RepertoirePhoto> repertoirePhotoIterator = arrayRepertoirePhoto.listIterator();
-        while (repertoirePhotoIterator.hasNext()) {
-            RepertoirePhoto repPhoto = repertoirePhotoIterator.next();
-            LOGGER.debug("UnzipAndExtractAllZip = > " + ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire());
-            List<String> listRep = WorkWithRepertory.listRepertoireEligible(ctx.getRepertoire50Phototheque(), repPhoto);
+            ListIterator<RepertoirePhoto> repertoirePhotoIterator = arrayRepertoirePhoto.listIterator();
+            while (repertoirePhotoIterator.hasNext()) {
+                RepertoirePhoto repPhoto = repertoirePhotoIterator.next();
+                LOGGER.debug("UnzipAndExtractAllZip = > " + ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire());
+                List<String> listRep = WorkWithRepertory.listRepertoireEligible(ctx.getRepertoire50Phototheque(), repPhoto);
 
-            int i = 0;
+                int i = 0;
 
-            ListIterator<String> repertoireIterator = listRep.listIterator();
-            while (repertoireIterator.hasNext()) {
+                ListIterator<String> repertoireIterator = listRep.listIterator();
+                while (repertoireIterator.hasNext()) {
 
-                visuProgress(progress, repPhoto.repertoire, i++, listRep.size());
+                    visuProgress(progress, repPhoto.repertoire, i++, listRep.size());
 
-                String repertoire = repertoireIterator.next();
-                findZipAndExtractToRejet(repertoire);
+                    String repertoire = repertoireIterator.next();
+                    findZipAndExtractToRejet(repertoire);
+                }
+
             }
-
+            progress.setString("");
+            
+            TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
         }
-        progress.setString("");
     }
 
-    private static AnalyseGlobalRepertoires analyseFonctionellesDesRepertoires() throws IOException, SQLException {
-        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-
+    private static AnalyseGlobalRepertoires analyseFonctionellesDesRepertoires(boolean makeAction) throws IOException, SQLException {
         AnalyseGlobalRepertoires analyseRepertoires = new AnalyseGlobalRepertoires();
-
-        List<RepertoirePhoto> arrayRepertoirePhoto = ctx.getArrayRepertoirePhoto();
-
-        ListIterator<RepertoirePhoto> repertoirePhotoIterator = arrayRepertoirePhoto.listIterator();
-        while (repertoirePhotoIterator.hasNext()) {
-            RepertoirePhoto repPhoto = repertoirePhotoIterator.next();
+        WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        if (makeAction) {
+            TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
 
 
-            LOGGER.debug("repertoire = > " + ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire());
-            List<String> listRep = WorkWithRepertory.listRepertoireEligible(ctx.getRepertoire50Phototheque(), repPhoto);
+            List<RepertoirePhoto> arrayRepertoirePhoto = ctx.getArrayRepertoirePhoto();
 
-            ListIterator<String> repertoireIterator = listRep.listIterator();
-            while (repertoireIterator.hasNext()) {
-                String repertoire = repertoireIterator.next();
+            ListIterator<RepertoirePhoto> repertoirePhotoIterator = arrayRepertoirePhoto.listIterator();
+            while (repertoirePhotoIterator.hasNext()) {
+                RepertoirePhoto repPhoto = repertoirePhotoIterator.next();
+
+
+                LOGGER.debug("repertoire = > " + ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire());
+                List<String> listRep = WorkWithRepertory.listRepertoireEligible(ctx.getRepertoire50Phototheque(), repPhoto);
+
+                ListIterator<String> repertoireIterator = listRep.listIterator();
+                while (repertoireIterator.hasNext()) {
+                    String repertoire = repertoireIterator.next();
 
 //                BlocRetourRepertoire retourRepertoire = AnalyseGlobalRepertoires.calculateLesEleChampsDuRepertoire(repertoire, repPhoto, ctx.getParamControleRepertoire());
 
-                analyseRepertoires.add(new BlocRetourRepertoire(repertoire, repPhoto, ctx.getParamControleRepertoire(), ctx, dbLr));
+                    analyseRepertoires.add(new BlocRetourRepertoire(repertoire, repPhoto, ctx.getParamControleRepertoire(), ctx, dbLr));
 
 //                File f = new File(repertoire + Context.FOLDERDELIM + "photoOrganizeAnalyse.json");
 //                if (!retourRepertoire.isRepertoireValide()) {
@@ -1399,15 +1407,19 @@ public class Main {
 //                    f.delete();
 //                }
 
-            }
+                }
 
 //            File f = new File(ctx.getRepertoire50Phototheque() + repPhoto.getRepertoire() + Context.FOLDERDELIM + new File(repPhoto.getRepertoire()).getName() + ".svg.json");
 //            Serialize.writeJSON(repPhoto, f);
 //            LOGGER.debug("ecriture fichier ->" + f.toString());
 
-        }
+            }
 
-        LOGGER.info(analyseRepertoires.toString());
+            LOGGER.info(analyseRepertoires.toString());
+            LOGGER_TO_ANAL_REP.info(analFonctionRep.toDisplay());
+            
+            TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+        }
         return analyseRepertoires;
     }
 
@@ -1426,78 +1438,106 @@ public class Main {
 
     }
 
-    private static void sauvegardeLightroomConfigSauve() throws ZipException {
+    private static void sauvegardeLightroomConfigSauve(boolean makeAction) throws ZipException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        if (makeAction) {
+            TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
 
-        // zip file with a folder
-        String repertoireDestZip = ctx.getRepertoireDestZip();
-        File f = new File(repertoireDestZip);
-        if (f.isFile()) {
-            f.delete();
+            // zip file with a folder
+            String repertoireDestZip = ctx.getRepertoireDestZip();
+            File f = new File(repertoireDestZip);
+            if (f.isFile()) {
+                f.delete();
+            }
+            File repertoireRoamingAdobeLightroom = new File(ctx.getRepertoireRoamingAdobeLightroom());
+            new ZipFile(repertoireDestZip).addFolder(repertoireRoamingAdobeLightroom);
+            
+            TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
         }
-        File repertoireRoamingAdobeLightroom = new File(ctx.getRepertoireRoamingAdobeLightroom());
-        new ZipFile(repertoireDestZip).addFolder(repertoireRoamingAdobeLightroom);
     }
 
-    private static void purgeDesRepertoireVide50Phototheque() throws IOException {
+    private static void purgeDesRepertoireVide50Phototheque(boolean makeAction) throws IOException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        if (makeAction) {
+            TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
 
-        String folderlocation = ctx.getRepertoire50Phototheque();
-        boolean isFinished = false;
-        do {
-            isFinished = WorkWithRepertory.deleteEmptyRep(new File(folderlocation), progress);
-        } while (!isFinished);
-        progress.setString("");
+            String folderlocation = ctx.getRepertoire50Phototheque();
+            boolean isFinished = false;
+            do {
+                isFinished = WorkWithRepertory.deleteEmptyRep(new File(folderlocation), progress);
+            } while (!isFinished);
+            progress.setString("");
+            
+            TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+        }
     }
 
-    private static void purgeDesRepertoireVide50New() throws IOException {
+    private static void purgeDesRepertoireVide50New(boolean makeAction) throws IOException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        if (makeAction) {
+            TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
 
-        String folderlocation = ctx.getParamTriNew().getRepertoire50NEW();
-        boolean isFinished = false;
-        do {
-            isFinished = WorkWithRepertory.deleteEmptyRep(new File(folderlocation), progress);
-        } while (!isFinished);
-        progress.setString("");
+            String folderlocation = ctx.getParamTriNew().getRepertoire50NEW();
+            boolean isFinished = false;
+            do {
+                isFinished = WorkWithRepertory.deleteEmptyRep(new File(folderlocation), progress);
+            } while (!isFinished);
+            progress.setString("");
+            
+            TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+        }
     }
 
-    private static void purgeDesRepertoireVide00NEW() throws IOException {
+    private static void purgeDesRepertoireVide00NEW(boolean makeAction) throws IOException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        if (makeAction) {
+            TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
 
-        String folderlocation = ctx.getRepertoire00NEW();
-        boolean isFinished = false;
-        do {
-            isFinished = WorkWithRepertory.deleteEmptyRep(new File(folderlocation), progress);
-        } while (!isFinished);
-        progress.setString("");
+            String folderlocation = ctx.getRepertoire00NEW();
+            boolean isFinished = false;
+            do {
+                isFinished = WorkWithRepertory.deleteEmptyRep(new File(folderlocation), progress);
+            } while (!isFinished);
+            progress.setString("");
+            
+            TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+        }
     }
 
 
-    private static void rangerLesRejets() throws IOException, SQLException {
+    private static void rangerLesRejets(boolean makeAction) throws IOException, SQLException {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
+        if (makeAction) {
+            TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
 
-        List<String> arrayFichierRejetStr = getFichierRejetStr();
+            List<String> arrayFichierRejetStr = getFichierRejetStr();
 
-        putThatInRejet(arrayFichierRejetStr);
+            putThatInRejet(arrayFichierRejetStr);
+            
+            TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+        }
     }
 
-    private static List<String> getFichierRejetStr() throws SQLException {
-        List<File> arrayFichierRejet = WorkWithFiles.getFilesFromRepertoryWithFilter(ctx.getRepertoire50Phototheque(), ctx.getArrayNomSubdirectoryRejet(), ctx.getParamElementsRejet().getExtFileRejet());
+    private static List<String> getFichierRejetStr() throws SQLException, IOException {
+        TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
+
+        List<String> arrayNomSubdirectoryRejet = new ArrayList<>();
+        arrayNomSubdirectoryRejet.add(repertoirerejet);
+
+        List<File> arrayFichierRejet = WorkWithFiles.getFilesFromRepertoryWithFilter(ctx.getRepertoire50Phototheque(), ctx.getArrayNomSubdirectoryRejet(),arrayNomSubdirectoryRejet, ctx.getParamElementsRejet().getExtFileRejet());
+        LOGGER.debug("getFichierRejetStr="+arrayFichierRejet.size());
 
         List<String> arrayFichierRejetStr = new ArrayList<>();
         for (File FichierRejet : arrayFichierRejet) {
             arrayFichierRejetStr.add(FichierRejet.toString());
         }
-
-        for (int y = 0; y < arrayFichierRejetStr.size(); y++) {
-            if (arrayFichierRejetStr.get(y).toLowerCase(Locale.ROOT).contains((ctx.getRepertoire50Phototheque() + repertoirerejet).toLowerCase(Locale.ROOT))) {
-                arrayFichierRejetStr.remove(y);
-                y--;
-            }
-        }
+        LOGGER.debug("getFichierRejetStr="+arrayFichierRejetStr.size());
 
         //todo add all photo rejected to arrayFichierRejetStr
         arrayFichierRejetStr.addAll(dbLr.getlistPhotoFlagRejeter());
+        LOGGER.debug("getFichierRejetStr="+arrayFichierRejetStr.size());
+
+        TimeTracker.endTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
         return arrayFichierRejetStr;
     }
 

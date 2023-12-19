@@ -2,21 +2,13 @@ package com.malicia.mrg.app.rep;
 
 import com.malicia.mrg.Context;
 import com.malicia.mrg.model.Database;
-import com.malicia.mrg.param.electx.ControleRepertoire;
-import com.malicia.mrg.param.electx.RepertoirePhoto;
 import com.malicia.mrg.util.WhereIAm;
 import com.malicia.mrg.view.RenameRepertoire;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
 
 public class AnalyseGlobalRepertoires {
     private static final Logger LOGGER = LogManager.getLogger(AnalyseGlobalRepertoires.class);
@@ -98,11 +90,13 @@ public class AnalyseGlobalRepertoires {
 
     }
 
-    public void action(Context ctx, Database dbLr) {
+    public void action(boolean makeAction, Context ctx, Database dbLr) {
         WhereIAm.displayWhereIAm(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER);
-        if (!listOfretourNomRepertoire.isEmpty()) {
-            RenameRepertoire.start2(dbLr, ctx, listOfretourNomRepertoire);
+        if (makeAction) {
+            if (!listOfretourNomRepertoire.isEmpty()) {
+                RenameRepertoire.start2(dbLr, ctx, listOfretourNomRepertoire);
 //            RenameRepertoire.start(dbLr, ctx, listOfretourNomRepertoire);
+            }
         }
     }
 
