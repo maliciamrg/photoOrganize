@@ -11,6 +11,7 @@ public class RepertoireFonctionnel {
     public String repertoireRoamingAdobeLightroom;
     public String repertoire50Phototheque;
     public String repertoire50NEW;
+    public String repertoireMidi2LRsetting;
     public String catalogLrcat;
     public String repertoire00NEW;
     public String repertoireCatalog;
@@ -18,20 +19,27 @@ public class RepertoireFonctionnel {
     public String[] rsyncexclude;
     public String[] repertoiresyncsource;
     public String repertoiresyncdest;
+    public String syncAmountDaysBetween;
+    public String syncdestmouchard;
+
+    public RepertoireFonctionnel() {
+        // Do nothing because of X and Y
+    }
+
+    public String getRepertoireMidi2LRsetting() {
+        return repertoireMidi2LRsetting;
+    }
+
+    public void setRepertoireMidi2LRsetting(String repertoireMidi2LRsetting) {
+        this.repertoireMidi2LRsetting = repertoireMidi2LRsetting;
+    }
 
     public String getSyncAmountDaysBetween() {
         return syncAmountDaysBetween;
     }
 
-    public String syncAmountDaysBetween;
     public String getSyncdestmouchard() {
         return syncdestmouchard;
-    }
-
-    public String syncdestmouchard;
-
-    public RepertoireFonctionnel() {
-        // Do nothing because of X and Y
     }
 
     public String[] getRepertoiresyncsource() {

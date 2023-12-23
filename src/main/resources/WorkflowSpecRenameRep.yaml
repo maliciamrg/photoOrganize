@@ -1,8 +1,13 @@
 workflow:
   IS_DRY_RUN: false  # Est-ce un dry_run (sans mise a jour des bases)
   TODO:
-    - IS_SYNCR_LR_0000000 # Synchronise les repertoire et fichiers physique avec la base LR
+    - IS_WRK_REP_PHOTO_00 # (analFonctionRep) analyse des repertoires en function des regles => analFonctionRep
+    - IS_EXEC_FONC_REP_00 # (analFonctionRep) => Renommage des repertoire via POP UP.
+  NOTTODO:
     - IS_WRK_REJET_000000 # ranger [les repertoire rejet et les les photo tagger rejeter] dans les repertoires rejet ou le 99-rejet (pour suppression)
+    - IS_TAG_RAPP_NEW_REP # (raprochement) grpPhotosRapprocher => mise En Place Des TAG_RAPPROCHEMENT++ possible entre les new et la phototheque
+    - IS_SYNCR_LR_0000000 # Synchronise les repertoire et fichiers physique avec la base LR
+    - IS_MAINT_LR_0000000 # Maintenance sur la base LR
     - IS_ACTION_FROM_KEY0 # (action) déplacement des photos tagger par TAG_ACTION_GO_RAPPROCHEMENT et Context.COLLECTIONS
     - IS_PURGE_ACTION_000 # (prepare) remove les tag [action] des photos (TAG_ACTION_GO_RAPPROCHEMENT et Context.COLLECTIONS)
     - IS_TAG_DEL_00000000 # (prepare) purge des tag liée au [Maitre] diffrent des tag crée par IS_TAG_CR_000000000 (par ex les TAG_REPSWEEP++ et TAG_RAPPROCHEMENT++)
@@ -10,14 +15,9 @@ workflow:
     - IS_RETAG_RED_000000 # (new) topper A 'RED' les photos NEW et deTopper A 'RED' les repertoire;
     - IS_RETAG_GREEN_0000 # (whatsapp) topper A 'GREEN' les photos NEW et deTopper A 'GREEN' les repertoire whatsapp;
     - IS_PURGE_FOLDER_000 # purgeDesRepertoireVide50Phototheque() (local) et purgeDesRepertoireVide00NEW() (reseau)
-    - IS_WRK_REP_PHOTO_00 # (analFonctionRep) analyse des repertoires en function des regles => analFonctionRep
     - IS_TAG_CTRL_REP_000 # (analFonctionRep) => appliquer des tag TAG_REPSWEEP++ sur les photo et mise a 'RED' de repertoire en fonction de analFonctionRep.getListOfretourValRepertoire()
-    - IS_EXEC_FONC_REP_00 # (analFonctionRep) => Renommage des repertoire via POP UP.
-  NOTTODO:
-    - IS_MAINT_LR_0000000 # Maintenance sur la base LR
     - IS_RGP_NEW_00000000 # (raprochement) regrouper les photo New par temps adherence
     - IS_LST_RAPP_NEW_REP # (raprochement) lister Les Rapprochement Avec Les Repertoires Photo (regrouper les photo New avec la photothèque par temps adherence) => grpPhotosRapprocher
-    - IS_TAG_RAPP_NEW_REP # (raprochement) grpPhotosRapprocher => mise En Place Des TAG_RAPPROCHEMENT++ possible entre les new et la phototheque
     - IS_UNZIP_REP_PHOTO0 # extraire les ZIP dans les repertoire rejet
     - IS_SVG_LRCONFIG_000 # sauvegarde du la config LR sur le reseau.
     - EMPTY

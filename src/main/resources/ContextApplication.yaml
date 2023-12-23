@@ -91,6 +91,7 @@ repFonctionnel:
   repertoireCatalog: "C:\\Users\\cleme\\Desktop\\50-Phototheque\\70_Catalog_Phototheque"
   catalogLrcat: "70_Catalog_Phototheque-2-v12.lrcat"
   nbRotateRepertoireDestZip: "5"
+  repertoireMidi2LRsetting: "Y:\\80_Logiciel_Windows\\Midi2LR_setting"
   rsyncexclude:
     - "*\\System Volume Information\\*"
     - "*\\$RECYCLE.BIN\\*"
