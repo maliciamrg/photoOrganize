@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Main" type="Application" factoryName="Application">
-    <option name="MAIN_CLASS_NAME" value="com.malicia.mrg.Main" />
+    <option name="MAIN_CLASS_NAME" value="mrg.Main" />
     <module name="photoOrganize" />
     <option name="PROGRAM_PARAMETERS" value=" thresholdNew:15" />
     <RunnerSettings RunnerId="Run" />
