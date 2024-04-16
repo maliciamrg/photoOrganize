@@ -1,5 +1,5 @@
 package malicia.mrg.photo.organize.domain.api;
 
-public interface HexMe {
+public interface IHexMe {
     String getMsgReturn(String inputHexMe);
 }

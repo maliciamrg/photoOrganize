@@ -14,8 +14,6 @@ import java.net.UnknownHostException;
 import java.util.Optional;
 
 @SpringBootApplication
-@EntityScan(basePackages = "malicia.mrg.photo.*")
-@ComponentScan(basePackages = "malicia.mrg.photo.*")
 public class PhotoOrganizeController {
 
     public static final String HTTP_DEFAULT_PORT = "8080";
