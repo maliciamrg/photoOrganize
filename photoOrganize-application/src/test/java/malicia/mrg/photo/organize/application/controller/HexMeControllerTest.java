@@ -1,6 +1,6 @@
 package malicia.mrg.photo.organize.application.controller;
 
-import malicia.mrg.photo.organize.application.config.DomainConfiguration;
+import malicia.mrg.photo.organize.application.controller.config.DomainConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

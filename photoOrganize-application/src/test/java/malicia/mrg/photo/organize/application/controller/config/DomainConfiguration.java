@@ -1,4 +1,4 @@
-package malicia.mrg.photo.organize.application.config;
+package malicia.mrg.photo.organize.application.controller.config;
 
 import malicia.mrg.photo.organize.domain.HexMeImpl;
 import malicia.mrg.photo.organize.domain.ddd.DomainService;
