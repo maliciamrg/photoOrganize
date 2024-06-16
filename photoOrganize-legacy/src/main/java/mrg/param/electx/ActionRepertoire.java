@@ -1,7 +1,5 @@
 package mrg.param.electx;
 
-import com.malicia.mrg.util.Serialize;
-
 import java.util.*;
 
 public class ActionRepertoire {
@@ -10,17 +8,6 @@ public class ActionRepertoire {
 
     public ActionRepertoire() {
         // Do nothing because of X and Y
-    }
-
-    public Map<String, String> getListeAction() {
-        return listeAction;
-    }
-
-    public void populate(HashMap<String, String> folderCollection) {
-        HashMap tmp = new HashMap<>();
-        tmp.putAll(listeAction);
-        tmp.putAll(folderCollection);
-        listeAction= sort(tmp);
     }
 
     private static HashMap sort(HashMap map) {
@@ -37,6 +24,17 @@ public class ActionRepertoire {
             sortedHashMap.put(entry.getKey(), entry.getValue());
         }
         return sortedHashMap;
+    }
+
+    public Map<String, String> getListeAction() {
+        return listeAction;
+    }
+
+    public void populate(HashMap<String, String> folderCollection) {
+        HashMap tmp = new HashMap<>();
+        tmp.putAll(listeAction);
+        tmp.putAll(folderCollection);
+        listeAction = sort(tmp);
     }
 }
 
