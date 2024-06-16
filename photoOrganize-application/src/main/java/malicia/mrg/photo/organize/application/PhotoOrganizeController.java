@@ -12,13 +12,13 @@ import java.net.UnknownHostException;
 import java.util.Optional;
 
 @SpringBootApplication
-public class PhotoOrganize {
+public class PhotoOrganizeController {
 
     public static final String HTTP_DEFAULT_PORT = "8080";
-    private static final Logger logger = LoggerFactory.getLogger(PhotoOrganize.class);
+    private static final Logger logger = LoggerFactory.getLogger(PhotoOrganizeController.class);
 
     public static void main(String[] args) throws UnknownHostException {
-        final Environment env = SpringApplication.run(PhotoOrganize.class, args).getEnvironment();
+        final Environment env = SpringApplication.run(PhotoOrganizeController.class, args).getEnvironment();
         logApplicationStartup(env);
 
         logger.trace("---==[ trace  ]==---");

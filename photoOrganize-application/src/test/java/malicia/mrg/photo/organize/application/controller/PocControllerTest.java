@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(PocController.class)
 @Import(DomainConfiguration.class)
-class PhotoOrganizeControllerTest {
+class PocControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
