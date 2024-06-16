@@ -1,8 +1,6 @@
 package malicia.mrg.photo.organize.infrastructure.persistence;
 
-import malicia.mrg.photo.organize.domain.HexMeImpl;
 import malicia.mrg.photo.organize.domain.spi.IWritePersistence;
-import malicia.mrg.photo.organize.domain.spi.stub.WritePersistenceStub;
 import malicia.mrg.photo.organize.infrastructure.persistence.repository.MasterTableRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -13,7 +11,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -33,12 +30,12 @@ class WritePersistenceTest {
 
 //        Then
         UUID uuid = null;
-        try{
+        try {
             uuid = UUID.fromString(ret.toString());
             //do something
-        } catch (IllegalArgumentException exception){
+        } catch (IllegalArgumentException exception) {
             //handle the case where string is not valid UUID
         }
-        assertThat(ret.toString()).isEqualTo(uuid.toString() );
+        assertThat(ret.toString()).isEqualTo(uuid.toString());
     }
 }

@@ -1,6 +1,5 @@
 package malicia.mrg.photo.organize.application.controller.config;
 
-import malicia.mrg.photo.organize.domain.HexMeImpl;
 import malicia.mrg.photo.organize.domain.ddd.DomainService;
 import malicia.mrg.photo.organize.domain.ddd.Stub;
 import org.springframework.context.annotation.ComponentScan;

@@ -47,7 +47,7 @@ class IHexMeTest {
         String ret = hexMe.getMsgReturn(msg);
 
 //        Then
-        assertThat(hexMe.getMsgReturn(msg)).isEqualTo("Hex_write57ceec5b-8f56-4175-8acc-fe161adb3536" );
+        assertThat(hexMe.getMsgReturn(msg)).isEqualTo("Hex_write57ceec5b-8f56-4175-8acc-fe161adb3536");
     }
 
 }
