@@ -5,5 +5,4 @@ import java.util.List;
 public interface IPoc {
     List<String> getPhysicalFilesNotLogic();
 
-    String getMsgReturn(String message);
 }

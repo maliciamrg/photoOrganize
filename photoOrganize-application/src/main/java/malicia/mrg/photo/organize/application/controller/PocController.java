@@ -24,7 +24,7 @@ public class PocController {
 
     @PostMapping
     public ResponseEntity<String> testHexMe(@RequestBody HexMeRequest inputHexMe) throws URISyntaxException {
-        return ok(pocImpl.getMsgReturn(inputHexMe.message));
+        return ok(pocImpl.getPhysicalFilesNotLogic().toString());
     }
 
 

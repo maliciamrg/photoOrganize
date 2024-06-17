@@ -32,7 +32,7 @@ class PocControllerTest {
         resultActions
                 .andExpect(status().is2xxSuccessful())
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(content().string("Not_Yet_Hex"))
+                .andExpect(content().string("[afoo01, file3]"))
                 .andReturn()
         ;
     }
@@ -48,7 +48,7 @@ class PocControllerTest {
         resultActions
                 .andExpect(status().is2xxSuccessful())
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(content().string("Yes_Hex"))
+                .andExpect(content().string("[afoo01, file3]"))
                 .andReturn()
         ;
     }

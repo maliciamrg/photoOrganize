@@ -1,9 +1,10 @@
 package malicia.mrg.photo.organize.domain;
 
-import malicia.mrg.photo.organize.domain.api.IHexMe;
 import malicia.mrg.photo.organize.domain.api.IPoc;
 import malicia.mrg.photo.organize.domain.ddd.DomainService;
-import malicia.mrg.photo.organize.domain.spi.IWritePersistence;
+import malicia.mrg.photo.organize.domain.spi.ILogicalSystem;
+import malicia.mrg.photo.organize.domain.spi.IParams;
+import malicia.mrg.photo.organize.domain.spi.IPhysicalSystem;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,31 +13,36 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @DomainService
 public class PocImpl implements IPoc {
-    private CharSequence defautValue = "hex?";
-    private String ok = "Yes_Hex";
-    private String notOk = "Not_Yet_Hex";
-    private String write = "write?";
-    private String hexWrite = "Hex_write";
     private static final Logger LOGGER_TO_SYNC_PH_FILE = LogManager.getLogger("loggerToSyncPhFile");
+    private final ILogicalSystem logicalSystem;
+    private final IPhysicalSystem physicalSystem;
+    private IParams params;
 
-    List<String> listFilesPh = new ArrayList<>();
-    List<String> listFilesLog = new ArrayList<>();
-    List<String> listFilesNotInLog = new ArrayList<>();
-    private Params params;
-    private IWritePersistence writePersistence;
+    private List<String> listFilesPh = new ArrayList<>();
+    private List<String> listFilesLog = new ArrayList<>();
+    private List<String> listFilesNotInLog = new ArrayList<>();
 
-    public PocImpl(IWritePersistence writePersistence) {
-        this.writePersistence = writePersistence;
+    public PocImpl(ILogicalSystem logicalSystem, IPhysicalSystem physicalSystem , IParams params) {
+        this.logicalSystem = logicalSystem;
+        this.physicalSystem = physicalSystem;
+        this.params = params;
     }
+
+
 
     private List<String> getAllRootPathsLogiques() {
         List<String> fileList = new ArrayList<>();
+
+        fileList = logicalSystem.getAllRootPathsLogiques();
         // Sort the file list alphabetically
         Collections.sort(fileList);
         return fileList;
@@ -44,53 +50,29 @@ public class PocImpl implements IPoc {
 
     private List<String> getAllFilesLogiques() {
         List<String> fileList = new ArrayList<>();
+
+        for (String rootPath : getAllRootPathsLogiques()) {
+            fileList.addAll(logicalSystem.getAllFilesLogiques(rootPath));
+        }
         // Sort the file list alphabetically
         Collections.sort(fileList);
         return fileList;
     }
 
-    public List<String> getAllPhysicalFiles(List<String> rootPaths, List<String> allowedExtensions, List<String> excludeSubdirectoryRejet){
+    private List<String> getAllPhysicalFiles(List<String> rootPaths, List<String> allowedExtensions, List<String> excludeSubdirectoryRejet) {
         List<String> fileList = new ArrayList<>();
 
         for (String rootPath : rootPaths) {
 
             // Make sure the root path is a directory
-            try {
-                fileList.addAll(listFiles(rootPath, allowedExtensions,excludeSubdirectoryRejet));
-            } catch (IOException e) {
-                System.out.println("Error due to: " + e.getMessage());
-            }
+            fileList.addAll(physicalSystem.listFiles(rootPath, allowedExtensions, excludeSubdirectoryRejet));
         }
         // Sort the file list alphabetically
         Collections.sort(fileList);
         return fileList;
     }
 
-
-    private static List<String> listFiles(String directoryPath, List<String> extension, List<String> excludeSubdirectoryRejet) throws IOException {
-        Path start = Paths.get(directoryPath);
-        try (Stream<Path> stream = Files.walk(start, Integer.MAX_VALUE)) {
-            return stream
-                    .map(name -> normalizePath(name.toString()))//.toLowerCase())
-                    .filter(fileName -> {
-                        return extension.contains( FilenameUtils.getExtension(fileName).toLowerCase());
-                    })
-                    .filter(fileName -> {
-                        // Assuming subfolder name is just before the file name in the path
-                        Path parent = Paths.get(fileName).getParent();
-                        return parent != null && !excludeSubdirectoryRejet.contains(parent.getFileName().toString());
-                    })
-//                    .filter(Files::isRegularFile)   // is a file
-                    .sorted()
-                    .collect(Collectors.toList());
-        }
-    }
-
-    private static String normalizePath(String path) {
-        return path.replace("\\", "/").replace("//", "/");
-    }
-
-    private void generateListFilesNotInLog(List<String> listFilesPh,List<String> listFilesLog){
+    private void generateListFilesNotInLog(List<String> listFilesPh, List<String> listFilesLog) {
         int koPhy = 0;
         int koLog = 0;
 
@@ -120,7 +102,7 @@ public class PocImpl implements IPoc {
             }
 
             if (compareResult < 0) {
-                LOGGER_TO_SYNC_PH_FILE.info("not in listFilesLog - " + elemPh + "");
+                LOGGER_TO_SYNC_PH_FILE.info("not in listFilesLog - " + elemPh);
                 listFilesNotInLog.add(elemPh);
                 koPhy++;
                 elemPh = iterPh.hasNext() ? iterPh.next() : null;
@@ -138,29 +120,20 @@ public class PocImpl implements IPoc {
 
     @Override
     public List<String> getPhysicalFilesNotLogic() {
-        List<String> fileList = new ArrayList<>();
 
         List<String> rootPaths = getAllRootPathsLogiques();
         List<String> allowedExtensions = params.getAllowedExtensions();
         List<String> excludeSubdirectoryRejet = params.getSubdirectoryRejet();
 
-        listFilesPh = getAllPhysicalFiles(rootPaths,allowedExtensions,excludeSubdirectoryRejet);
+        listFilesPh = getAllPhysicalFiles(rootPaths, allowedExtensions, excludeSubdirectoryRejet);
         listFilesLog = getAllFilesLogiques();
 
+        listFilesPh.removeAll(listFilesLog);
+
         // Sort the file list alphabetically
-        Collections.sort(fileList);
-        return fileList;
+        Collections.sort(listFilesPh);
+        return listFilesPh;
     }
 
-    @Override
-    public String getMsgReturn(String msg) {
-        if (msg.contains(write)) {
-            UUID uuid_persistence = writePersistence.write(msg);
-            return hexWrite + uuid_persistence.toString();
-        }
-        if (msg.contains(defautValue)) {
-            return ok;
-        }
-        return notOk;
-    }
+
 }
