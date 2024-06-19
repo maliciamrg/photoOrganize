@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class PocImplTest {
     @Test
-    void getAllRootPathsLogiques() {
+    void getPhysicalFilesNotLogic() {
 //        Given
         ILogicalSystem logicalSystem = new LogicalSystemStub();
         IPhysicalSystem physicalSystem = new PhysicalSystemStub();

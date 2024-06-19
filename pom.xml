@@ -12,7 +12,7 @@
         <module>photoOrganize-domain</module>
         <module>photoOrganize-infrastructure</module>
         <module>photoOrganize-application</module>
-        <module>photoOrganize-legacy</module>
+        <module>legacy-photoOrganize</module>
         <module>photoOrganize-service</module>
     </modules>
 

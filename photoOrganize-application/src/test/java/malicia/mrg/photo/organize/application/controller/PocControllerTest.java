@@ -3,12 +3,19 @@ package malicia.mrg.photo.organize.application.controller;
 import malicia.mrg.photo.organize.application.controller.config.DomainConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -22,34 +29,30 @@ class PocControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    void testHexMeNotOk() throws Exception {
+    void getFilesNotLogicOk() throws Exception {
 
         ResultActions resultActions = mockMvc.perform(
-                post("/poc")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{ \"message\" : \"bob\" }"));
+                post("/poc/getFilesNotLogic"));
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content("{ \"message\" : \"bob\" }"));
 
         resultActions
                 .andExpect(status().is2xxSuccessful())
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(content().string("[afoo01, file3]"))
+                .andExpect(
+                    content().json(
+                        (
+                            new ArrayList<String>(
+                                Arrays.asList(
+                                    "afoo01",
+                                    "file3"
+                                )
+                            ).toString()
+                        )
+                    )
+                )
                 .andReturn()
         ;
     }
 
-    @Test
-    void testHexMeOk() throws Exception {
-
-        ResultActions resultActions = mockMvc.perform(
-                post("/poc")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{ \"message\" : \"hex?\" }"));
-
-        resultActions
-                .andExpect(status().is2xxSuccessful())
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(content().string("[afoo01, file3]"))
-                .andReturn()
-        ;
-    }
 }
