@@ -1,5 +1,16 @@
 /.idea/
-/photoOrganize.iml
+/legacy-photoOrganize.iml
+/legacy-photoOrganize/target/
 /logs/
 /out/artifacts/photoOrganize_jar/
+/photoOrganize-application.iml
+/photoOrganize-application/target/
+/photoOrganize-domain.iml
+/photoOrganize-domain/target/
+/photoOrganize-infrastructure.iml
+/photoOrganize-infrastructure/target/
+/photoOrganize-service.iml
+/photoOrganize-service/target/
+/photoOrganize.iml
 /target/
+/*.iml
