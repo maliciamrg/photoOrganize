@@ -55,4 +55,23 @@ class PocControllerTest {
         ;
     }
 
+    @Test
+    void getAnalyseResultOk() throws Exception {
+
+        ResultActions resultActions = mockMvc.perform(
+                post("/poc/getAnalyseResult"));
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content("{ \"message\" : \"bob\" }"));
+
+        resultActions
+                .andExpect(status().is2xxSuccessful())
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(
+                        content().json("{phyKo:2,phyNb:5,logicKo:1,logicNb:4}"
+                        )
+                )
+                .andReturn()
+        ;
+    }
+
 }

@@ -5,38 +5,30 @@ import malicia.mrg.photo.organize.domain.ddd.DomainService;
 import malicia.mrg.photo.organize.domain.spi.ILogicalSystem;
 import malicia.mrg.photo.organize.domain.spi.IParams;
 import malicia.mrg.photo.organize.domain.spi.IPhysicalSystem;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @DomainService
 public class PocImpl implements IPoc {
     private static final Logger LOGGER_TO_SYNC_PH_FILE = LogManager.getLogger("loggerToSyncPhFile");
     private final ILogicalSystem logicalSystem;
     private final IPhysicalSystem physicalSystem;
-    private IParams params;
+    private final IParams params;
 
     private List<String> listFilesPh = new ArrayList<>();
     private List<String> listFilesLog = new ArrayList<>();
-    private List<String> listFilesNotInLog = new ArrayList<>();
+    private final List<String> listFilesNotInLog = new ArrayList<>();
 
-    public PocImpl(ILogicalSystem logicalSystem, IPhysicalSystem physicalSystem , IParams params) {
+    public PocImpl(ILogicalSystem logicalSystem, IPhysicalSystem physicalSystem, IParams params) {
         this.logicalSystem = logicalSystem;
         this.physicalSystem = physicalSystem;
         this.params = params;
     }
-
 
 
     private List<String> getAllRootPathsLogiques() {
@@ -133,6 +125,97 @@ public class PocImpl implements IPoc {
         // Sort the file list alphabetically
         Collections.sort(listFilesPh);
         return listFilesPh;
+    }
+
+    @Override
+    public Analysis analyseFileFPhysiqueAndLogic() {
+        List<String> rootPaths = getAllRootPathsLogiques();
+        List<String> allowedExtensions = params.getAllowedExtensions();
+        List<String> excludeSubdirectoryRejet = params.getSubdirectoryRejet();
+
+        listFilesPh = getAllPhysicalFiles(rootPaths, allowedExtensions, excludeSubdirectoryRejet);
+        listFilesLog = getAllFilesLogiques();
+
+        List<String> listFilesNotInLog = new ArrayList<>();
+        List<String> listFilesNotInPhy = new ArrayList<>();
+        int koPhy = 0;
+        int koLog = 0;
+        Collections.sort(listFilesPh);
+        Collections.sort(listFilesLog);
+        Analysis result = new Analysis();
+
+
+//        int posLog = 0;
+        int nbLog = listFilesLog.size();
+
+//        int posPhy = 0;
+        int nbPhy = listFilesPh.size();
+
+        LOGGER_TO_SYNC_PH_FILE.info("Differences between listFilesPh and listFilesLog:");
+
+        Iterator<String> iterPh = listFilesPh.listIterator();
+        Iterator<String> iterLo = listFilesLog.listIterator();
+
+        String elemPh = iterPh.hasNext() ? iterPh.next() : null;
+        String elemLo = iterLo.hasNext() ? iterLo.next() : null;
+
+        while (elemPh != null || elemLo != null) {
+            int compareResult;
+
+            if (elemPh == null) {
+                compareResult = 1; // listFilesPh is exhausted
+            } else if (elemLo == null) {
+                compareResult = -1; // listFilesLog is exhausted
+            } else {
+                compareResult = elemPh.compareTo(elemLo);
+            }
+
+            if (compareResult < 0) {
+                //              LOGGER_TO_SYNC_PH_FILE.info("not in listFilesLog - " + elemPh + "");
+                listFilesNotInLog.add(elemPh);
+                koPhy++;
+                elemPh = iterPh.hasNext() ? iterPh.next() : null;
+            } else if (compareResult > 0) {
+                //              LOGGER_TO_SYNC_PH_FILE.info("not in listFilesPh  - " + elemLo + " ");
+                listFilesNotInPhy.add(elemLo);
+                koLog++;
+                elemLo = iterLo.hasNext() ? iterLo.next() : null;
+            } else {
+                // Elements are equal, move both iterators forward
+                elemPh = iterPh.hasNext() ? iterPh.next() : null;
+                elemLo = iterLo.hasNext() ? iterLo.next() : null;
+            }
+        }
+
+
+        //LOGGER.info(" nb path logique  = " + nbLog + " : absent logique in physique = " + koLog + "\n");
+        LOGGER_TO_SYNC_PH_FILE.info(" nb path logique  = " + nbLog + " : absent logique in physique = " + koLog + "\n");
+        //LOGGER.info(" nb path physique = " + nbPhy + " : absent physique in logique = " + koPhy + "\n");
+        LOGGER_TO_SYNC_PH_FILE.info(" nb path physique = " + nbPhy + " : absent physique in logique = " + koPhy + "\n");
+
+        result.logicNb = nbLog;
+        result.logicKo = koLog;
+        result.phyNb = nbPhy;
+        result.phyKo = koPhy;
+        result.listFilesNotInPhy = listFilesNotInPhy;
+        result.listFilesNotInLog= listFilesNotInLog;
+//        correctPhysique_lc_duplicate(listFilesPh, listFilesNotInLog);
+
+//        correctLogicalLowercase(listFilesLog, listFilesNotInLog);
+
+//        correctPhysiqueLostSidecar(listFilesNotInLog);
+
+//        correctPhysiqueAlreadyHash(listFilesNotInLog);
+
+//        correctPhysiqueStartDot(listFilesNotInLog);
+
+        //todo
+        // - gif 2 mp4
+        // - bmp 2 jpeg
+        // - mp3 2 mp4
+
+//        LOGGER.info("\n");
+        return result;
     }
 
 

@@ -26,5 +26,9 @@ public class PocController {
         return pocImpl.getPhysicalFilesNotLogic();
     }
 
+    @PostMapping("/getAnalyseResult")
+    public Object getAnalyseResult() {
+        return pocImpl.analyseFileFPhysiqueAndLogic();
+    }
 
 }
