@@ -4,10 +4,7 @@ import malicia.mrg.photo.organize.domain.ddd.Stub;
 import malicia.mrg.photo.organize.domain.spi.ILogicalSystem;
 import malicia.mrg.photo.organize.domain.spi.IWritePersistence;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Stub
 public class LogicalSystemStub implements ILogicalSystem {
@@ -32,5 +29,30 @@ public class LogicalSystemStub implements ILogicalSystem {
             fileList.add("fileazertyuiop12");
         }
         return fileList;
+    }
+
+    @Override
+    public int sqlmovefile(long scrFileIdLocal, String newPath) {
+        return 0;
+    }
+
+    @Override
+    public String sqlGetSidecarExtensions(long scrFileIdLocal) {
+        return null;
+    }
+
+    @Override
+    public Map<String, Long> getIdlocalforFilePath(String source) {
+        return null;
+    }
+
+    @Override
+    public String getFileByHash(String s) {
+        return null;
+    }
+
+    @Override
+    public void makeRepertory(String directoryName) {
+
     }
 }

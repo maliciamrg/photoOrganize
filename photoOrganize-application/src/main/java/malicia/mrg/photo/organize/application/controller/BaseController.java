@@ -6,8 +6,6 @@ import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 public class BaseController {
-
-
     @GetMapping("/")
     public String index() {
         return "Greetings from Spring Boot!";

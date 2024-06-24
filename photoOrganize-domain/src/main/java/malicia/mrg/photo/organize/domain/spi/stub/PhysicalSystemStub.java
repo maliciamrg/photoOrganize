@@ -4,6 +4,8 @@ import malicia.mrg.photo.organize.domain.ddd.Stub;
 import malicia.mrg.photo.organize.domain.spi.ILogicalSystem;
 import malicia.mrg.photo.organize.domain.spi.IPhysicalSystem;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,4 +28,20 @@ public class PhysicalSystemStub implements IPhysicalSystem {
         }
         return fileList;
     }
+
+    @Override
+    public int movePhysique(String modifiedSource, String modifiedNewPath) {
+        return 0;
+    }
+
+    @Override
+    public void extractZipFile(File file) {
+
+    }
+
+    @Override
+    public void mkdir(String directoryName) {
+
+    }
+
 }

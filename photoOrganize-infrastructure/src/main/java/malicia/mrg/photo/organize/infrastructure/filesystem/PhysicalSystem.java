@@ -7,6 +7,7 @@ import malicia.mrg.photo.organize.infrastructure.persistence.repository.MasterTa
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,6 +44,22 @@ public class PhysicalSystem implements IPhysicalSystem {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public int movePhysique(String modifiedSource, String modifiedNewPath) {
+        return 0;
+    }
+
+    @Override
+    public void extractZipFile(File file) {
+
+    }
+
+    @Override
+    public void mkdir(String directoryName) {
+
+    }
+
     private static String normalizePath(String path) {
         return path.replace("\\", "/").replace("//", "/");
     }

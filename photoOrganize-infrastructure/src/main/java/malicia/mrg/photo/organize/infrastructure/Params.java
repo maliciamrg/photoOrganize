@@ -28,5 +28,35 @@ public class Params implements IParams {
         return subdirectoryRejet;
     }
 
+    @Override
+    public List<String> getExtensionFileRejetSup() {
+        return null;
+    }
+
+    @Override
+    public List<String> getNomSubdirectoryRejet() {
+        return null;
+    }
+
+    @Override
+    public String getExtFileRejet() {
+        return null;
+    }
+
+    @Override
+    public String getRepertoire(String rejet) {
+        return null;
+    }
+
+    @Override
+    public String getRepertoire50Phototheque() {
+        return null;
+    }
+
+    @Override
+    public List<String> getExtensionsUseFile() {
+        return null;
+    }
+
 
 }

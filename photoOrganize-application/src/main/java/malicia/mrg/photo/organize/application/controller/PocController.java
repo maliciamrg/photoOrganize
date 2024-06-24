@@ -28,7 +28,9 @@ public class PocController {
 
     @PostMapping("/getAnalyseResult")
     public Object getAnalyseResult() {
-        return pocImpl.analyseFileFPhysiqueAndLogic();
+        return pocImpl.analyseFilePhysiqueAndLogic();
     }
 
+    @PostMapping("/putSynchroDatabase")
+    public Object putSynchroDatabase() { return pocImpl.synchroDatabase(); }
 }
