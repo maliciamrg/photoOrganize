@@ -1,0 +1,7 @@
+version: '3.8'
+services:
+    photoOrganize:
+        image: photoorganize:latest
+        ports:
+            - 8080:8080
+        container_name: photoOrganize-service

@@ -1,6 +1,7 @@
 package malicia.mrg.photo.organize.domain;
 
 import malicia.mrg.photo.organize.domain.api.IKeyAction;
+import malicia.mrg.photo.organize.domain.ddd.DomainService;
 import malicia.mrg.photo.organize.domain.dto.Analysis;
 import malicia.mrg.photo.organize.domain.spi.ILogicalSystem;
 import malicia.mrg.photo.organize.domain.spi.IParams;
@@ -10,12 +11,12 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@DomainService
 public class KeyActionImpl implements IKeyAction {
     private static final Logger LOGGER = LogManager.getLogger("loggerToSyncPhFile");
     private final ILogicalSystem logicalSystem;
@@ -31,7 +32,7 @@ public class KeyActionImpl implements IKeyAction {
     @Override
     public Analysis makeActionRapprochement() {
         Analysis result = new Analysis();
-        List<String> listMove= new ArrayList<>();
+        List<String> listMove = new ArrayList<>();
 
         Map<String, Map<String, String>> fileToGo = logicalSystem.getFileForGoTag(params.getTag_action_go_rapprochement());
         LOGGER.info("nb de fichier tagger : " + params.getTag_action_go_rapprochement() + " => " + String.format("%05d", fileToGo.size()), fileToGo.size());
@@ -45,7 +46,7 @@ public class KeyActionImpl implements IKeyAction {
                 if (new File(source).exists() && !new File(newPath).exists()) {
                     LOGGER.debug("---move " + params.getTag_action_go_rapprochement() + " : " + source + " -> " + newPath);
                     try {
-                        Tools.moveFile(source, newPath,physicalSystem,logicalSystem);
+                        Tools.moveFile(source, newPath, physicalSystem, logicalSystem);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     } catch (SQLException e) {
@@ -57,14 +58,14 @@ public class KeyActionImpl implements IKeyAction {
             }
         }
         LOGGER.info("move " + String.format("%05d", nb) + " - " + params.getTag_action_go_rapprochement(), nb);
-        result.add("move - " + params.getTag_action_go_rapprochement() ,listMove,nb);
+        result.add("move - " + params.getTag_action_go_rapprochement(), listMove, nb);
         return result;
     }
 
     @Override
     public Analysis makeActionMoveToRepertory() {
         Analysis result = new Analysis();
-        List<String> listMove= new ArrayList<>();
+        List<String> listMove = new ArrayList<>();
 
         Map<String, String> listeAction = logicalSystem.getFolderCollection(params.getCollections(), params.getTag_org(), "");
         int nb = 0;
@@ -78,7 +79,7 @@ public class KeyActionImpl implements IKeyAction {
                 if (new File(oldPath).exists() && !new File(newPath).exists()) {
                     LOGGER.debug("---move " + key + " : " + oldPath + " -> " + newPath);
                     try {
-                        Tools.moveFile(oldPath, newPath,physicalSystem,logicalSystem);
+                        Tools.moveFile(oldPath, newPath, physicalSystem, logicalSystem);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     } catch (SQLException e) {
@@ -89,7 +90,7 @@ public class KeyActionImpl implements IKeyAction {
                 }
             }
         }
-        result.add("move - " + params.getTag_action_go_rapprochement() ,listMove,nb);
+        result.add("move - " + params.getTag_action_go_rapprochement(), listMove, nb);
         return result;
     }
 
