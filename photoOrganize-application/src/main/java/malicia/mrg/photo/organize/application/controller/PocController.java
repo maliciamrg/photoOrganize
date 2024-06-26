@@ -33,4 +33,8 @@ public class PocController {
 
     @PostMapping("/putSynchroDatabase")
     public Object putSynchroDatabase() { return pocImpl.synchroDatabase(); }
+
+    @PostMapping("/putMaintenanceDatabase")
+    public Object putMaintenanceDatabase() { return pocImpl.maintenanceDatabase(); }
+
 }

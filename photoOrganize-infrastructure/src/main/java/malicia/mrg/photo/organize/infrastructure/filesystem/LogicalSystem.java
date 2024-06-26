@@ -53,4 +53,54 @@ public class LogicalSystem implements ILogicalSystem {
     public void makeRepertory(String directoryName) {
 
     }
+
+    @Override
+    public void AdobeImagesWithoutLibraryFile() {
+
+    }
+
+    @Override
+    public void folderWithoutRoot() {
+
+    }
+
+    @Override
+    public void fileWithoutFolder() {
+
+    }
+
+    @Override
+    public void KeywordImageWithoutImages() {
+
+    }
+
+    @Override
+    public void keywordImageWithoutKeyword() {
+
+    }
+
+    @Override
+    public Map<String, Map<String, String>> getFileForGoTag(String tagActionGoRapprochement) {
+        return null;
+    }
+
+    @Override
+    public Map<String, String> getNewPathForGoTagandFileIdlocal(String tagOrg, String scrFileIdLocal) {
+        return null;
+    }
+
+    @Override
+    public void removeKeywordImages(String kiIdLocal) {
+
+    }
+
+    @Override
+    public Map<String, Map<String, String>> sqllistAllFileWithTagtoRep(String key, String s) {
+        return null;
+    }
+
+    @Override
+    public Map<String, String> getFolderCollection(String collections, String tagOrg, String s) {
+        return null;
+    }
 }

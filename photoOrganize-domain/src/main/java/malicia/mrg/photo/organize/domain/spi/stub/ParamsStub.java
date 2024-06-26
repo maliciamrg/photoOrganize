@@ -11,6 +11,16 @@ public class ParamsStub implements IParams {
 
 
     @Override
+    public String getFolderdelim() {
+        return "\\";
+    }
+
+    @Override
+    public long getGmt01jan200112am() {
+        return 978307200;
+    }
+
+    @Override
     public List<String> getAllowedExtensions() {
         List<String> fileList = new ArrayList<>();
         fileList.add("jpg");
@@ -71,6 +81,29 @@ public class ParamsStub implements IParams {
     @Override
     public List<String> getExtensionsUseFile() {
         return null;
+    }
+
+    @Override
+    public String getTag_action_go_rapprochement() {
+        return getTag_action_go() + gettag_rapprochement();
+    }
+
+    @Override
+    public String getTag_action_go() {
+        return "GO" + "->";
+    }
+    @Override
+    public String gettag_rapprochement() {
+        return getTag_org() + "RAPPROCHEMENT";
+    }
+    @Override
+    public String getTag_org() {
+        return "#ORG#";
+    }
+
+    @Override
+    public String getCollections() {
+        return "!!Collections";
     }
 
 }

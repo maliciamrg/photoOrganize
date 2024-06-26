@@ -1,5 +1,6 @@
 package malicia.mrg.photo.organize.domain;
 
+import malicia.mrg.photo.organize.domain.dto.Analysis;
 import malicia.mrg.photo.organize.domain.spi.ILogicalSystem;
 import malicia.mrg.photo.organize.domain.spi.IParams;
 import malicia.mrg.photo.organize.domain.spi.IPhysicalSystem;
@@ -14,9 +15,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 class PocImplTest {
+
     @Test
-    void getPhysicalFilesNotLogic() {
-//        Given
+    void testGetPhysicalFilesNotLogic() {
+        //        Given
         ILogicalSystem logicalSystem = new LogicalSystemStub();
         IPhysicalSystem physicalSystem = new PhysicalSystemStub();
         IParams params= new ParamsStub();;
@@ -29,4 +31,23 @@ class PocImplTest {
         assertThat(ret.toString()).isEqualTo("[afoo01, file3]");
     }
 
+    @Test
+    void analyseFilePhysiqueAndLogic() {
+    }
+
+    @Test
+    void synchroDatabase() {
+        //        Given
+        ILogicalSystem logicalSystem = new LogicalSystemStub();
+        IPhysicalSystem physicalSystem = new PhysicalSystemStub();
+        IParams params= new ParamsStub();;
+        PocImpl pocMe = new PocImpl(logicalSystem,physicalSystem,params);
+
+//        When
+        Analysis ret = new Analysis();
+        ret = pocMe.synchroDatabase();
+
+//        Then
+        assertThat(ret.getActions().size()).isEqualTo(5);
+    }
 }

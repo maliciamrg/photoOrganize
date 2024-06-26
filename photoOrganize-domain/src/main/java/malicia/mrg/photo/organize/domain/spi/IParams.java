@@ -5,6 +5,10 @@ import java.util.Collection;
 import java.util.List;
 
 public interface IParams {
+
+    String getFolderdelim();
+    long getGmt01jan200112am();
+
     List<String> getAllowedExtensions();
 
     List<String> getSubdirectoryRejet();
@@ -20,4 +24,14 @@ public interface IParams {
     String getRepertoire50Phototheque();
 
     List<String> getExtensionsUseFile();
+
+    String getTag_action_go_rapprochement();
+
+    String getTag_action_go();
+
+    String gettag_rapprochement();
+
+    String getTag_org();
+
+    String getCollections();
 }

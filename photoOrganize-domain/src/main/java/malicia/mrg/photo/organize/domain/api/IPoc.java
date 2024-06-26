@@ -1,10 +1,7 @@
 package malicia.mrg.photo.organize.domain.api;
 
-import malicia.mrg.photo.organize.domain.Analysis;
+import malicia.mrg.photo.organize.domain.dto.Analysis;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.List;
 
 public interface IPoc {
@@ -12,5 +9,7 @@ public interface IPoc {
 
     Analysis analyseFilePhysiqueAndLogic();
 
-    Analysis synchroDatabase() throws SQLException, IOException, ParseException;
+    Analysis synchroDatabase();
+    Analysis maintenanceDatabase();
+
 }

@@ -400,7 +400,7 @@ public class Main {
         if (makeAction) {
             TimeTracker.startTimer(Thread.currentThread().getStackTrace()[1].getMethodName(), LOGGER_TO_TIME);
             //action collection
-            Map<String, String> listeAction = ctx.getActionVersRepertoire().getListeAction();
+            Map<String, String> listeAction = dbLr.getFolderCollection(Context.COLLECTIONS, Context.TAG_ORG, "");
             //action GO
             listeAction.put(Context.TAG_ACTION_GO_RAPPROCHEMENT, "");
 
@@ -470,7 +470,7 @@ public class Main {
                 LOGGER.info(getStringLn("Keyword " + Context.TAG_ACTION_GO_RAPPROCHEMENT) + " idlocal = " + lstIdKey.get(lstIdKey.size() - 1));
             }
 
-            for (String key : ctx.getActionVersRepertoire().getListeAction().keySet()) {
+            for (String key : dbLr.getFolderCollection(Context.COLLECTIONS, Context.TAG_ORG, "").keySet()) {
 
                 dbLrSqlcreateKeyword = dbLr.sqlcreateKeyword(Context.TAG_ORG, key);
                 lstIdKey.add(dbLrSqlcreateKeyword.get("keyWordIdlocal"));
@@ -560,7 +560,7 @@ public class Main {
             loggerInfo("move " + String.format("%05d", nb) + " - " + Context.TAG_ACTION_GO_RAPPROCHEMENT, nb);
 
             //action collection
-            Map<String, String> listeAction = ctx.getActionVersRepertoire().getListeAction();
+            Map<String, String> listeAction = dbLr.getFolderCollection(Context.COLLECTIONS, Context.TAG_ORG, "");
             for (String key : listeAction.keySet()) {
                 Map<String, Map<String, String>> fileToTag = dbLr.sqllistAllFileWithTagtoRep(key, listeAction.get(key));
                 loggerInfo("move " + String.format("%05d", fileToTag.size()) + " - " + key, fileToTag.size());

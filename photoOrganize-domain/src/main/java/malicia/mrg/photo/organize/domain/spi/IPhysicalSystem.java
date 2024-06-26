@@ -1,6 +1,8 @@
 package malicia.mrg.photo.organize.domain.spi;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -13,4 +15,12 @@ public interface IPhysicalSystem {
     void extractZipFile(File file);
 
     void mkdir(String directoryName);
+
+    FileTime getLastModifiedTime(Path filePath);
+
+    String size(Path filePath);
+
+    String getFileseparator();
+
+    String getFilegetParent(String newPath);
 }

@@ -19,6 +19,16 @@ public class Params implements IParams {
     }
 
     @Override
+    public String getFolderdelim() {
+        return null;
+    }
+
+    @Override
+    public long getGmt01jan200112am() {
+        return 0;
+    }
+
+    @Override
     public List<String> getAllowedExtensions() {
         return allowedExtensions;
     }
@@ -55,6 +65,31 @@ public class Params implements IParams {
 
     @Override
     public List<String> getExtensionsUseFile() {
+        return null;
+    }
+
+    @Override
+    public String getTag_action_go_rapprochement() {
+        return null;
+    }
+
+    @Override
+    public String getTag_action_go() {
+        return null;
+    }
+
+    @Override
+    public String gettag_rapprochement() {
+        return null;
+    }
+
+    @Override
+    public String getTag_org() {
+        return null;
+    }
+
+    @Override
+    public String getCollections() {
         return null;
     }
 

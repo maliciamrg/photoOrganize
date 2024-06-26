@@ -6,10 +6,16 @@ import malicia.mrg.photo.organize.domain.spi.IPhysicalSystem;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+
+import static java.time.LocalTime.now;
 
 @Stub
 public class PhysicalSystemStub implements IPhysicalSystem {
@@ -42,6 +48,33 @@ public class PhysicalSystemStub implements IPhysicalSystem {
     @Override
     public void mkdir(String directoryName) {
 
+    }
+
+    @Override
+    public FileTime getLastModifiedTime(Path filePath) {
+        long milis = 0;
+        try {
+            milis = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss").parse("01.01.2013 10:00:10").getTime();
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        FileTime fileTime = FileTime.fromMillis(milis);
+        return fileTime;
+    }
+
+    @Override
+    public String size(Path filePath) {
+        return "200";
+    }
+
+    @Override
+    public String getFileseparator() {
+        return null;
+    }
+
+    @Override
+    public String getFilegetParent(String newPath) {
+        return null;
     }
 
 }

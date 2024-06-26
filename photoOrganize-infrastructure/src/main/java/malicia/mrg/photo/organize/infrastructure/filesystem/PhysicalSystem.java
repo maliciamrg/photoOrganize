@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -58,6 +59,26 @@ public class PhysicalSystem implements IPhysicalSystem {
     @Override
     public void mkdir(String directoryName) {
 
+    }
+
+    @Override
+    public FileTime getLastModifiedTime(Path filePath) {
+        return null;
+    }
+
+    @Override
+    public String size(Path filePath) {
+        return null;
+    }
+
+    @Override
+    public String getFileseparator() {
+        return null;
+    }
+
+    @Override
+    public String getFilegetParent(String newPath) {
+        return null;
     }
 
     private static String normalizePath(String path) {
