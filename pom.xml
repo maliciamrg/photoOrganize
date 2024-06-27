@@ -13,7 +13,6 @@
         <module>photoOrganize-infrastructure</module>
         <module>photoOrganize-application</module>
         <module>legacy-photoOrganize</module>
-        <module>photoOrganize-service</module>
     </modules>
 
     <properties>

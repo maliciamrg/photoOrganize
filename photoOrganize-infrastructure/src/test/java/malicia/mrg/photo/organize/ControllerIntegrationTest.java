@@ -1,20 +1,17 @@
 package malicia.mrg.photo.organize;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-
-import java.util.UUID;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class ControllerIntegrationTest {
@@ -28,13 +25,13 @@ class ControllerIntegrationTest {
     void Base_Ok() throws Exception {
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(APPLICATION_JSON);
+        headers.setContentType(MediaType.APPLICATION_JSON);
         var response = restTemplate.getForEntity("http://localhost:%d/".formatted(port), String.class);
 
         System.out.println(response.toString());
 
-        assertThat(response.getStatusCode()).isEqualTo(OK);
-        assertThat(response.getBody()).isEqualTo("Greetings from Spring Boot!");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Assertions.assertThat(response.getBody()).isEqualTo("Greetings from Spring Boot!");
 
     }
 
