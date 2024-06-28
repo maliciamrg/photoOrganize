@@ -6,6 +6,32 @@ pipeline {
                 sh 'mvn -B -DskipTests clean package'
             }
         }
+        stage("Create/Push Docker Image") {
+            steps {
+                script {
+                    pom = readMavenPom file: 'pom.xml'
+                    withCredentials([usernamePassword(credentialsId: 'hub.docker.com', passwordVariable: 'HUB_REPO_PASS', usernameVariable: 'HUB_REPO_USER')]) {
+                        def user = env.HUB_REPO_USER
+                        def password = env.HUB_REPO_PASS
+                        dir("photoOrganize-infrastructure") {
+                            sh "docker version"
+                            sh "docker login -u $user -p $password"
+                            sh "docker build -t maliciamrg/${pom.getArtifactId().toLowerCase()}:${pom.getVersion()} . "
+                            sh "docker push maliciamrg/${pom.getArtifactId().toLowerCase()}:${pom.getVersion()}"
+                        }
+                    }
+                }
+            }
+        }
+        stage("install Docker Image into 200") {
+            steps {
+                script {
+                    dir("photoOrganize-infrastructure") {
+                        sh "docker --context remote compose up -d"
+                    }
+                }
+            }
+        }
     }
     post {
         always {

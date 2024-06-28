@@ -1,7 +1,7 @@
-version: '3.8'
+version: '2.2'
 services:
     photoOrganize:
-        image: photoorganize:latest
+        image: maliciamrg/photoorganize:1.0
         ports:
-            - 8080:8080
+            - 8090:8080
         container_name: photoOrganize
