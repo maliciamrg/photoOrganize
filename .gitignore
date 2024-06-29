@@ -14,3 +14,6 @@
 /photoOrganize.iml
 /target/
 /*.iml
+/photoOrganize-infrastructure/src/test/ressources/database/test.lrcat-data/
+/photoOrganize-infrastructure/src/test/ressources/database/test Helper.lrdata/
+/photoOrganize-infrastructure/src/test/ressources/database/test Previews.lrdata/

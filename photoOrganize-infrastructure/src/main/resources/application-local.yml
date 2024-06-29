@@ -9,5 +9,5 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
 application:
-  lightroomdbpath: /Photo/70_Catalog_Phototheque/70_Catalog_Phototheque-2-v12.lrcat
+  lightroomdbpath: src/test/ressources/database/70_Catalog_Phototheque-2-v12.lrcat
 

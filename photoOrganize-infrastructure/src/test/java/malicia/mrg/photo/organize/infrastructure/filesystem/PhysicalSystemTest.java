@@ -34,7 +34,8 @@ class PhysicalSystemTest {
                                 "src/test/ressources/testOne/file1 - Copy (3).err"
                         )
                 )
-        );    }
+        );
+    }
 
     @Test
     void listFilestxt() {

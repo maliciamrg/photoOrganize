@@ -5,3 +5,5 @@ services:
         ports:
             - 8090:8080
         container_name: photoOrganize
+        volumes:
+            - '/Photo:/Photo'

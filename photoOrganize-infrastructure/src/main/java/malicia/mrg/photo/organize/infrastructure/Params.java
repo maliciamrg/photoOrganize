@@ -1,21 +1,27 @@
 package malicia.mrg.photo.organize.infrastructure;
 
 import malicia.mrg.photo.organize.domain.spi.IParams;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Service
+@Primary
+@Component
+@ConfigurationProperties(prefix = "application")
 public class Params implements IParams {
 
-    private String lightroomDBPath;
+    private String lightroomdbpath;
     private List<String> subdirectoryRejet;
     private List<String> allowedExtensions;
 
-    public String getLightroomDBPath() {
-        return lightroomDBPath;
+    public String getLightroomdbpath() {
+        return lightroomdbpath;
+    }
+
+    public void setLightroomdbpath(String lightroomdbpath) {
+        this.lightroomdbpath = lightroomdbpath;
     }
 
     @Override
@@ -92,6 +98,5 @@ public class Params implements IParams {
     public String getCollections() {
         return null;
     }
-
 
 }

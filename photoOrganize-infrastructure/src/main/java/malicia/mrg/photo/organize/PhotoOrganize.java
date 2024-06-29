@@ -2,11 +2,13 @@ package malicia.mrg.photo.organize;
 
 import malicia.mrg.photo.organize.domain.ddd.DomainService;
 import malicia.mrg.photo.organize.domain.ddd.Stub;
+import malicia.mrg.photo.organize.infrastructure.Params;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.core.env.Environment;
@@ -21,6 +23,7 @@ import java.util.Optional;
 @ComponentScan(
         basePackages = {"malicia.mrg.photo.organize"},
         includeFilters = {@ComponentScan.Filter(type = FilterType.ANNOTATION, classes = {DomainService.class})})
+@EnableConfigurationProperties(value = Params.class)
 public class PhotoOrganize {
 
     public static final String HTTP_DEFAULT_PORT = "8080";
