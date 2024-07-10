@@ -3,7 +3,7 @@ services:
     photoOrganize:
         image: maliciamrg/photoorganize:1.0
         ports:
-            - 8090:8080
+            - 8090:8090
         container_name: photoOrganize
         volumes:
-            - '/Photo:/Photo'
+            - '/Photo/50-Phototheque:/Phototheque'

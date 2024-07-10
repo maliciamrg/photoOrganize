@@ -124,6 +124,7 @@
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
                     <parameters>true</parameters>
+                    <compilerArgs>--enable-preview</compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
@@ -133,5 +134,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
