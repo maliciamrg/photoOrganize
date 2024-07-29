@@ -2,8 +2,13 @@ package malicia.mrg.photo.organize.infrastructure.filesystem;
 
 import malicia.mrg.photo.organize.domain.spi.ILogicalSystem;
 import malicia.mrg.photo.organize.infrastructure.Params;
+import malicia.mrg.photo.organize.infrastructure.dto.AgLibraryRootFolderDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -11,13 +16,8 @@ import java.util.Map;
 @Service
 public class LogicalSystem implements ILogicalSystem {
 
-
+    private static final Logger logger = LoggerFactory.getLogger(LogicalSystem.class);
     private final String lightroomdbpath;
-
-    public Params getParameter() {
-        return parameter;
-    }
-
     private final Params parameter;
 
     public LogicalSystem(Params parameter) {
@@ -25,14 +25,42 @@ public class LogicalSystem implements ILogicalSystem {
         this.parameter = parameter;
     }
 
+    public Params getParameter() {
+        return parameter;
+    }
+
     @Override
     public List<String> getAllRootPathsLogiques() {
-        return null;
+        List<String> outReturn = new ArrayList<>();
+        WebClient webClient = WebClient.create();
+        AgLibraryRootFolderDto[] responseJson = webClient.get()
+                .uri("http://localhost:8091/api/agLibraryRootFolder")
+                .exchange()
+                .block()
+                .bodyToMono(AgLibraryRootFolderDto[].class)
+                .block();
+        logger.info(responseJson.toString());
+        for (AgLibraryRootFolderDto agLibraryRootFolder : responseJson) {
+            outReturn.add(agLibraryRootFolder.getAbsolutePath());
+        }
+        return outReturn;
     }
 
     @Override
     public Collection<String> getAllFilesLogiques(String rootPath) {
-        return null;
+        List<String> outReturn = new ArrayList<>();
+        WebClient webClient = WebClient.create();
+        AgLibraryRootFolderDto[] responseJson = webClient.get()
+                .uri("http://localhost:8091/api/agLibraryRootFolder")
+                .exchange()
+                .block()
+                .bodyToMono(AgLibraryRootFolderDto[].class)
+                .block();
+        logger.info(responseJson.toString());
+        for (AgLibraryRootFolderDto agLibraryRootFolder : responseJson) {
+            outReturn.add(agLibraryRootFolder.getAbsolutePath());
+        }
+        return outReturn;
     }
 
     @Override

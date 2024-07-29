@@ -1,26 +1,21 @@
 package malicia.mrg.photo.organize;
 
 import malicia.mrg.photo.organize.domain.ddd.DomainService;
-import malicia.mrg.photo.organize.domain.ddd.Stub;
 import malicia.mrg.photo.organize.infrastructure.Params;
-import org.komamitsu.spring.data.sqlite.EnableSqliteRepositories;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
-import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StringUtils;
 
-import javax.sql.DataSource;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Optional;
@@ -31,7 +26,6 @@ import java.util.Optional;
         basePackages = {"malicia.mrg.photo.organize"},
         includeFilters = {@ComponentScan.Filter(type = FilterType.ANNOTATION, classes = {DomainService.class})})
 @EnableConfigurationProperties(value = Params.class)
-@EnableJdbcRepositories
 public class PhotoOrganize {
 
     public static final String HTTP_DEFAULT_PORT = "8080";
@@ -60,16 +54,17 @@ public class PhotoOrganize {
             contextPath = "/";
         }
         final String hosttAddress = InetAddress.getLocalHost().getHostAddress();
-        final String ipOutsideDocker = env.getProperty("spring.ipOutsideDocker");
-        logger.info("\n---------------------------------------------------------------\n\t" +
-                        "Application '{} ({})' is running!\n\tAccess URLs:\n\t" +
-                        "Local: \t\t{}://localhost:{}{}\n\t" +
-                        "External: \t{}://{}:{}{}\n\t" +
-                        "Ip for Testing: \t{}\t (manual)\n\t" +
+        final String ipOutsideDocker = env.getProperty("application.ipWan");
+        logger.info("\n\t---------------------------------------------------------------\n\t" +
+                        "Application '{} ({})' is running!\n\t" +
+                        "Access URLs:\n\t" +
+                        "  Local: \t\t{}://localhost:{}{}\n\t" +
+                        "  External: \t{}://{}:{}{}\n\t" +
+                        "  IpWan: \t\t{}://{}\t (manual)\n\t" +
                         "Profile(s): \t{}\n\t" +
                         "---------------------------------------------------------------\n\t" +
                         "Swagger: \t{}://{}:{}{}swagger-ui/index.html\n\t" +
-                        "Swagger for testing: \t{}swagger-ui/index.html\n\t",
+                        "Swagger IpWan: \t{}://{}/swagger-ui/index.html\n\t",
                 env.getProperty("spring.application.name"),
                 env.getProperty("application.version"),
                 protocol,
@@ -79,13 +74,24 @@ public class PhotoOrganize {
                 hosttAddress,
                 serverPort,
                 contextPath,
+                protocol,
                 ipOutsideDocker,
                 env.getActiveProfiles(),
                 protocol,
                 hosttAddress,
                 serverPort,
                 contextPath,
+                protocol,
                 ipOutsideDocker);
     }
 
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer placeholderConfigurer() {
+        PropertySourcesPlaceholderConfigurer propsConfig
+                = new PropertySourcesPlaceholderConfigurer();
+        propsConfig.setLocation(new ClassPathResource("git.properties"));
+        propsConfig.setIgnoreResourceNotFound(true);
+        propsConfig.setIgnoreUnresolvablePlaceholders(true);
+        return propsConfig;
+    }
 }

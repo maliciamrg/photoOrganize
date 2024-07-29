@@ -1,17 +1,16 @@
 package malicia.mrg.photo.organize.domain.spi;
 
-import java.io.File;
-import java.util.Collection;
 import java.util.List;
 
 public interface IParams {
 
     String getFolderdelim();
+
     long getGmt01jan200112am();
 
-    List<String> getAllowedExtensions();
+    List<String> getAllowed_extensions();
 
-    List<String> getSubdirectoryRejet();
+    List<String> getExclude_subdirectory_reject();
 
     List<String> getExtensionFileRejetSup();
 

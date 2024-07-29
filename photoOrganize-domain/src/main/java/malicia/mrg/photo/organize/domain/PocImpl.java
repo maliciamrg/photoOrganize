@@ -77,8 +77,8 @@ public class PocImpl implements IPoc {
     public List<String> getPhysicalFilesNotLogic() {
 
         List<String> rootPaths = getAllRootPathsLogiques();
-        List<String> allowedExtensions = params.getAllowedExtensions();
-        List<String> excludeSubdirectoryRejet = params.getSubdirectoryRejet();
+        List<String> allowedExtensions = params.getAllowed_extensions();
+        List<String> excludeSubdirectoryRejet = params.getExclude_subdirectory_reject();
 
         listFilesPh = getAllPhysicalFiles(rootPaths, allowedExtensions, excludeSubdirectoryRejet);
         listFilesLog = getAllFilesLogiques();
@@ -93,8 +93,8 @@ public class PocImpl implements IPoc {
     @Override
     public Analysis analyseFilePhysiqueAndLogic() {
         List<String> rootPaths = getAllRootPathsLogiques();
-        List<String> allowedExtensions = params.getAllowedExtensions();
-        List<String> excludeSubdirectoryRejet = params.getSubdirectoryRejet();
+        List<String> allowedExtensions = params.getAllowed_extensions();
+        List<String> excludeSubdirectoryRejet = params.getExclude_subdirectory_reject();
 
         listFilesPh = getAllPhysicalFiles(rootPaths, allowedExtensions, excludeSubdirectoryRejet);
         listFilesLog = getAllFilesLogiques();
@@ -150,8 +150,8 @@ public class PocImpl implements IPoc {
 
         LOGGER.info(" nb path logique  = " + nbLog + " : absent logique in physique = " + koLog + "\n");
         LOGGER.info(" nb path physique = " + nbPhy + " : absent physique in logique = " + koPhy + "\n");
-        result.add("nb path logique",listFilesNotInLog,koLog);
-        result.add("nb path physique",listFilesNotInPhy,koPhy);
+        result.add("nb path logique", listFilesNotInLog, koLog);
+        result.add("nb path physique", listFilesNotInPhy, koPhy);
 
         return result;
     }
@@ -266,7 +266,7 @@ public class PocImpl implements IPoc {
         }
         LOGGER.info("    --- corrige Physique lc_duplicate            : toDo = " + listFilesToRename.size() + " , Done = " + koRenameDo + "\n");
         //------------------------------------------------
-        result.add("corrige Physique lc_duplicate",listFilesToRename,koRenameDo);
+        result.add("corrige Physique lc_duplicate", listFilesToRename, koRenameDo);
         return result;
     }
 
@@ -305,7 +305,7 @@ public class PocImpl implements IPoc {
             } else {
                 // Elements are equal, move both iterators forward
                 if (elemLoRe.compareTo(elemPhNotLog) != 0) {
-                    listLoIdxFilenameToUpdate.add(elemLoRe +";to;"+ elemPhNotLog);
+                    listLoIdxFilenameToUpdate.add(elemLoRe + ";to;" + elemPhNotLog);
                 }
                 elemLoRe = iterLoRe.hasNext() ? iterLoRe.next() : null;
                 elemPhNotLog = iterPhNotLog.hasNext() ? iterPhNotLog.next() : null;
@@ -326,7 +326,7 @@ public class PocImpl implements IPoc {
         }
         LOGGER.info("    --- corrige Correct logique U/L case         : toDo = " + listLoIdxFilenameToUpdate.size() + " , Done = " + koLoExtUpdateDo + "\n");
         //------------------------------------------------
-        result.add("corrige Correct logique U/L case",listLoIdxFilenameToUpdate,koLoExtUpdateDo);
+        result.add("corrige Correct logique U/L case", listLoIdxFilenameToUpdate, koLoExtUpdateDo);
         return result;
     }
 
@@ -348,7 +348,7 @@ public class PocImpl implements IPoc {
         koPhLostSidecarToRejetDo = putThatInRejet(listPhLostSidecarToRejet);
         LOGGER.info("    --- corrige physique lost sidecar to rejet   : toDo = " + listPhLostSidecarToRejet.size() + " , Done = " + koPhLostSidecarToRejetDo + "\n");
         //------------------------------------------------
-        result.add("corrige physique lost sidecar to rejet",listPhLostSidecarToRejet,koPhLostSidecarToRejetDo);
+        result.add("corrige physique lost sidecar to rejet", listPhLostSidecarToRejet, koPhLostSidecarToRejetDo);
         return result;
     }
 
@@ -364,7 +364,7 @@ public class PocImpl implements IPoc {
             }
         }
         LOGGER.info("    --- corrige physique hash already exist      : -------------- Done = " + koPhHashExistToRejetDo + "\n");
-        result.add("corrige physique hash already exist",listFilesNotInLog,koPhHashExistToRejetDo);
+        result.add("corrige physique hash already exist", listFilesNotInLog, koPhHashExistToRejetDo);
         return result;
     }
 
@@ -386,12 +386,12 @@ public class PocImpl implements IPoc {
             }
         }
         LOGGER.info("    --- corrige physique start dot               : -------------- Done = " + koPhStartDotDo + "\n");
-        result.add("corrige physique start dot",listFilesNotInLog,koPhStartDotDo);
+        result.add("corrige physique start dot", listFilesNotInLog, koPhStartDotDo);
         return result;
     }
 
 
-    private String lrHashOf(String file) throws IOException, ParseException {
+    private String lrHashOf(String file) {
         //706893605.66357:img_2337.MOV:86632353
         //modtime(windows):filename:sizeinbytes
 
@@ -507,8 +507,6 @@ public class PocImpl implements IPoc {
             return FilenameUtils.concat(rejetPath, FilenameUtils.getName(fichierStr));
         }
     }
-
-
 
 
     private String modifyPathIfExistWithRandom(String newPath) {

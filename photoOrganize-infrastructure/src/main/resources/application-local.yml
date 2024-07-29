@@ -1,9 +1,0 @@
-spring:
-  application:
-    name: photo-organize-infrastructure
-  datasource:
-    url: 'jdbc:sqlite:./../../test/ressources/database/test.lrcat'
-  sql:
-    init:
-      mode: always
-

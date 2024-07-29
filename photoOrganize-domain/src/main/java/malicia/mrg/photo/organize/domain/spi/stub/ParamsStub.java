@@ -21,7 +21,7 @@ public class ParamsStub implements IParams {
     }
 
     @Override
-    public List<String> getAllowedExtensions() {
+    public List<String> getAllowed_extensions() {
         List<String> fileList = new ArrayList<>();
         fileList.add("jpg");
         fileList.add("bmp");
@@ -29,7 +29,7 @@ public class ParamsStub implements IParams {
     }
 
     @Override
-    public List<String> getSubdirectoryRejet() {
+    public List<String> getExclude_subdirectory_reject() {
         List<String> fileList = new ArrayList<>();
         fileList.add("rejet");
         fileList.add("RepRej");
@@ -92,10 +92,12 @@ public class ParamsStub implements IParams {
     public String getTag_action_go() {
         return "GO" + "->";
     }
+
     @Override
     public String gettag_rapprochement() {
         return getTag_org() + "RAPPROCHEMENT";
     }
+
     @Override
     public String getTag_org() {
         return "#ORG#";

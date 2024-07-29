@@ -13,8 +13,8 @@ import java.util.List;
 public class Params implements IParams {
 
     private String lightroomdbpath;
-    private List<String> subdirectoryRejet;
-    private List<String> allowedExtensions;
+    private List<String> exclude_subdirectory_reject;
+    private List<String> allowed_extensions;
 
     public String getLightroomdbpath() {
         return lightroomdbpath;
@@ -35,13 +35,21 @@ public class Params implements IParams {
     }
 
     @Override
-    public List<String> getAllowedExtensions() {
-        return allowedExtensions;
+    public List<String> getAllowed_extensions() {
+        return allowed_extensions;
+    }
+
+    public void setAllowed_extensions(List<String> allowed_extensions) {
+        this.allowed_extensions = allowed_extensions;
     }
 
     @Override
-    public List<String> getSubdirectoryRejet() {
-        return subdirectoryRejet;
+    public List<String> getExclude_subdirectory_reject() {
+        return exclude_subdirectory_reject;
+    }
+
+    public void setExclude_subdirectory_reject(List<String> exclude_subdirectory_reject) {
+        this.exclude_subdirectory_reject = exclude_subdirectory_reject;
     }
 
     @Override
