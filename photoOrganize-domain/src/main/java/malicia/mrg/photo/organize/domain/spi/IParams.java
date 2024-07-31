@@ -33,4 +33,7 @@ public interface IParams {
     String getTag_org();
 
     String getCollections();
+
+    List<String> getArrayRepertoirePhotoRepertoire();
+
 }

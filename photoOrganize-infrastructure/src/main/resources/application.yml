@@ -41,3 +41,94 @@ application:
     - brut
     - image
     - jpg
+  array_repertoire_photo:
+    - repertoire: '01-Cataloque_Photo\\!!Collections\\##Autoconstruction 03-05 j'
+      nomunique: Autoconstruction
+      uniteDeJour: 1
+      nbMaxParUniteDeJour: 5
+      ratioStarMax:
+        - 25
+        - 12
+        - 5
+        - 2
+        - 1
+      zoneValeurAdmise:
+        - '£DATE£'
+        - '@10_Action@'
+        - '@10_Piece@'
+        - '@10_Chantier@'
+      rapprochermentNewOk: false
+    - repertoire: '01-Cataloque_Photo\##Events 10-15 j'
+      nomunique: Events
+      uniteDeJour: 1
+      nbMaxParUniteDeJour: 15
+      ratioStarMax:
+        - 25
+        - 12
+        - 5
+        - 2
+        - 1
+      zoneValeurAdmise:
+        - '£DATE£'
+        - '@00_EVENT@'
+        - '@00_WHERE@'
+        - '@00_WHAT@|@00_WHO@'
+      rapprochermentNewOk: true
+    - repertoire: '01-Cataloque_Photo\##Holidays 20-30 sem'
+      nomunique: Holidays
+      uniteDeJour: 7
+      nbMaxParUniteDeJour: 30
+      ratioStarMax:
+        - 25
+        - 12
+        - 5
+        - 2
+        - 1
+      zoneValeurAdmise:
+        - '£DATE£'
+        - '@00_EVENT@'
+        - '@00_WHERE@'
+        - '@00_WHAT@|@00_WHO@'
+      rapprochermentNewOk: true
+    - repertoire: '01-Cataloque_Photo\##Shooting 03-05 j'
+      nomunique: Shooting
+      uniteDeJour: 1
+      nbMaxParUniteDeJour: 5
+      ratioStarMax:
+        - 25
+        - 12
+        - 5
+        - 2
+        - 1
+      zoneValeurAdmise:
+        - '£DATE£'
+        - '@00_PHOTOGRAPHY@'
+        - '@00_WHERE@'
+        - '@00_WHAT@|@00_WHO@'
+      rapprochermentNewOk: true
+    - repertoire: '99-Rejet'
+      nomunique: Rejet
+      uniteDeJour: 1
+      nbMaxParUniteDeJour: 999
+      ratioStarMax:
+        - 0
+        - 0
+        - 0
+        - 0
+        - 0
+      zoneValeurAdmise:
+        - '£DATE£'
+      rapprochermentNewOk: false
+    - repertoire: '01-Cataloque_Photo\!!Collections\##Sauvegarde 999 j'
+      nomunique: Sauvegarde
+      uniteDeJour: 1
+      nbMaxParUniteDeJour: 999
+      ratioStarMax:
+        - 100
+        - 100
+        - 100
+        - 100
+        - 100
+      zoneValeurAdmise:
+        - '£DATE£'
+      rapprochermentNewOk: false

@@ -108,4 +108,16 @@ public class ParamsStub implements IParams {
         return "!!Collections";
     }
 
+    @Override
+    public List<String> getArrayRepertoirePhotoRepertoire() {
+        ArrayList<String> ret = new ArrayList<String>();
+        ret.add("01-Cataloque_Photo\\##Shooting 03-05 j");
+        ret.add("01-Cataloque_Photo\\##Events 10-15 j");
+        ret.add("01-Cataloque_Photo\\##Holidays 20-30 sem");
+        ret.add("01-Cataloque_Photo\\##Shooting 03-05 j");
+        ret.add("99-Rejet");
+        ret.add("01-Cataloque_Photo\\!!Collections\\##Sauvegarde 999 j");
+        return ret;
+    }
+
 }

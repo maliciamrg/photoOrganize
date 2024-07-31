@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Primary
@@ -13,8 +14,10 @@ import java.util.List;
 public class Params implements IParams {
 
     private String lightroomdbpath;
+    private String version;
     private List<String> exclude_subdirectory_reject;
     private List<String> allowed_extensions;
+    private List<ParamRepertoire> array_repertoire_photo;
 
     public String getLightroomdbpath() {
         return lightroomdbpath;
@@ -107,4 +110,28 @@ public class Params implements IParams {
         return null;
     }
 
+    @Override
+    public List<String> getArrayRepertoirePhotoRepertoire() {
+        ArrayList<String> ret = new ArrayList<String>();
+        for (ParamRepertoire item : getArray_repertoire_photo()) {
+            ret.add(item.getRepertoire());
+        }
+        return ret;
+    }
+
+    public List<ParamRepertoire> getArray_repertoire_photo() {
+        return array_repertoire_photo;
+    }
+
+    public void setArray_repertoire_photo(List<ParamRepertoire> array_repertoire_photo) {
+        this.array_repertoire_photo = array_repertoire_photo;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
 }
