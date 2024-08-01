@@ -3,13 +3,8 @@ package malicia.mrg.photo.organize.application.controller;
 import malicia.mrg.photo.organize.application.controller.config.DomainConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -40,16 +35,16 @@ class PocControllerTest {
                 .andExpect(status().is2xxSuccessful())
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(
-                    content().json(
-                        (
-                            new ArrayList<String>(
-                                Arrays.asList(
-                                    "afoo01",
-                                    "file3"
+                        content().json(
+                                (
+                                        new ArrayList<String>(
+                                                Arrays.asList(
+                                                        "afoo01",
+                                                        "file3"
+                                                )
+                                        ).toString()
                                 )
-                            ).toString()
                         )
-                    )
                 )
                 .andReturn()
         ;
@@ -67,7 +62,7 @@ class PocControllerTest {
                 .andExpect(status().is2xxSuccessful())
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(
-                        content().json("{phyKo:2,phyNb:5,logicKo:1,logicNb:4}"
+                        content().json("{\"actions\":{\"nb path physique\":{\"listFilesToDo\":[\"file2\"],\"nbDone\":2},\"nb path logique\":{\"listFilesToDo\":[\"afoo01\",\"file3\"],\"nbDone\":1}}}"
                         )
                 )
                 .andReturn()

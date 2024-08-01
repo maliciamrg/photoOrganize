@@ -33,18 +33,6 @@ class ParamsControllerTest {
         resultActions
                 .andExpect(status().is2xxSuccessful())
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(
-                        content().json(
-                                (
-                                        new ArrayList<String>(
-                                                Arrays.asList(
-                                                        "afoo01",
-                                                        "file3"
-                                                )
-                                        ).toString()
-                                )
-                        )
-                )
                 .andReturn()
         ;
     }

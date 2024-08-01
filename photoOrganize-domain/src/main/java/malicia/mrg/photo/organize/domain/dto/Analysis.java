@@ -6,6 +6,7 @@ import java.util.Map;
 
 public class Analysis {
     private HashMap<String, ActionPoc> actions = new HashMap<String, ActionPoc>();
+
     public void addResult(Analysis analysis) {
         actions.putAll(analysis.getActions());
     }
@@ -14,7 +15,18 @@ public class Analysis {
         return actions;
     }
 
-    public void add(String label,List<String> listFilesToDo, int nbDone) {
-        actions.put(label ,new ActionPoc(listFilesToDo,nbDone));
+    public void setActions(HashMap<String, ActionPoc> actions) {
+        this.actions = actions;
+    }
+
+    public void add(String label, List<String> listFilesToDo, int nbDone) {
+        actions.put(label, new ActionPoc(listFilesToDo, nbDone));
+    }
+
+    @Override
+    public String toString() {
+        return "Analysis{" +
+                "actions=" + actions +
+                '}';
     }
 }

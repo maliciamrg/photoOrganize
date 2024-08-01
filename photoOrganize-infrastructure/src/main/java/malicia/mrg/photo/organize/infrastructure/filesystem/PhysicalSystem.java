@@ -1,9 +1,6 @@
 package malicia.mrg.photo.organize.infrastructure.filesystem;
 
 import malicia.mrg.photo.organize.domain.spi.IPhysicalSystem;
-import malicia.mrg.photo.organize.domain.spi.IWritePersistence;
-import malicia.mrg.photo.organize.infrastructure.persistence.model.MasterTable;
-import malicia.mrg.photo.organize.infrastructure.persistence.repository.MasterTableRepository;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +12,16 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
 public class PhysicalSystem implements IPhysicalSystem {
 
+
+    private static String normalizePath(String path) {
+        return path.replace("\\", "/").replace("//", "/");
+    }
 
     @Override
     public Collection<String> listFiles(String rootPath, List<String> allowedExtensions, List<String> excludeSubdirectoryRejet) {
@@ -79,10 +79,6 @@ public class PhysicalSystem implements IPhysicalSystem {
     @Override
     public String getFilegetParent(String newPath) {
         return null;
-    }
-
-    private static String normalizePath(String path) {
-        return path.replace("\\", "/").replace("//", "/");
     }
 
 }

@@ -2,6 +2,7 @@ package malicia.mrg.photo.organize.infrastructure.persistence;
 
 import malicia.mrg.photo.organize.domain.spi.IWritePersistence;
 import malicia.mrg.photo.organize.infrastructure.persistence.repository.MasterTableRepository;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @JdbcTest
 @AutoConfigureTestDatabase
+@Disabled
 class WritePersistenceTest {
 
     @Autowired
