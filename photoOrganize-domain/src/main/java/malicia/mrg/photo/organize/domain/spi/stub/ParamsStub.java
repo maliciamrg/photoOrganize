@@ -4,11 +4,16 @@ import malicia.mrg.photo.organize.domain.ddd.Stub;
 import malicia.mrg.photo.organize.domain.spi.IParams;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Stub
 public class ParamsStub implements IParams {
-
+    @Override
+    public Object getArrayRepertoirePhotoRepertoire(Integer rootFolderNum) {
+        return null;
+    }
 
     @Override
     public String getFolderdelim() {
@@ -109,14 +114,18 @@ public class ParamsStub implements IParams {
     }
 
     @Override
-    public List<String> getArrayRepertoirePhotoRepertoire() {
-        ArrayList<String> ret = new ArrayList<String>();
-        ret.add("01-Cataloque_Photo\\##Shooting 03-05 j");
-        ret.add("01-Cataloque_Photo\\##Events 10-15 j");
-        ret.add("01-Cataloque_Photo\\##Holidays 20-30 sem");
-        ret.add("01-Cataloque_Photo\\##Shooting 03-05 j");
-        ret.add("99-Rejet");
-        ret.add("01-Cataloque_Photo\\!!Collections\\##Sauvegarde 999 j");
+    public List<Map<String,String>> getArrayRepertoirePhotoRepertoire() {
+        ArrayList<Map<String,String>> ret = new ArrayList<Map<String,String>>();
+        HashMap<String,String> retIt = new HashMap<>();
+        retIt.put("id","1");
+        retIt.put("repertoire","01-Cataloque_Photo\\##Shooting 03-05 j");
+
+       // ret.add("01-Cataloque_Photo\\##Events 10-15 j");
+       // ret.add("01-Cataloque_Photo\\##Holidays 20-30 sem");
+       // ret.add("01-Cataloque_Photo\\##Shooting 03-05 j");
+       // ret.add("99-Rejet");
+       // ret.add("01-Cataloque_Photo\\!!Collections\\##Sauvegarde 999 j");
+        ret.add(retIt);
         return ret;
     }
 

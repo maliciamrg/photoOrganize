@@ -6,7 +6,9 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Primary
 @Component
@@ -111,13 +113,23 @@ public class Params implements IParams {
     }
 
     @Override
-    public List<String> getArrayRepertoirePhotoRepertoire() {
-        ArrayList<String> ret = new ArrayList<String>();
-        for (ParamRepertoire item : getArray_repertoire_photo()) {
-            ret.add(item.getRepertoire());
+    public List<Map<String,String>> getArrayRepertoirePhotoRepertoire() {
+        ArrayList<Map<String,String>> ret = new ArrayList();
+        List<ParamRepertoire> listRepertoire = getArray_repertoire_photo();
+        for (int i=0; i<listRepertoire.size(); ++i){
+            HashMap<String,String> retIt = new HashMap<>();
+            retIt.put("id",""+i);
+            retIt.put("repertoire",listRepertoire.get(i).getRepertoire());
+            ret.add(retIt);
         }
         return ret;
     }
+
+    @Override
+    public Object getArrayRepertoirePhotoRepertoire(Integer rootFolderNum) {
+        return getArray_repertoire_photo().get(rootFolderNum);
+    }
+
 
     public List<ParamRepertoire> getArray_repertoire_photo() {
         return array_repertoire_photo;
