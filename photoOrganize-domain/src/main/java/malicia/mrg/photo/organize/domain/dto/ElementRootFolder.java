@@ -1,8 +1,9 @@
-package malicia.mrg.photo.organize.infrastructure;
+package malicia.mrg.photo.organize.domain.dto;
 
+import java.util.Collection;
 import java.util.List;
 
-public class ParamRepertoire {
+public class ElementRootFolder {
     private String repertoire;
     private String nomunique;
     private Integer uniteDeJour;
@@ -10,6 +11,7 @@ public class ParamRepertoire {
     private List<Integer> ratioStarMax;
     private List<String> zoneValeurAdmise;
     private Boolean rapprochermentNewOk;
+    private Collection<String> listRepertories;
 
     public String getRepertoire() {
         return repertoire;
@@ -67,4 +69,11 @@ public class ParamRepertoire {
         this.rapprochermentNewOk = rapprochermentNewOk;
     }
 
+    public Collection<String> getListRepertories() {
+        return listRepertories;
+    }
+
+    public void setListRepertories(Collection<String> listRepertories) {
+        this.listRepertories = listRepertories;
+    }
 }

@@ -41,8 +41,9 @@ application:
     - brut
     - image
     - jpg
-  array_repertoire_photo:
-    - repertoire: '01-Cataloque_Photo\\!!Collections\\##Autoconstruction 03-05 j'
+  repertoire_photo_root: 'Y:\50-Phototheque\'
+  repertoire_photo_array:
+    - repertoire: '##Autoconstruction 03-05 j'
       nomunique: Autoconstruction
       uniteDeJour: 1
       nbMaxParUniteDeJour: 5
@@ -58,7 +59,7 @@ application:
         - '@10_Piece@'
         - '@10_Chantier@'
       rapprochermentNewOk: false
-    - repertoire: '01-Cataloque_Photo\##Events 10-15 j'
+    - repertoire: '##Events 10-15 j'
       nomunique: Events
       uniteDeJour: 1
       nbMaxParUniteDeJour: 15
@@ -74,7 +75,7 @@ application:
         - '@00_WHERE@'
         - '@00_WHAT@|@00_WHO@'
       rapprochermentNewOk: true
-    - repertoire: '01-Cataloque_Photo\##Holidays 20-30 sem'
+    - repertoire: '##Holidays 20-30 sem'
       nomunique: Holidays
       uniteDeJour: 7
       nbMaxParUniteDeJour: 30
@@ -90,7 +91,7 @@ application:
         - '@00_WHERE@'
         - '@00_WHAT@|@00_WHO@'
       rapprochermentNewOk: true
-    - repertoire: '01-Cataloque_Photo\##Shooting 03-05 j'
+    - repertoire: '##Shooting 03-05 j'
       nomunique: Shooting
       uniteDeJour: 1
       nbMaxParUniteDeJour: 5
@@ -119,7 +120,7 @@ application:
       zoneValeurAdmise:
         - '£DATE£'
       rapprochermentNewOk: false
-    - repertoire: '01-Cataloque_Photo\!!Collections\##Sauvegarde 999 j'
+    - repertoire: '##Sauvegarde 999 j'
       nomunique: Sauvegarde
       uniteDeJour: 1
       nbMaxParUniteDeJour: 999

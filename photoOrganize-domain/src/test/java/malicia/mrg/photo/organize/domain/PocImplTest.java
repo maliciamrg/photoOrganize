@@ -22,7 +22,7 @@ class PocImplTest {
         ILogicalSystem logicalSystem = new LogicalSystemStub();
         IPhysicalSystem physicalSystem = new PhysicalSystemStub();
         IParams params= new ParamsStub();;
-        PocImpl pocMe = new PocImpl(logicalSystem,physicalSystem,params);
+        PhotoControllerImpl pocMe = new PhotoControllerImpl(logicalSystem,physicalSystem,params);
 
 //        When
         List<String> ret = pocMe.getPhysicalFilesNotLogic();
@@ -41,7 +41,7 @@ class PocImplTest {
         ILogicalSystem logicalSystem = new LogicalSystemStub();
         IPhysicalSystem physicalSystem = new PhysicalSystemStub();
         IParams params= new ParamsStub();;
-        PocImpl pocMe = new PocImpl(logicalSystem,physicalSystem,params);
+        PhotoControllerImpl pocMe = new PhotoControllerImpl(logicalSystem,physicalSystem,params);
 
 //        When
         Analysis ret = new Analysis();

@@ -1,4 +1,4 @@
-package malicia.mrg.photo.organize.application.controller;
+package malicia.mrg.photo.organize.application.controller.dto;
 
 
 import malicia.mrg.photo.organize.domain.api.IKeyAction;

@@ -1,8 +1,9 @@
 package malicia.mrg.photo.organize.domain;
 
-import malicia.mrg.photo.organize.domain.api.IPoc;
+import malicia.mrg.photo.organize.domain.api.IPhotoController;
 import malicia.mrg.photo.organize.domain.ddd.DomainService;
 import malicia.mrg.photo.organize.domain.dto.Analysis;
+import malicia.mrg.photo.organize.domain.dto.ElementRootFolder;
 import malicia.mrg.photo.organize.domain.spi.ILogicalSystem;
 import malicia.mrg.photo.organize.domain.spi.IParams;
 import malicia.mrg.photo.organize.domain.spi.IPhysicalSystem;
@@ -22,21 +23,21 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @DomainService
-public class PocImpl implements IPoc {
+public class PhotoControllerImpl implements IPhotoController {
 
     private static final Logger LOGGER = LogManager.getLogger("loggerToSyncPhFile");
     private final ILogicalSystem logicalSystem;
     private final IPhysicalSystem physicalSystem;
-    private final IParams params;
+    private final IParams parameter;
 
     private List<String> listFilesPh = new ArrayList<>();
     private List<String> listFilesLog = new ArrayList<>();
     private List<String> listFilesNotInLog = new ArrayList<>();
 
-    public PocImpl(ILogicalSystem logicalSystem, IPhysicalSystem physicalSystem, IParams params) {
+    public PhotoControllerImpl(ILogicalSystem logicalSystem, IPhysicalSystem physicalSystem, IParams parameter) {
         this.logicalSystem = logicalSystem;
         this.physicalSystem = physicalSystem;
-        this.params = params;
+        this.parameter = parameter;
     }
 
 
@@ -77,8 +78,8 @@ public class PocImpl implements IPoc {
     public List<String> getPhysicalFilesNotLogic() {
 
         List<String> rootPaths = getAllRootPathsLogiques();
-        List<String> allowedExtensions = params.getAllowed_extensions();
-        List<String> excludeSubdirectoryRejet = params.getExclude_subdirectory_reject();
+        List<String> allowedExtensions = parameter.getAllowed_extensions();
+        List<String> excludeSubdirectoryRejet = parameter.getExclude_subdirectory_reject();
 
         listFilesPh = getAllPhysicalFiles(rootPaths, allowedExtensions, excludeSubdirectoryRejet);
         listFilesLog = getAllFilesLogiques();
@@ -93,8 +94,8 @@ public class PocImpl implements IPoc {
     @Override
     public Analysis analyseFilePhysiqueAndLogic() {
         List<String> rootPaths = getAllRootPathsLogiques();
-        List<String> allowedExtensions = params.getAllowed_extensions();
-        List<String> excludeSubdirectoryRejet = params.getExclude_subdirectory_reject();
+        List<String> allowedExtensions = parameter.getAllowed_extensions();
+        List<String> excludeSubdirectoryRejet = parameter.getExclude_subdirectory_reject();
 
         listFilesPh = getAllPhysicalFiles(rootPaths, allowedExtensions, excludeSubdirectoryRejet);
         listFilesLog = getAllFilesLogiques();
@@ -203,6 +204,46 @@ public class PocImpl implements IPoc {
         logicalSystem.KeywordImageWithoutImages();
         logicalSystem.keywordImageWithoutKeyword();
         return result;
+    }
+
+    @Override
+    public List<String> getSubDirectory(Integer rootFolderId) {
+        ElementRootFolder rootFolder = parameter.getArrayRepertoirePhotoRepertoire(rootFolderId);
+        return getListRepertories(rootFolder);
+    }
+
+    private List<String> getListRepertories(ElementRootFolder rootFolder) {
+        List<String> listRepertories = physicalSystem.listRepertories(
+                normalizePath(parameter.getRootFolder() + parameter.getFolderdelim() + rootFolder.getRepertoire()),
+                parameter.getExclude_subdirectory_reject()
+        );
+        Collections.sort(listRepertories);
+        return listRepertories;
+    }
+
+    public static String normalizePath(String path) {
+        return path.replace("\\", "/").replace("//", "/");
+    }
+
+    @Override
+    public String getSubDirectory(Integer rootFolderId, Integer folderId) {
+        ElementRootFolder rootFolder = parameter.getArrayRepertoirePhotoRepertoire(rootFolderId);
+        return getListRepertories(rootFolder).get(folderId);
+    }
+
+    @Override
+    public List<Map<String, String>> getArrayRepertoirePhotoRepertoire() {
+        return parameter.getArrayRepertoirePhotoRepertoire();
+    }
+
+    @Override
+    public ElementRootFolder getArrayRepertoirePhotoRepertoire(Integer rootFolderId) {
+        return parameter.getArrayRepertoirePhotoRepertoire(rootFolderId);
+    }
+
+    @Override
+    public Object getParamsApplication() {
+        return parameter;
     }
 
 
@@ -338,7 +379,7 @@ public class PocImpl implements IPoc {
         List<String> listPhLostSidecarToRejet = new ArrayList<>();
         int koPhLostSidecarToRejetDo = 0;
         for (String element : listFilesNotInLog) {
-            for (String suffix : params.getExtensionFileRejetSup()) {
+            for (String suffix : parameter.getExtensionFileRejetSup()) {
                 if (element.toLowerCase().endsWith(suffix.toLowerCase())) {
                     listPhLostSidecarToRejet.add(element);
                     break;  // If a match is found, break out of the inner loop
@@ -399,7 +440,7 @@ public class PocImpl implements IPoc {
         FileTime fileTime = physicalSystem.getLastModifiedTime(filePath);
         // Convert the FileTime to microsecond
         long unixTimeMicro = fileTime.to(TimeUnit.MICROSECONDS);
-        double dbFileTime = ((((double) unixTimeMicro) / 10) / 100000) - params.getGmt01jan200112am();//GMT: Monday, January 1, 2001 12:00:00 AM
+        double dbFileTime = ((((double) unixTimeMicro) / 10) / 100000) - parameter.getGmt01jan200112am();//GMT: Monday, January 1, 2001 12:00:00 AM
         String PerfectHash = new DecimalFormat("#.#####").format(dbFileTime) + ":" + filePath.getFileName() + ":" + physicalSystem.size(filePath);
         String timestamp = new DecimalFormat("#.#####").format(dbFileTime);
         String hashLike = timestamp.substring(0, timestamp.length() - 3) + "%:%" + filePath.getFileName() + ":" + physicalSystem.size(filePath);
@@ -435,10 +476,10 @@ public class PocImpl implements IPoc {
                 physicalSystem.extractZipFile(new File(fichierStr));
             }
 
-            if (params.getExtensionsUseFile().contains(fileExt.toLowerCase()) ||
+            if (parameter.getExtensionsUseFile().contains(fileExt.toLowerCase()) ||
                     (
-                            params.getExtFileRejet().compareTo(fileExt.toLowerCase()) == 0
-                                    && !params.getNomSubdirectoryRejet().stream().anyMatch(filepath::contains)
+                            parameter.getExtFileRejet().compareTo(fileExt.toLowerCase()) == 0
+                                    && !parameter.getNomSubdirectoryRejet().stream().anyMatch(filepath::contains)
                     )
             ) {
                 String generatedString = new Random().ints(48, 122 + 1)
@@ -449,7 +490,7 @@ public class PocImpl implements IPoc {
 
                 //rename to rejet dans meme repertoire
                 String oldName = fichierStr;
-                String newName = addRejetSubRepToPath(oldName) + "." + generatedString + "." + params.getExtFileRejet();
+                String newName = addRejetSubRepToPath(oldName) + "." + generatedString + "." + parameter.getExtFileRejet();
                 File fsource = new File(oldName);
                 File fdest = new File(newName);
                 if (fsource.exists() && fsource.isFile() && !fdest.exists()) {
@@ -457,7 +498,7 @@ public class PocImpl implements IPoc {
                     countMove = countMove + Tools.moveFile(oldName, newName, physicalSystem, logicalSystem);
                 }
             } else {
-                if (params.getExtensionFileRejetSup().contains(fileExt.toLowerCase())) {
+                if (parameter.getExtensionFileRejetSup().contains(fileExt.toLowerCase())) {
                     int retNb = moveTo99Rejet(fichierStr);
                     countMove = countMove + retNb;
                     countExtDel.replace(fileExt, countExtDel.get(fileExt), countExtDel.get(fileExt) + retNb);
@@ -478,12 +519,12 @@ public class PocImpl implements IPoc {
         //move to 99-rejet
         int countMove = 0;
 
-        if (params.getRepertoire("Rejet") != "") {
+        if (parameter.getRepertoire("Rejet") != "") {
 
             String oldName = fichierStr;
             File fsource = new File(oldName);
 
-            File fdest = new File(params.getRepertoire50Phototheque() + params.getRepertoire("Rejet") + params.getFolderdelim() + oldName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_"));
+            File fdest = new File(parameter.getRepertoire50Phototheque() + parameter.getRepertoire("Rejet") + parameter.getFolderdelim() + oldName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_"));
             String newName = fdest.toString();
 
             if (fsource.exists() && fsource.isFile() && !fdest.exists()) {

@@ -2,13 +2,13 @@ package malicia.mrg.photo.organize.infrastructure.filesystem;
 
 import malicia.mrg.photo.organize.domain.spi.IPhysicalSystem;
 import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.nio.file.attribute.FileTime;
 import java.util.Collection;
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 
 @Service
 public class PhysicalSystem implements IPhysicalSystem {
-
+    private static final Logger logger = LoggerFactory.getLogger(PhysicalSystem.class);
 
     private static String normalizePath(String path) {
         return path.replace("\\", "/").replace("//", "/");
@@ -78,6 +78,29 @@ public class PhysicalSystem implements IPhysicalSystem {
 
     @Override
     public String getFilegetParent(String newPath) {
+        return null;
+    }
+
+    @Override
+    public List<String> listRepertories(String rootPath, List<String> excludeSubdirectoryRejet) {
+        logger.info(rootPath);
+        Path directory = Paths.get(rootPath); // Specify the path to your directory
+
+        try (Stream<Path> paths = Files.list(directory)) {
+            return paths.filter(Files::isDirectory) // Filter only directories
+                    .map(name -> normalizePath(name.toString()))//.toLowerCase())
+                    .filter(fileName -> {
+                        // Assuming subfolder name is just before the file name in the path
+                        Path parent = Paths.get(fileName).getParent();
+                        return parent != null && !excludeSubdirectoryRejet.contains(parent.getFileName().toString());
+                    })
+//                    .forEach(System.out::println)// Print each subdirectory
+                    .sorted()
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 

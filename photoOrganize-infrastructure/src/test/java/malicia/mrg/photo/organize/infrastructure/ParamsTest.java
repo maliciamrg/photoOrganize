@@ -28,8 +28,8 @@ class ParamsTest {
         assertEquals("1.0", params.getVersion());
     }
     @Test
-    void getArray_repertoire_photo() {
-        assertEquals(6, params.getArray_repertoire_photo().size());
+    void getRepertoire_photo_array() {
+        assertEquals(6, params.getRepertoire_photo_array().size());
     }
     @Test
     void getArrayRepertoirePhotoRepertoire() {

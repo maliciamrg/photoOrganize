@@ -29,7 +29,7 @@ class PhotoRepertoryControllerTest {
 
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/prc/repertories"));
+                        .get("/photo/repertories"));
 //                        .contentType(MediaType.APPLICATION_JSON)
 //                        .content("{ \"message\" : \"bob\" }"));
 

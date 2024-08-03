@@ -23,4 +23,6 @@ public interface IPhysicalSystem {
     String getFileseparator();
 
     String getFilegetParent(String newPath);
+
+    List<String> listRepertories(String rootPath, List<String> excludeSubdirectoryRejet);
 }

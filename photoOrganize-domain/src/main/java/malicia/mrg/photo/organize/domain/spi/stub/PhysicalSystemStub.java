@@ -77,4 +77,9 @@ public class PhysicalSystemStub implements IPhysicalSystem {
         return null;
     }
 
+    @Override
+    public List<String> listRepertories(String rootPath, List<String> excludeSubdirectoryRejet) {
+        return null;
+    }
+
 }

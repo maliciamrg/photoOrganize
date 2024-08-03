@@ -1,5 +1,7 @@
 package malicia.mrg.photo.organize.domain.spi;
 
+import malicia.mrg.photo.organize.domain.dto.ElementRootFolder;
+
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +38,8 @@ public interface IParams {
     String getCollections();
 
     List<Map<String,String>> getArrayRepertoirePhotoRepertoire();
+    
+    ElementRootFolder getArrayRepertoirePhotoRepertoire(Integer rootFolderNum);
 
-    Object getArrayRepertoirePhotoRepertoire(Integer rootFolderNum);
+    String getRootFolder();
 }

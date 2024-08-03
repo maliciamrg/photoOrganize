@@ -1,28 +1,38 @@
 package malicia.mrg.photo.organize.application.controller;
 
-import malicia.mrg.photo.organize.domain.api.IPoc;
-import malicia.mrg.photo.organize.domain.spi.IParams;
+import malicia.mrg.photo.organize.domain.api.IPhotoController;
+import malicia.mrg.photo.organize.domain.dto.ElementRootFolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/prc")
+@RequestMapping("/photo")
 public class PhotoRepertoryController {
-    private final IParams parameter;
+    private final IPhotoController photoController;
 
-    public PhotoRepertoryController(IParams parameter) {
-        this.parameter = parameter;
+    public PhotoRepertoryController(IPhotoController photoController) {
+        this.photoController = photoController;
     }
+
     @GetMapping("/repertories")
     public List<Map<String,String>> getRepertories() {
-        return parameter.getArrayRepertoirePhotoRepertoire();
-    }
-    @GetMapping("/repertory")
-    public Object getRepertories(@RequestParam Integer rootFolderNum) {
-        return parameter.getArrayRepertoirePhotoRepertoire(rootFolderNum);
+        return photoController.getArrayRepertoirePhotoRepertoire();
     }
 
+    @GetMapping("/repertory/{rootFolderId}")
+    public ElementRootFolder getRepertory(@PathVariable("rootFolderId") Integer rootFolderId) {
+        return photoController.getArrayRepertoirePhotoRepertoire(rootFolderId);
+    }
 
+    @GetMapping("/repertory/{rootFolderId}/folders")
+    public List<String> getSubRepertories(@PathVariable("rootFolderId") Integer rootFolderId) {
+        return photoController.getSubDirectory(rootFolderId);
+    }
+
+    @GetMapping("/repertory/{rootFolderId}/folder/{folderId}")
+    public String getSubRepertory(@PathVariable("rootFolderId") Integer rootFolderId , @PathVariable("folderId") Integer folderId) {
+        return photoController.getSubDirectory(rootFolderId,folderId);
+    }
 }
