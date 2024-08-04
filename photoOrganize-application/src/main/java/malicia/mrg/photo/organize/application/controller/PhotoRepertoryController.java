@@ -1,6 +1,7 @@
 package malicia.mrg.photo.organize.application.controller;
 
 import malicia.mrg.photo.organize.domain.api.IPhotoController;
+import malicia.mrg.photo.organize.domain.dto.ElementPhotoFolder;
 import malicia.mrg.photo.organize.domain.dto.ElementRootFolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,11 +29,11 @@ public class PhotoRepertoryController {
 
     @GetMapping("/repertory/{rootFolderId}/folders")
     public List<String> getSubRepertories(@PathVariable("rootFolderId") Integer rootFolderId) {
-        return photoController.getSubDirectory(rootFolderId);
+        return photoController.getSubDirectories(rootFolderId);
     }
 
     @GetMapping("/repertory/{rootFolderId}/folder/{folderId}")
-    public String getSubRepertory(@PathVariable("rootFolderId") Integer rootFolderId , @PathVariable("folderId") Integer folderId) {
+    public ElementPhotoFolder getSubRepertory(@PathVariable("rootFolderId") Integer rootFolderId , @PathVariable("folderId") Integer folderId) {
         return photoController.getSubDirectory(rootFolderId,folderId);
     }
 }

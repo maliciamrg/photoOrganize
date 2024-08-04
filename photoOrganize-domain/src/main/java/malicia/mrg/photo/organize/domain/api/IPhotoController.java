@@ -1,6 +1,7 @@
 package malicia.mrg.photo.organize.domain.api;
 
 import malicia.mrg.photo.organize.domain.dto.Analysis;
+import malicia.mrg.photo.organize.domain.dto.ElementPhotoFolder;
 import malicia.mrg.photo.organize.domain.dto.ElementRootFolder;
 
 import java.util.List;
@@ -14,9 +15,9 @@ public interface IPhotoController {
     Analysis synchroDatabase();
     Analysis maintenanceDatabase();
 
-    List<String> getSubDirectory(Integer rootFolderId);
+    List<String> getSubDirectories(Integer rootFolderId);
 
-    String getSubDirectory(Integer rootFolderId, Integer folderId);
+    ElementPhotoFolder getSubDirectory(Integer rootFolderId, Integer folderId);
 
     List<Map<String, String>> getArrayRepertoirePhotoRepertoire();
 

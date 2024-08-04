@@ -105,4 +105,32 @@ public class LogicalSystemStub implements ILogicalSystem {
     public Map<String, String> getFolderCollection(String collections, String tagOrg, String s) {
         return null;
     }
+
+    @Override
+    public Date getFolderFirstDate(String folderName) {
+        return new Date();
+    }
+
+    @Override
+    public boolean isValueInKeyword(String value, String keyword) {
+        switch (keyword) {
+            case "00_EVENT":
+                if (value.compareTo("eventKey") == 0) {
+                    return true;
+                }
+            case "00_WHERE":
+                if (value.compareTo("whereKey") == 0) {
+                    return true;
+                }
+            case "00_WHAT":
+                if (value.compareTo("whatKey") == 0) {
+                    return true;
+                }
+            case "00_WHO":
+                if (value.compareTo("whoKey") == 0) {
+                    return true;
+                }
+        }
+        return false;
+    }
 }

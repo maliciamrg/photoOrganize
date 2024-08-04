@@ -1,9 +1,6 @@
 package malicia.mrg.photo.organize.domain.spi;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public interface ILogicalSystem {
 
@@ -41,4 +38,7 @@ public interface ILogicalSystem {
 
     Map<String, String> getFolderCollection(String collections, String tagOrg, String s);
 
+    Date getFolderFirstDate(String folderName);
+
+    boolean isValueInKeyword(String value, String keyword);
 }

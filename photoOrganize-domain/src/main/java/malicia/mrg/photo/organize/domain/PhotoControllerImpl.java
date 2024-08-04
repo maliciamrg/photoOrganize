@@ -3,6 +3,7 @@ package malicia.mrg.photo.organize.domain;
 import malicia.mrg.photo.organize.domain.api.IPhotoController;
 import malicia.mrg.photo.organize.domain.ddd.DomainService;
 import malicia.mrg.photo.organize.domain.dto.Analysis;
+import malicia.mrg.photo.organize.domain.dto.ElementPhotoFolder;
 import malicia.mrg.photo.organize.domain.dto.ElementRootFolder;
 import malicia.mrg.photo.organize.domain.spi.ILogicalSystem;
 import malicia.mrg.photo.organize.domain.spi.IParams;
@@ -207,14 +208,14 @@ public class PhotoControllerImpl implements IPhotoController {
     }
 
     @Override
-    public List<String> getSubDirectory(Integer rootFolderId) {
+    public List<String> getSubDirectories(Integer rootFolderId) {
         ElementRootFolder rootFolder = parameter.getArrayRepertoirePhotoRepertoire(rootFolderId);
         return getListRepertories(rootFolder);
     }
 
     private List<String> getListRepertories(ElementRootFolder rootFolder) {
         List<String> listRepertories = physicalSystem.listRepertories(
-                normalizePath(parameter.getRootFolder() + parameter.getFolderdelim() + rootFolder.getRepertoire()),
+                rootFolder.getRepertoire(),
                 parameter.getExclude_subdirectory_reject()
         );
         Collections.sort(listRepertories);
@@ -226,9 +227,10 @@ public class PhotoControllerImpl implements IPhotoController {
     }
 
     @Override
-    public String getSubDirectory(Integer rootFolderId, Integer folderId) {
+    public ElementPhotoFolder getSubDirectory(Integer rootFolderId, Integer folderId) {
         ElementRootFolder rootFolder = parameter.getArrayRepertoirePhotoRepertoire(rootFolderId);
-        return getListRepertories(rootFolder).get(folderId);
+        String folder = getListRepertories(rootFolder).get(folderId);
+        return new ElementPhotoFolder(folder,rootFolder , physicalSystem , logicalSystem);
     }
 
     @Override

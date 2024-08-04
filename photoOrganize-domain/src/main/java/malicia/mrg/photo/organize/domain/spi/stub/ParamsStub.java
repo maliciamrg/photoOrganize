@@ -1,6 +1,7 @@
 package malicia.mrg.photo.organize.domain.spi.stub;
 
 import malicia.mrg.photo.organize.domain.ddd.Stub;
+import malicia.mrg.photo.organize.domain.dto.ElementPhotoFolder;
 import malicia.mrg.photo.organize.domain.dto.ElementRootFolder;
 import malicia.mrg.photo.organize.domain.spi.IParams;
 
@@ -13,7 +14,8 @@ import java.util.Map;
 public class ParamsStub implements IParams {
     @Override
     public ElementRootFolder getArrayRepertoirePhotoRepertoire(Integer rootFolderNum) {
-        return null;
+        ElementRootFolder ret = new ElementRootFolder();
+        return ret;
     }
 
     @Override
