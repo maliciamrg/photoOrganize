@@ -1,7 +1,6 @@
 package malicia.mrg.photo.organize.domain.spi.stub;
 
 import malicia.mrg.photo.organize.domain.ddd.Stub;
-import malicia.mrg.photo.organize.domain.dto.ElementPhotoFolder;
 import malicia.mrg.photo.organize.domain.dto.ElementRootFolder;
 import malicia.mrg.photo.organize.domain.spi.IParams;
 
@@ -13,7 +12,7 @@ import java.util.Map;
 @Stub
 public class ParamsStub implements IParams {
     @Override
-    public ElementRootFolder getArrayRepertoirePhotoRepertoire(Integer rootFolderNum) {
+    public ElementRootFolder getArrayRepertoirePhotoNmUnique(Integer rootFolderNum) {
         ElementRootFolder ret = new ElementRootFolder();
         return ret;
     }
@@ -21,6 +20,12 @@ public class ParamsStub implements IParams {
     @Override
     public String getRootFolder() {
         return null;
+    }
+
+    @Override
+    public ElementRootFolder getArrayRepertoirePhotoNmUnique(String rootFolder) {
+        ElementRootFolder ret = new ElementRootFolder();
+        return ret;
     }
 
     @Override
@@ -122,19 +127,15 @@ public class ParamsStub implements IParams {
     }
 
     @Override
-    public List<Map<String,String>> getArrayRepertoirePhotoRepertoire() {
-        ArrayList<Map<String,String>> ret = new ArrayList<Map<String,String>>();
-        HashMap<String,String> retIt = new HashMap<>();
-        retIt.put("id","1");
-        retIt.put("repertoire","01-Cataloque_Photo\\##Shooting 03-05 j");
-
-       // ret.add("01-Cataloque_Photo\\##Events 10-15 j");
-       // ret.add("01-Cataloque_Photo\\##Holidays 20-30 sem");
-       // ret.add("01-Cataloque_Photo\\##Shooting 03-05 j");
-       // ret.add("99-Rejet");
-       // ret.add("01-Cataloque_Photo\\!!Collections\\##Sauvegarde 999 j");
-        ret.add(retIt);
-        return ret;
+    public List<ElementRootFolder> getArrayRepertoirePhotoNmUnique() {
+        List<ElementRootFolder> listRet = new ArrayList<>();
+        ElementRootFolder ret1 = new ElementRootFolder();
+        ret1.setRepertoire("01-Cataloque_Photo\\##Shooting 03-05 j");
+        listRet.add(ret1);
+        ElementRootFolder ret2 = new ElementRootFolder();
+        ret2.setRepertoire("01-Cataloque_Photo\\##Shooting 03-05 j");
+        listRet.add(ret2);
+        return listRet;
     }
 
 }

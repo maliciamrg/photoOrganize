@@ -29,10 +29,10 @@ class ParamsTest {
     }
     @Test
     void getRepertoire_photo_array() {
-        assertEquals(6, params.getRepertoire_photo_array().size());
+        assertEquals(6, params.getRepertoirePhotoArray().size());
     }
     @Test
     void getArrayRepertoirePhotoRepertoire() {
-        assertEquals(6, params.getArrayRepertoirePhotoRepertoire().size());
+        assertEquals(6, params.getArrayRepertoirePhotoNmUnique().size());
     }
 }

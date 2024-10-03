@@ -208,15 +208,16 @@ public class PhotoControllerImpl implements IPhotoController {
     }
 
     @Override
-    public List<String> getSubDirectories(Integer rootFolderId) {
-        ElementRootFolder rootFolder = parameter.getArrayRepertoirePhotoRepertoire(rootFolderId);
-        return getListRepertories(rootFolder);
+    public List<String> getSubDirectories(String rootFolderId) {
+        ElementRootFolder rootFolder = parameter.getArrayRepertoirePhotoNmUnique(rootFolderId);
+        return getListRepertories(rootFolder,"");
     }
 
-    private List<String> getListRepertories(ElementRootFolder rootFolder) {
+    private List<String> getListRepertories(ElementRootFolder rootFolder, String searchFolder) {
         List<String> listRepertories = physicalSystem.listRepertories(
-                rootFolder.getRepertoire(),
-                parameter.getExclude_subdirectory_reject()
+                normalizePath(parameter.getRootFolder() + "\\" + rootFolder.getRepertoire()),
+                parameter.getExclude_subdirectory_reject(),
+                searchFolder
         );
         Collections.sort(listRepertories);
         return listRepertories;
@@ -227,25 +228,30 @@ public class PhotoControllerImpl implements IPhotoController {
     }
 
     @Override
-    public ElementPhotoFolder getSubDirectory(Integer rootFolderId, Integer folderId) {
-        ElementRootFolder rootFolder = parameter.getArrayRepertoirePhotoRepertoire(rootFolderId);
-        String folder = getListRepertories(rootFolder).get(folderId);
+    public ElementPhotoFolder getSubDirectory(String rootFolderId, String folderId) {
+        ElementRootFolder rootFolder = parameter.getArrayRepertoirePhotoNmUnique(rootFolderId);
+        String folder = getListRepertories(rootFolder,folderId).get(0);
         return new ElementPhotoFolder(folder,rootFolder , physicalSystem , logicalSystem);
     }
 
     @Override
-    public List<Map<String, String>> getArrayRepertoirePhotoRepertoire() {
-        return parameter.getArrayRepertoirePhotoRepertoire();
+    public List<ElementRootFolder> getArrayRepertoirePhotoRepertoire() {
+        return parameter.getArrayRepertoirePhotoNmUnique();
     }
 
     @Override
     public ElementRootFolder getArrayRepertoirePhotoRepertoire(Integer rootFolderId) {
-        return parameter.getArrayRepertoirePhotoRepertoire(rootFolderId);
+        return parameter.getArrayRepertoirePhotoNmUnique(rootFolderId);
     }
 
     @Override
     public Object getParamsApplication() {
         return parameter;
+    }
+
+
+    public ElementRootFolder getArrayRepertoirePhotoRepertoire(String rootFolder) {
+        return parameter.getArrayRepertoirePhotoNmUnique(rootFolder);
     }
 
 

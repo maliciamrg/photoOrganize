@@ -47,7 +47,7 @@ public class ElementPhotoFolder {
             valideName.add(testElementChamp(rootFolder.getZoneValeurAdmise().get(i), elemChamp));
 
         }
-        valideName.addAll(Arrays.asList(arrayFolderName).subList(rootFolder.getZoneValeurAdmise().size(), rootFolder.getZoneValeurAdmise().size()));
+        valideName.addAll(Arrays.asList(arrayFolderName));
         return String.join("_", valideName);
     }
 

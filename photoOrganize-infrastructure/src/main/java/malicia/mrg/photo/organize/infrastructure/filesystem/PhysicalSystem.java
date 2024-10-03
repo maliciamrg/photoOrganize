@@ -82,7 +82,7 @@ public class PhysicalSystem implements IPhysicalSystem {
     }
 
     @Override
-    public List<String> listRepertories(String rootPath, List<String> excludeSubdirectoryRejet) {
+    public List<String> listRepertories(String rootPath, List<String> excludeSubdirectoryRejet, String searchFolder) {
         logger.info(rootPath);
         Path directory = Paths.get(rootPath); // Specify the path to your directory
 
@@ -93,6 +93,10 @@ public class PhysicalSystem implements IPhysicalSystem {
                         // Assuming subfolder name is just before the file name in the path
                         Path parent = Paths.get(fileName).getParent();
                         return parent != null && !excludeSubdirectoryRejet.contains(parent.getFileName().toString());
+                    })
+                    .filter(fileName -> {
+                        String name = Paths.get(fileName).getFileName().toString();
+                        return searchFolder == "" || name.compareTo(searchFolder)==0;
                     })
 //                    .forEach(System.out::println)// Print each subdirectory
                     .sorted()

@@ -1,0 +1,45 @@
+digraph FullStackArchitecture {
+
+// Define clusters to represent the frontend, backend, and database layers
+subgraph cluster_frontend {
+label = "Frontend (React)";
+"React App" [shape = box, style = filled, color = lightblue, label = "React\nApp"];
+}
+
+subgraph cluster_backend {
+label = "Backend (Java + Spring Boot)";
+"Application" [shape = box, style = filled, color = lightgreen, label = "Application\n(Spring Boot)"];
+"Domain" [shape = hexagon, style = filled, color = lightgreen, label = "Domain\n(Business Logic)"];
+"Infrastructure" [shape = box, style = filled, color = lightgreen, label = "Infrastructure\n(Data Access)"];
+}
+
+subgraph cluster_database {
+label = "Database";
+"LRJavaApi" [shape = box, style = filled, color = lightgrey, label = "LightRoom\nApi"];
+"LightRoom Database" [shape = cylinder, style = filled, color = lightgrey, label = "LightRoom\nDatabase"];
+}
+
+subgraph cluster_filesystem {
+label="File System";
+"File System" [shape=folder, style=filled, color=lightyellow, label="Photo File\nSystem"];
+}
+
+// Define edges between the components
+"React App" -> "Application" [label = "HTTP Request (REST API)", style = dashed];
+"Application" -> "Domain" [label = "Method Call"];
+"Domain" -> "Infrastructure" [label = "Data Access"];
+
+"Infrastructure" -> "LRJavaApi" [label = "HTTP Request (REST API)", style = dashed];
+"LRJavaApi" -> "Infrastructure" [label = "HTTP Response (JSON)", style = dashed];
+
+"Infrastructure" -> "Domain" [label = "Processed Data"];
+"Domain" -> "Application" [label = "Business Logic Result"];
+"Application" -> "React App" [label = "HTTP Response (JSON)", style = dashed];
+
+"LRJavaApi" -> "LightRoom Database" [label = "SQL Query"];
+"LightRoom Database" -> "LRJavaApi" [label = "Query Result"];
+
+// Interaction between the backend Service and the File System
+"Infrastructure" -> "File System" [label="File Read/Write", style = dashed];
+
+}

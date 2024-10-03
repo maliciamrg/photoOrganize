@@ -6,7 +6,6 @@ import malicia.mrg.photo.organize.domain.dto.ElementRootFolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/photo")
@@ -18,22 +17,17 @@ public class PhotoRepertoryController {
     }
 
     @GetMapping("/repertories")
-    public List<Map<String,String>> getRepertories() {
+    public List<ElementRootFolder> getRepertories() {
         return photoController.getArrayRepertoirePhotoRepertoire();
     }
 
-    @GetMapping("/repertory/{rootFolderId}")
-    public ElementRootFolder getRepertory(@PathVariable("rootFolderId") Integer rootFolderId) {
-        return photoController.getArrayRepertoirePhotoRepertoire(rootFolderId);
+    @GetMapping("/repertory/{nomUnique}/folders")
+    public List<String> getSubRepertories(@PathVariable("nomUnique") String nomUnique) {
+        return photoController.getSubDirectories(nomUnique);
     }
 
-    @GetMapping("/repertory/{rootFolderId}/folders")
-    public List<String> getSubRepertories(@PathVariable("rootFolderId") Integer rootFolderId) {
-        return photoController.getSubDirectories(rootFolderId);
-    }
-
-    @GetMapping("/repertory/{rootFolderId}/folder/{folderId}")
-    public ElementPhotoFolder getSubRepertory(@PathVariable("rootFolderId") Integer rootFolderId , @PathVariable("folderId") Integer folderId) {
-        return photoController.getSubDirectory(rootFolderId,folderId);
+    @GetMapping("/repertory/{nomUnique}/folder/{folderName}")
+    public ElementPhotoFolder getSubRepertory(@PathVariable("nomUnique") String nomUnique , @PathVariable("folderName") String folderId) {
+        return photoController.getSubDirectory(nomUnique,folderId);
     }
 }

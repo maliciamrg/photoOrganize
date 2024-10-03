@@ -1,21 +1,21 @@
-.App {
+.AppBis {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
+.AppBis-logo {
+  height: 30vmin;
   pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+  .AppBis-logo {
+    animation: AppBis-logo-spin infinite 60s linear;
   }
 }
 
-.App-header {
+.AppBis-header {
   background-color: #282c34;
-  min-height: 100vh;
+  min-height: 50vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -24,11 +24,11 @@
   color: white;
 }
 
-.App-link {
+.AppBis-link {
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
+@keyframes AppBis-logo-spin {
   from {
     transform: rotate(0deg);
   }

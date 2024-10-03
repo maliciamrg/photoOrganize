@@ -1,17 +1,19 @@
 package malicia.mrg.photo.organize.infrastructure.filesystem;
 
+import com.nimbusds.jose.shaded.gson.Gson;
+import com.nimbusds.jose.shaded.gson.reflect.TypeToken;
 import malicia.mrg.photo.organize.domain.spi.ILogicalSystem;
 import malicia.mrg.photo.organize.infrastructure.Params;
 import malicia.mrg.photo.organize.infrastructure.dto.AgLibraryRootFolderDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Type;
+import java.sql.ResultSet;
+import java.util.*;
 
 @Service
 public class LogicalSystem implements ILogicalSystem {
@@ -136,5 +138,31 @@ public class LogicalSystem implements ILogicalSystem {
     @Override
     public Map<String, String> getFolderCollection(String collections, String tagOrg, String s) {
         return null;
+    }
+
+    @Override
+    public Date getFolderFirstDate(String folderName) {
+        return new Date();
+    }
+
+    @Override
+    public boolean isValueInKeyword(String value, String keyword) {
+        List<String> listTag = getValueForKeyword(keyword);
+        return listTag.contains(value);
+    }
+
+    private List<String> getValueForKeyword(String keyword) {
+        WebClient webClient = WebClient.create();
+        String responseJson = webClient.get()
+                .uri("http://localhost:8091/api/keywords/byName/"+keyword.toLowerCase()+"/child/nameList")
+                .exchange()
+                .block()
+                .bodyToMono(String.class)
+                .block();
+        logger.info(responseJson);
+        Type listType = new TypeToken<List<String>>(){}.getType();
+        Gson gson = new Gson();
+        List<String> list = gson.fromJson(responseJson, listType);
+        return list;
     }
 }

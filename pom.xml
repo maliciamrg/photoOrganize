@@ -12,7 +12,6 @@
         <module>photoOrganize-domain</module>
         <module>photoOrganize-infrastructure</module>
         <module>photoOrganize-application</module>
-        <module>legacy-photoOrganize</module>
     </modules>
 
     <properties>

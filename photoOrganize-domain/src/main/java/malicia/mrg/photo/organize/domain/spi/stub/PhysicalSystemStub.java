@@ -1,11 +1,9 @@
 package malicia.mrg.photo.organize.domain.spi.stub;
 
 import malicia.mrg.photo.organize.domain.ddd.Stub;
-import malicia.mrg.photo.organize.domain.spi.ILogicalSystem;
 import malicia.mrg.photo.organize.domain.spi.IPhysicalSystem;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.text.ParseException;
@@ -13,7 +11,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 import static java.time.LocalTime.now;
 
@@ -78,7 +75,7 @@ public class PhysicalSystemStub implements IPhysicalSystem {
     }
 
     @Override
-    public List<String> listRepertories(String rootPath, List<String> excludeSubdirectoryRejet) {
+    public List<String> listRepertories(String rootPath, List<String> excludeSubdirectoryRejet, String searchFolder) {
         return null;
     }
 

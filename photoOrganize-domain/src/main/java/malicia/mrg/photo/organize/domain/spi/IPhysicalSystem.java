@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 public interface IPhysicalSystem {
     Collection<String> listFiles(String rootPath, List<String> allowedExtensions, List<String> excludeSubdirectoryRejet);
@@ -24,5 +23,5 @@ public interface IPhysicalSystem {
 
     String getFilegetParent(String newPath);
 
-    List<String> listRepertories(String rootPath, List<String> excludeSubdirectoryRejet);
+    List<String> listRepertories(String rootPath, List<String> excludeSubdirectoryRejet , String searchFolder);
 }

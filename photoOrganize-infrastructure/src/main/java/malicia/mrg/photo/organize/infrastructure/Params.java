@@ -6,10 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Primary
 @Component
@@ -123,21 +120,13 @@ public class Params implements IParams {
     }
 
     @Override
-    public List<Map<String, String>> getArrayRepertoirePhotoRepertoire() {
-        ArrayList<Map<String, String>> ret = new ArrayList();
-        List<ElementRootFolder> listRepertoire = getRepertoire_photo_array();
-        for (int i = 0; i < listRepertoire.size(); ++i) {
-            HashMap<String, String> retIt = new HashMap<>();
-            retIt.put("id", "" + i);
-            retIt.put("repertoire", listRepertoire.get(i).getRepertoire());
-            ret.add(retIt);
-        }
-        return ret;
+    public List<ElementRootFolder> getArrayRepertoirePhotoNmUnique() {
+        return getRepertoirePhotoArray();
     }
 
     @Override
-    public ElementRootFolder getArrayRepertoirePhotoRepertoire(Integer rootFolderNum) {
-        return getRepertoire_photo_array().get(rootFolderNum);
+    public ElementRootFolder getArrayRepertoirePhotoNmUnique(Integer rootFolderNum) {
+        return getRepertoirePhotoArray().get(rootFolderNum);
     }
 
     @Override
@@ -145,12 +134,23 @@ public class Params implements IParams {
         return repertoire_photo_root;
     }
 
+    @Override
+    public ElementRootFolder getArrayRepertoirePhotoNmUnique(String rootFolder) {
+        ElementRootFolder eleRootFolderEmpty = new ElementRootFolder();
+        for (ElementRootFolder eleRootFolder : getRepertoirePhotoArray()) {
+            if (eleRootFolder.getNomunique().compareTo(rootFolder)==0){
+                return eleRootFolder;
+            }
+        }
+        return eleRootFolderEmpty;
+    }
 
-    public List<ElementRootFolder> getRepertoire_photo_array() {
+
+    public List<ElementRootFolder> getRepertoirePhotoArray() {
         return repertoire_photo_array;
     }
 
-    public void setRepertoire_photo_array(List<ElementRootFolder> repertoire_photo_array) {
+    public void setRepertoirePhotoArray(List<ElementRootFolder> repertoire_photo_array) {
         this.repertoire_photo_array = repertoire_photo_array;
     }
 

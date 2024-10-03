@@ -1,6 +1,5 @@
 package malicia.mrg.photo.organize.domain.dto;
 
-import malicia.mrg.photo.organize.domain.PhotoControllerImpl;
 import malicia.mrg.photo.organize.domain.spi.ILogicalSystem;
 import malicia.mrg.photo.organize.domain.spi.IParams;
 import malicia.mrg.photo.organize.domain.spi.IPhysicalSystem;
@@ -15,7 +14,6 @@ import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class ElementPhotoFolderTest {
     @Test
@@ -24,7 +22,7 @@ class ElementPhotoFolderTest {
         ILogicalSystem logicalSystem = new LogicalSystemStub();
         IPhysicalSystem physicalSystem = new PhysicalSystemStub();
         IParams params= new ParamsStub();;
-        ElementRootFolder elementRootFolder = params.getArrayRepertoirePhotoRepertoire(0);
+        ElementRootFolder elementRootFolder = params.getArrayRepertoirePhotoNmUnique(0);
         List<String> valeurAdmise = new ArrayList<>();
         valeurAdmise.add("£DATE£");
         valeurAdmise.add("@00_EVENT@");
@@ -49,7 +47,7 @@ class ElementPhotoFolderTest {
         ILogicalSystem logicalSystem = new LogicalSystemStub();
         IPhysicalSystem physicalSystem = new PhysicalSystemStub();
         IParams params= new ParamsStub();;
-        ElementRootFolder elementRootFolder = params.getArrayRepertoirePhotoRepertoire(0);
+        ElementRootFolder elementRootFolder = params.getArrayRepertoirePhotoNmUnique(0);
         List<String> valeurAdmise = new ArrayList<>();
         valeurAdmise.add("£DATE£");
         valeurAdmise.add("@00_EVENT@");
@@ -77,7 +75,7 @@ class ElementPhotoFolderTest {
         ILogicalSystem logicalSystem = new LogicalSystemStub();
         IPhysicalSystem physicalSystem = new PhysicalSystemStub();
         IParams params= new ParamsStub();;
-        ElementRootFolder elementRootFolder = params.getArrayRepertoirePhotoRepertoire(0);
+        ElementRootFolder elementRootFolder = params.getArrayRepertoirePhotoNmUnique(0);
         List<String> valeurAdmise = new ArrayList<>();
         valeurAdmise.add("£DATE£");
         valeurAdmise.add("@00_EVENT@");

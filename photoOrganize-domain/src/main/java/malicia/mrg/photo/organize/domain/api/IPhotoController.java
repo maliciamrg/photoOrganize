@@ -5,7 +5,6 @@ import malicia.mrg.photo.organize.domain.dto.ElementPhotoFolder;
 import malicia.mrg.photo.organize.domain.dto.ElementRootFolder;
 
 import java.util.List;
-import java.util.Map;
 
 public interface IPhotoController {
     List<String> getPhysicalFilesNotLogic();
@@ -15,13 +14,14 @@ public interface IPhotoController {
     Analysis synchroDatabase();
     Analysis maintenanceDatabase();
 
-    List<String> getSubDirectories(Integer rootFolderId);
+    List<String> getSubDirectories(String rootFolderId);
 
-    ElementPhotoFolder getSubDirectory(Integer rootFolderId, Integer folderId);
+    ElementPhotoFolder getSubDirectory(String rootFolderId, String folderId);
 
-    List<Map<String, String>> getArrayRepertoirePhotoRepertoire();
+    List<ElementRootFolder> getArrayRepertoirePhotoRepertoire();
 
     ElementRootFolder getArrayRepertoirePhotoRepertoire(Integer rootFolderId);
 
     Object getParamsApplication();
+
 }
