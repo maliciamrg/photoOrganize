@@ -5,14 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>malicia.mrg</groupId>
-    <artifactId>photoOrganizeGroup</artifactId>
+    <artifactId>photoOrganize_Front</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
-    <modules>
-        <module>queryLrcatApi</module>
-        <module>photoOrganize_Back</module>
-        <module>photoOrganize_Front</module>
-    </modules>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

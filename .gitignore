@@ -3,17 +3,17 @@
 /legacy-photoOrganize/target/
 /logs/
 /out/artifacts/photoOrganize_jar/
-/photoOrganize-application.iml
-/photoOrganize-application/target/
-/photoOrganize-domain.iml
-/photoOrganize-domain/target/
-/photoOrganize-infrastructure.iml
-/photoOrganize-infrastructure/target/
-/photoOrganize-service.iml
-/photoOrganize-service/target/
-/photoOrganize.iml
-/target/
+/photoOrganize_Back/photoOrganize-application.iml
+/photoOrganize_Back/photoOrganize-application/target/
+/photoOrganize_Back/photoOrganize-domain.iml
+/photoOrganize_Back/photoOrganize-domain/target/
+/photoOrganize_Back/photoOrganize-infrastructure.iml
+/photoOrganize_Back/photoOrganize-infrastructure/target/
+/photoOrganize_Back/photoOrganize-service.iml
+/photoOrganize_Back/photoOrganize-service/target/
+/photoOrganize_Back/photoOrganize.iml
+/photoOrganize_Back/target/
 /*.iml
-/photoOrganize-infrastructure/src/test/ressources/database/test.lrcat-data/
-/photoOrganize-infrastructure/src/test/ressources/database/test Helper.lrdata/
-/photoOrganize-infrastructure/src/test/ressources/database/test Previews.lrdata/
+/photoOrganize_Back/photoOrganize-infrastructure/src/test/ressources/database/test.lrcat-data/
+/photoOrganize_Back/photoOrganize-infrastructure/src/test/ressources/database/test Helper.lrdata/
+/photoOrganize_Back/photoOrganize-infrastructure/src/test/ressources/database/test Previews.lrdata/

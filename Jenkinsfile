@@ -1,19 +1,42 @@
 pipeline {
     agent any
     stages {
-        stage('Build') {
-            steps {
-                sh 'mvn -B -DskipTests clean package'
-            }
-        }
-        stage("Create/Push Docker Image") {
+        stage('queryLrcatApi : Build') {
             steps {
                 script {
-                    pom = readMavenPom file: 'pom.xml'
-                    withCredentials([usernamePassword(credentialsId: 'hub.docker.com', passwordVariable: 'HUB_REPO_PASS', usernameVariable: 'HUB_REPO_USER')]) {
-                        def user = env.HUB_REPO_USER
-                        def password = env.HUB_REPO_PASS
-                        dir("photoOrganize-infrastructure") {
+                    dir("queryLrcatApi") {
+                        sh 'mvn -B -DskipTests clean package'
+                    }
+                }
+            }
+        }
+        stage('photoOrganize_Back : Build') {
+            steps {
+                script {
+                    dir("photoOrganize_Back") {
+                        sh 'mvn -B -DskipTests clean package'
+                    }
+                }
+            }
+        }
+        stage('photoOrganize_Front : Build') {
+            steps {
+                script {
+                    dir("photoOrganize_Front") {
+                        sh 'mvn -B -DskipTests clean package'
+                    }
+                }
+            }
+        }
+
+        stage("queryLrcatApi : Create/Push Docker Image") {
+            steps {
+                script {
+                    dir("queryLrcatApi") {
+                        pom = readMavenPom file: 'pom.xml'
+                        withCredentials([usernamePassword(credentialsId: 'hub.docker.com', passwordVariable: 'HUB_REPO_PASS', usernameVariable: 'HUB_REPO_USER')]) {
+                            def user = env.HUB_REPO_USER
+                            def password = env.HUB_REPO_PASS
                             sh "docker version"
                             sh "docker login -u $user -p $password"
                             sh "docker build -t maliciamrg/${pom.getArtifactId().toLowerCase()}:${pom.getVersion()} . "
@@ -23,15 +46,51 @@ pipeline {
                 }
             }
         }
-        stage("install Docker Image into 200") {
+        stage("photoOrganize_Back : Create/Push Docker Image") {
             steps {
                 script {
-                    dir("photoOrganize-infrastructure") {
+                    dir("photoOrganize_Back") {
+                        dir("photoOrganize-infrastructure") {
+                            pom = readMavenPom file: 'pom.xml'
+                            withCredentials([usernamePassword(credentialsId: 'hub.docker.com', passwordVariable: 'HUB_REPO_PASS', usernameVariable: 'HUB_REPO_USER')]) {
+                                def user = env.HUB_REPO_USER
+                                def password = env.HUB_REPO_PASS
+                                dir("photoOrganize-infrastructure") {
+                                    sh "docker version"
+                                    sh "docker login -u $user -p $password"
+                                    sh "docker build -t maliciamrg/${pom.getParent().getArtifactId().toLowerCase()}:${pom.getVersion()} . "
+                                    sh "docker push maliciamrg/${pom.getParent().getArtifactId().toLowerCase()}:${pom.getVersion()}"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        stage("queryLrcatApi : install Docker Image into 200") {
+            steps {
+                script {
+                    dir("queryLrcatApi") {
                         sh "docker --context remote compose up -d"
                     }
                 }
             }
         }
+        stage("photoOrganize_Back : install Docker Image into 200") {
+            steps {
+                script {
+                    dir("photoOrganize_Back") {
+                        dir("photoOrganize-infrastructure") {
+                            sh "docker --context remote compose up -d"
+                        }
+                    }
+                }
+            }
+        }
+
+
     }
     post {
         always {
