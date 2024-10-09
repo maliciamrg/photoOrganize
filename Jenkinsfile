@@ -54,18 +54,39 @@ pipeline {
                         withCredentials([usernamePassword(credentialsId: 'hub.docker.com', passwordVariable: 'HUB_REPO_PASS', usernameVariable: 'HUB_REPO_USER')]) {
                             def user = env.HUB_REPO_USER
                             def password = env.HUB_REPO_PASS
+                            sh "docker version"
+                            sh "docker login -u $user -p $password"
+                            sh "docker build -t maliciamrg/${pom.getArtifactId().toLowerCase()}:${pom.getVersion()} . "
+                            sh "docker push maliciamrg/${pom.getArtifactId().toLowerCase()}:${pom.getVersion()}"
+                        }
+                    }
+                }
+            }
+        }
+        stage("photoOrganize_Front : Create/Push Docker Image") {
+            steps {
+                script {
+                    dir("photoOrganize_Front") {
+                        // Read the package.json file into a variable
+                        def packageJson = readJSON file: './package.json'
+
+                        // Extract the name and version
+                        def packageName = packageJson.name
+                        def packageVersion = packageJson.version
+                        withCredentials([usernamePassword(credentialsId: 'hub.docker.com', passwordVariable: 'HUB_REPO_PASS', usernameVariable: 'HUB_REPO_USER')]) {
+                            def user = env.HUB_REPO_USER
+                            def password = env.HUB_REPO_PASS
                             dir("photoOrganize-infrastructure") {
                                 sh "docker version"
                                 sh "docker login -u $user -p $password"
-                                sh "docker build -t maliciamrg/${pom.getArtifactId().toLowerCase()}:${pom.getVersion()} . "
-                                sh "docker push maliciamrg/${pom.getArtifactId().toLowerCase()}:${pom.getVersion()}"
+                                sh "docker build -t maliciamrg/${packageName}:${packageVersion} . "
+                                sh "docker push maliciamrg/${packageName}:${packageVersion}"
                             }
                         }
                     }
                 }
             }
         }
-
 
         stage("queryLrcatApi : install Docker Image into 200") {
             steps {
@@ -87,7 +108,15 @@ pipeline {
                 }
             }
         }
-
+        stage("photoOrganize_Front : install Docker Image into 200") {
+            steps {
+                script {
+                    dir("photoOrganize_Front") {
+                        sh "docker --context remote compose up -d"
+                    }
+                }
+            }
+        }
 
     }
     post {
