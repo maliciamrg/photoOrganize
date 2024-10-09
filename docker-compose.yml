@@ -11,7 +11,7 @@ services:
     photoOrganize_Front:
         image: maliciamrg/photoorganize_front:0.1.0
         ports:
-            - 3000:3000
+            - 3030:3000
         container_name: photoOrganize_Front
     photoOrganize_Back:
         image: maliciamrg/photoorganize_back:1.0
