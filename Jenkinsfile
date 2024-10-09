@@ -50,17 +50,15 @@ pipeline {
             steps {
                 script {
                     dir("photoOrganize_Back") {
-                        dir("photoOrganize-infrastructure") {
-                            pom = readMavenPom file: 'pom.xml'
-                            withCredentials([usernamePassword(credentialsId: 'hub.docker.com', passwordVariable: 'HUB_REPO_PASS', usernameVariable: 'HUB_REPO_USER')]) {
-                                def user = env.HUB_REPO_USER
-                                def password = env.HUB_REPO_PASS
-                                dir("photoOrganize-infrastructure") {
-                                    sh "docker version"
-                                    sh "docker login -u $user -p $password"
-                                    sh "docker build -t maliciamrg/${pom.getParent().getArtifactId().toLowerCase()}:${pom.getVersion()} . "
-                                    sh "docker push maliciamrg/${pom.getParent().getArtifactId().toLowerCase()}:${pom.getVersion()}"
-                                }
+                        pom = readMavenPom file: 'pom.xml'
+                        withCredentials([usernamePassword(credentialsId: 'hub.docker.com', passwordVariable: 'HUB_REPO_PASS', usernameVariable: 'HUB_REPO_USER')]) {
+                            def user = env.HUB_REPO_USER
+                            def password = env.HUB_REPO_PASS
+                            dir("photoOrganize-infrastructure") {
+                                sh "docker version"
+                                sh "docker login -u $user -p $password"
+                                sh "docker build -t maliciamrg/${pom.getParent().getArtifactId().toLowerCase()}:${pom.getVersion()} . "
+                                sh "docker push maliciamrg/${pom.getParent().getArtifactId().toLowerCase()}:${pom.getVersion()}"
                             }
                         }
                     }
