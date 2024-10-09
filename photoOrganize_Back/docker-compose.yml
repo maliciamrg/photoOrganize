@@ -1,6 +1,6 @@
 version: '2.2'
 services:
-    photoOrganize:
+    photoOrganize_Back:
         image: maliciamrg/photoorganize_back:1.0
         ports:
             - 8090:8090

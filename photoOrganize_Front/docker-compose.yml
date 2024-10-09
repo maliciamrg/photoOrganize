@@ -1,7 +1,7 @@
 version: '2.2'
 services:
-    lrcatApi:
-        image: maliciamrg/photoorganize_front:1.0
+    photoOrganize_Front:
+        image: maliciamrg/photoorganize_front:0.1.0
         ports:
             - 3000:3000
         container_name: photoOrganize_Front

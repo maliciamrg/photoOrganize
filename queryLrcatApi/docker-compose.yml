@@ -1,6 +1,6 @@
 version: '2.2'
 services:
-    lrcatApi:
+    queryLrcatApi:
         image: maliciamrg/querylrcatapi:0.0.1-SNAPSHOT
         ports:
             - 8091:8091
