@@ -1,0 +1,9 @@
+version: '2.2'
+services:
+    lrcatApi:
+        image: maliciamrg/queryLrcatApi:latest
+        ports:
+            - 8091:8091
+        container_name: queryLrcatApi
+        volumes:
+            - '/Photo/lrcat:/Lrcat'
