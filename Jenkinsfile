@@ -57,8 +57,8 @@ pipeline {
                             dir("photoOrganize-infrastructure") {
                                 sh "docker version"
                                 sh "docker login -u $user -p $password"
-                                sh "docker build -t maliciamrg/${pom.getParent().getArtifactId().toLowerCase()}:${pom.getVersion()} . "
-                                sh "docker push maliciamrg/${pom.getParent().getArtifactId().toLowerCase()}:${pom.getVersion()}"
+                                sh "docker build -t maliciamrg/${pom.getArtifactId().toLowerCase()}:${pom.getVersion()} . "
+                                sh "docker push maliciamrg/${pom.getArtifactId().toLowerCase()}:${pom.getVersion()}"
                             }
                         }
                     }
